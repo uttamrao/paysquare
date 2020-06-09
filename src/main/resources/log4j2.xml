@@ -2,8 +2,8 @@
 <Configuration status="DEBUG" strict="true" name="LogConfig"
 	monitorInterval="60">
 	<Properties>
-		<Property name="logDir" value="D:\logs" />
-		<Property name="logFilename" value="demo" />
+		<Property name="logDir" value="D:\logs\payroll-service" />
+		<Property name="logFilename" value="payroll-service" />
 		<Property name="logFilenameExtension" value=".log" />
 	</Properties>
 	<Appenders>
@@ -18,12 +18,12 @@
 			</Policies>
 			<DefaultRolloverStrategy max="200000" />
 			<Layout type="PatternLayout"
-				pattern="%d{HH:mm:ss.SSS} %thread %message%n" />
+				pattern="%d{HH:mm:ss.SSS} %-5p - [%c{1}] : %m%n" />
 		</Appender>
 
 		<Appender type="Console" name="Console" target="SYSTEM_OUT">
 			<Layout type="PatternLayout"
-				pattern="%d{HH:mm:ss.SSS} %thread %message%n" />
+				pattern="%d{HH:mm:ss.SSS} %-5p - [%c{1}] : %m%n" />
 		</Appender>
 	</Appenders>
 

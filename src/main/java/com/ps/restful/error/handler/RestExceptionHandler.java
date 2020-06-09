@@ -1,18 +1,18 @@
-package com.ps.restful.error.handler;
+package com.ps.RESTful.error.handler;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.Nullable;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -23,24 +23,28 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.ps.dto.ErrorDTO;
-import com.ps.restful.resources.response.handler.Response;
-import com.ps.restful.resources.response.handler.ResponseBuilder;
-import com.ps.restful.util.StringUtils;
-import com.ps.services.constants.ErrorMessageConstants;
+import com.ps.RESTful.enums.ErrorCode;
+import com.ps.RESTful.enums.StatusEnum;
+import com.ps.RESTful.resources.response.handler.Response;
+import com.ps.RESTful.resources.response.handler.ResponseBuilder;
+import com.ps.dto.StatusDTO;
+import com.ps.util.ErrorMessageConstants;
 
 
 @RestControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	private static final Logger logger = LogManager.getLogger(RestExceptionHandler.class);
 	
-	@Autowired
-	private Environment env;
-	
 	@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleException(Exception exception) {
-		return handleExceptionInternal(exception, null, null, null, null);
+		
+		 if (exception instanceof BindException) {	
+			 BindException bindException = (BindException)exception;
+			return handleCustomBindException(bindException);
+		}
+		
+		 return handleExceptionInternal(exception, null, null, null, null);
 	}
 	
 	@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -49,7 +53,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		if(logger.isDebugEnabled()) logger.debug("Handling business exception : " + businessException.getMessage());
 		
 		return new ResponseEntity<Response>(ResponseBuilder.builder()
-				.error(new ErrorDTO(businessException.getErrorCode().getCode(), businessException.getErrorCode().name(), ErrorMessageConstants.ERROR_SOMETHING_WENT_WRONG))
+				.status(new StatusDTO(StatusEnum.FAILURE.getValue(),businessException.getErrorCode().getCode(), ErrorMessageConstants.ERROR_SOMETHING_WENT_WRONG))
 				.build(),
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
@@ -60,7 +64,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		if(logger.isDebugEnabled()) logger.debug("Handling invalid request exception : " + invRequestException.getMessage());
 		
 		return new ResponseEntity<Response>(ResponseBuilder.builder()
-				.error(new ErrorDTO(invRequestException.getErrorCode().getCode(), invRequestException.getErrorCode().name(), invRequestException.getDescription()))
+				.status(new StatusDTO(StatusEnum.FAILURE.getValue(),invRequestException.getErrorCode().getCode(),invRequestException.getDescription()))
 				.build(),
 				HttpStatus.BAD_REQUEST);
 	}
@@ -70,19 +74,42 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity<Response> handleResourceNotFoundException(ResourceNotFoundException resourceNotFoundException) {
 		if(logger.isDebugEnabled()) logger.debug("Handling resource not found exception : " + resourceNotFoundException.getMessage());
 		
-		ErrorDTO errorDTO = null;
+		StatusDTO statusDTO = null;
 		
-		if (StringUtils.isValidString(resourceNotFoundException.getDescription())) {
-			errorDTO = new ErrorDTO(resourceNotFoundException.getErrorCode().getCode(), resourceNotFoundException.getErrorCode().name(),
+		if (!StringUtils.isBlank(resourceNotFoundException.getDescription())) {
+			statusDTO = new StatusDTO(StatusEnum.FAILURE.getValue(),resourceNotFoundException.getErrorCode().getCode(),
 					resourceNotFoundException.getDescription());
 		} else {
-			errorDTO = new ErrorDTO(resourceNotFoundException.getErrorCode().getCode(), resourceNotFoundException.getErrorCode().name(),
+			statusDTO = new StatusDTO(StatusEnum.FAILURE.getValue(),resourceNotFoundException.getErrorCode().getCode(),
 					ErrorMessageConstants.ERROR_BAD_REQUEST);
 		}
 		
-		return new ResponseEntity<Response>(ResponseBuilder.builder().error(errorDTO).build(), HttpStatus.NOT_FOUND);
+		return new ResponseEntity<Response>(ResponseBuilder.builder().status(statusDTO).build(), HttpStatus.NOT_FOUND);
 	}
 	
+
+	@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Object> handleCustomBindException(BindException bindException) {
+		if(logger.isDebugEnabled()) logger.debug("Handling Bind exception : " + bindException.getMessage());
+		
+		List<FieldError> errors = bindException.getBindingResult().getFieldErrors();        
+        String defaultMessage = "";
+        String errorCode = "";
+        
+        for (FieldError fieldError : errors) {
+        	defaultMessage = fieldError.getDefaultMessage();
+        	errorCode = fieldError.getCode();
+        	break;
+        }
+        
+        StatusDTO statusDTO = new StatusDTO(
+        		StatusEnum.FAILURE.getValue()
+        		,errorCode
+        		,defaultMessage);
+		
+		return new ResponseEntity<Object>(ResponseBuilder.builder().status(statusDTO).build(),HttpStatus.BAD_REQUEST);
+
+	}
 	
 	//############### Overridden methods go here ###############
 	@Override
@@ -96,21 +123,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 			logger.debug("Handling method argument not valid exception : " + methodArgumentNotValidException.getMessage());
 		}
 		
-		List<ErrorDTO> errorDTOs = new ArrayList<ErrorDTO>();
 		
+		StatusDTO statusDTO = new StatusDTO();		
 		List<ObjectError> objectErrors = methodArgumentNotValidException.getBindingResult().getAllErrors();
 		
-		if(logger.isDebugEnabled()) logger.debug("Number of objectErrors: "+ objectErrors.size());
-		
-		for (ObjectError objectError : objectErrors) {
-			errorDTOs.add(
-					new ErrorDTO(
-							ErrorCode.INVALID_PARAMETER.getCode(), 
-							ErrorCode.INVALID_PARAMETER.name(), 
-							objectError.getDefaultMessage()));	
+		if(logger.isDebugEnabled()) logger.debug("Number of objectErrors: "+ objectErrors.size());	
+		for (ObjectError objectError : objectErrors) {			
+			statusDTO = new StatusDTO(StatusEnum.FAILURE.getValue(),ErrorCode.INVALID_PARAMETER.getCode(),objectError.getDefaultMessage());
+			break;
 		}
 		
-		return new ResponseEntity<Object>(ResponseBuilder.builder().errors(errorDTOs).build(),HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<Object>(ResponseBuilder.builder().status(statusDTO).build(),HttpStatus.BAD_REQUEST);
 	}
 	
 	@Override
@@ -121,7 +144,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 			HttpHeaders headers, 
 			HttpStatus status, 
 			WebRequest request) {
-		ErrorDTO errorDTO = null;
+		StatusDTO statusDTO = null;
 		String message = exception.getMessage();
 		
 		if(exception instanceof HttpMessageNotReadableException || 
@@ -131,17 +154,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Handling " + exception.getClass().getSimpleName() + ": " + message);
 			}
-			errorDTO = new ErrorDTO(
+			statusDTO = new StatusDTO(StatusEnum.FAILURE.getValue(),
 					ErrorCode.BAD_REQUEST.getCode(),
-					message,
 					ErrorMessageConstants.ERROR_BAD_REQUEST);
-			return new ResponseEntity<>(ResponseBuilder.builder().error(errorDTO).build(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(ResponseBuilder.builder().status(statusDTO).build(), HttpStatus.BAD_REQUEST);
 		}
 		logger.error("Handling exception internal: " + exception.getClass() + " " + message, exception);
-		errorDTO = new ErrorDTO(
+		statusDTO = new StatusDTO(StatusEnum.FAILURE.getValue(),
 				ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
-				message,
 				ErrorMessageConstants.ERROR_SOMETHING_WENT_WRONG);
-		return new ResponseEntity<Object>(ResponseBuilder.builder().error(errorDTO).build(), HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<Object>(ResponseBuilder.builder().status(statusDTO).build(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

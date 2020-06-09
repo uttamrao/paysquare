@@ -1,4 +1,4 @@
-package com.ps.restful.resources;
+package com.ps.RESTful.resources;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.ps.restful.resources.response.handler.Response;
+import com.ps.RESTful.resources.response.handler.Response;
 
 public interface AbstractResource {
 

@@ -1,7 +1,6 @@
 package com.ps.dto;
 
 public class MetaDTO implements DTO {
-	private static final long serialVersionUID = 1L;
 	
 	private long timestamp;
 	private String path ="";

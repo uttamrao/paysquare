@@ -1,25 +1,18 @@
-package com.ps.restful.resources.response.handler;
-
-import java.util.List;
+package com.ps.RESTful.resources.response.handler;
 
 import com.ps.dto.DTO;
 
 public interface Response{
 
-	public DTO getData();
+	public DTO getData();	
 	
-
-	public void setData(DTO data) ;
+	public void setData(DTO data) ;	
 	
-
-	public List<DTO> getErrors() ;
+	public void setStatus(DTO status);
 	
-
-	public void setErrors(List<DTO> error) ;
+	public DTO getStatus();
 	
-
-	public DTO getMeta() ;
-	
+	public DTO getMeta() ;	
 
 	public void setMeta(DTO meta) ;
 }

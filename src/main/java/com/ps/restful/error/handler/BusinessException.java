@@ -1,4 +1,6 @@
-package com.ps.restful.error.handler;
+package com.ps.RESTful.error.handler;
+
+import com.ps.RESTful.enums.ErrorCode;
 
 public class BusinessException extends RuntimeException{
 

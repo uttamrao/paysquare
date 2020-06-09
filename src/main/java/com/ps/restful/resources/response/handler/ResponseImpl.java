@@ -1,15 +1,12 @@
-package com.ps.restful.resources.response.handler;
-
-import java.util.List;
+package com.ps.RESTful.resources.response.handler;
 
 import com.ps.dto.DTO;
 
 public class ResponseImpl implements Response {
-	private static final long serialVersionUID = 1L;
 
 	private DTO data;
-	private List<DTO> errors;
 	private DTO meta;
+	private DTO status;
 	
 	/**
 	 * @return the data
@@ -24,21 +21,7 @@ public class ResponseImpl implements Response {
 	public void setData(DTO data) {
 		this.data = data;
 	}
-	
-	/**
-	 * @return the error
-	 */
-	public List<DTO> getErrors() {
-		return errors;
-	}
-	
-	/**
-	 * @param error the error to set
-	 */
-	public void setErrors(List<DTO> errors) {
-		this.errors = errors;
-	}
-	
+		
 	/**
 	 * @return the meta
 	 */
@@ -51,5 +34,15 @@ public class ResponseImpl implements Response {
 	 */
 	public void setMeta(DTO meta) {
 		this.meta = meta;
+	}
+
+	@Override
+	public DTO getStatus() {
+		return status;
+	}
+
+	@Override
+	public void setStatus(DTO status) {
+		this.status = status;
 	}
 }
