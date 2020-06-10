@@ -3,8 +3,8 @@ package com.ps.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
+import org.springframework.util.StringUtils;
 
 public class DateUtils {
 
@@ -19,7 +19,7 @@ public class DateUtils {
 		
 		Date date = null;
 		try {			
-			if(!StringUtils.isBlank(inputDate)) {
+			if(StringUtils.isEmpty(inputDate)) {
 				if(logger.isDebugEnabled()) logger.debug("Parsing the input date string "+inputDate);
 				date = dateFormatter.parse(inputDate);
 			}			

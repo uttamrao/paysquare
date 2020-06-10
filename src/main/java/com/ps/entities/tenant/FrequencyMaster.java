@@ -20,11 +20,11 @@ public class FrequencyMaster {
 	private String name;
 	
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date createDate = new Date();
+	private Date createDateTime = new Date();
 	
 	private String createdBy;
 		
-	private boolean isActive;
+	private boolean isActive = true;
 
 	public int getId() {
 		return id;
@@ -42,14 +42,6 @@ public class FrequencyMaster {
 		this.name = name;
 	}
 
-	public Date getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
-
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -64,6 +56,14 @@ public class FrequencyMaster {
 
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
+	}
+
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
 	}
 	
 }
