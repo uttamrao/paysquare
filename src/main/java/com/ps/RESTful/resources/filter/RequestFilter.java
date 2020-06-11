@@ -22,7 +22,7 @@ public class RequestFilter implements Filter  {
 	  @Override 
 	  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {  
 	  
-	  if(logger.isDebugEnabled())logger.debug("In request filter We are filtering the Request");
+	  if(logger.isDebugEnabled())logger.debug("In request filter We are filtering the Request "+request.getLocalAddr());
 	  if(logger.isDebugEnabled())logger.debug("____________________________________________");
 	  
 	  chain.doFilter(request, response); 
