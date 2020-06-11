@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(2)
-public class CORSFilter  implements Filter  {
+public class CORSFilter implements Filter  {
 	
 	  private static final Logger logger = LogManager.getLogger(CORSFilter.class);
 
@@ -31,6 +31,11 @@ public class CORSFilter  implements Filter  {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         HttpServletRequest request= (HttpServletRequest) servletRequest;
+
+        if (logger.isDebugEnabled())
+			logger.debug("In CORSFilter, we are filtering request-> " + request.getRequestURI());
+		if (logger.isDebugEnabled())
+			logger.debug("____________________________________________");
 
 		if(logger.isDebugEnabled())logger.debug("request origin::" + request.getHeader("Origin"));
 

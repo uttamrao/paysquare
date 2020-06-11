@@ -14,7 +14,7 @@ import com.ps.config.tenant.TenantContextHolder;
 @Component
 public class RequestInterceptor extends HandlerInterceptorAdapter {
 
-	private static final Logger logger = LogManager.getLogger(RequestFilter.class);
+	private static final Logger logger = LogManager.getLogger(RequestInterceptor.class);
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object object) throws Exception {
