@@ -2,7 +2,6 @@ package com.ps.RESTful.error.handler;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
@@ -11,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -76,7 +76,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		StatusDTO statusDTO = null;
 		
-		if (!StringUtils.isBlank(resourceNotFoundException.getDescription())) {
+		if (!StringUtils.isEmpty(resourceNotFoundException.getDescription())) {
 			statusDTO = new StatusDTO(StatusEnum.FAILURE.getValue(),resourceNotFoundException.getErrorCode().getCode(),
 					resourceNotFoundException.getDescription());
 		} else {
