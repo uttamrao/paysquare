@@ -18,7 +18,7 @@ import javax.persistence.TemporalType;
 public class CompanyMaster extends AbstractTimeEntity {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="globalCompanyMasterId")
 	private int companyMasterId;
 	

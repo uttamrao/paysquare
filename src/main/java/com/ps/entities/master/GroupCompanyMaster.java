@@ -16,7 +16,7 @@ import javax.persistence.TemporalType;
 public class GroupCompanyMaster {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="groupDBMasterId")
 	private int groupCompanyMasterId;
 	
