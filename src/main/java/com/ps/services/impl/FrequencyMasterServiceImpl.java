@@ -82,7 +82,7 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Getting all frequency master records from DB");
-		List<FrequencyMaster> frequencyMasters = frequencyMasterRepository.findAll();
+		List<FrequencyMaster> frequencyMasters = frequencyMasterRepository.findAllByIsActive(true);
 		
 		return frequencyMasters;
 	}
