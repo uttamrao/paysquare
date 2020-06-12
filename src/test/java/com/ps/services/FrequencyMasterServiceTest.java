@@ -42,7 +42,6 @@ public class FrequencyMasterServiceTest {
 	@MockBean
 	private FrequencyMasterRepository frequencyMasterRepository;
 	
-	static String testCase = "add";
 	FrequencyMaster frequencyMaster;
 	List<FrequencyMaster> frequencyMasterList;
 
