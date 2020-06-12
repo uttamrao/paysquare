@@ -31,14 +31,13 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		
 		if(logger.isDebugEnabled()) logger.debug("In add frequency master");
 		
-		if(frequencyMaster.getCreateDateTime() == null) {
+		if(frequencyMaster != null && frequencyMaster.getCreateDateTime() == null) {
 			frequencyMaster.setCreateDateTime(new Date());
 			if(logger.isDebugEnabled()) logger.debug("Changed create date "
 					+ "time to-> "+frequencyMaster.getCreateDateTime());
 		}
 		
-		if(logger.isDebugEnabled()) logger.debug("In add frequency master");
-		if(StringUtils.isEmpty(frequencyMaster.getCreatedBy())) {
+		if(frequencyMaster != null && StringUtils.isEmpty(frequencyMaster.getCreatedBy())) {
 			if(logger.isDebugEnabled()) logger.debug("Setting created by to logged in "
 					+ "user name-> "+frequencyMaster.getCreatedBy()+", as createdBy is not set in request"); 
 			frequencyMaster.setCreatedBy(requestUtils.getUserName());	
@@ -62,17 +61,17 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		if(logger.isDebugEnabled())
 			logger.debug("Validating frequency master, object-> "+frequencyMaster);
 		if(frequencyMaster == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency name not found");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency not found!");
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating frequency master, name-> "+frequencyMaster.getName());
 		if(StringUtils.isEmpty(frequencyMaster.getName()))
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency name not found");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency name not found!");
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating frequency master, createdBy-> "+frequencyMaster.getCreatedBy());
 		if(StringUtils.isEmpty(frequencyMaster.getCreatedBy()))
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Created by is Invalid");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Created by is Invalid!");
 
 		return frequencyMaster;
 	}
