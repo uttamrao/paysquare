@@ -47,8 +47,7 @@ public class FrequencyMasterServiceTest {
 	List<FrequencyMaster> frequencyMasterList;
 
 	@Before
-	public void setUp() throws Exception {
-		
+	public void setUp() throws Exception {		
 		//creating object for add test scenario
 			frequencyMaster = FrequencyMasterTestUtil.add();
 			System.out.println("before mocking repository add");
@@ -68,8 +67,7 @@ public class FrequencyMasterServiceTest {
 	}
 	
 	@Test
-	public void add_PositiveTest() {
-		
+	public void add_PositiveTest() {		
 		Mockito.when(RequestUtils.getUserName())
 				.thenReturn(Mockito.anyString());
 		
@@ -77,8 +75,7 @@ public class FrequencyMasterServiceTest {
 	}
 	
 	@Test
-	public void add_CreatedBy_NegativeTest() {
-		
+	public void add_CreatedBy_NegativeTest() {		
 		try {
 			
 			Mockito.when(RequestUtils.getUserName())
@@ -90,13 +87,11 @@ public class FrequencyMasterServiceTest {
 		} catch (InvalidRequestException ex) {
 			assertEquals(ErrorCode.BAD_REQUEST, ex.getErrorCode());
 			assertEquals("Created by is Invalid!",ex.getDescription());
-		}
-		
+		}		
 	}
 	
 	@Test
-	public void add_name_NegativeTest() {
-		
+	public void add_name_NegativeTest() {		
 		try {			
 			
 			Mockito.when(RequestUtils.getUserName())
@@ -108,13 +103,11 @@ public class FrequencyMasterServiceTest {
 		} catch (InvalidRequestException ex) {
 			assertEquals(ErrorCode.BAD_REQUEST, ex.getErrorCode());
 			assertEquals("Frequency name not found!",ex.getDescription());
-		}
-		
+		}		
 	}
 	
 	@Test
-	public void add_NegativeTest() {
-		
+	public void add_NegativeTest() {		
 		try {
 			
 			Mockito.when(RequestUtils.getUserName())
@@ -125,17 +118,14 @@ public class FrequencyMasterServiceTest {
 		} catch (InvalidRequestException ex) {
 			assertEquals(ErrorCode.BAD_REQUEST, ex.getErrorCode());
 			assertEquals("Frequency not found!",ex.getDescription());
-		}
-		
+		}		
 	}
 	
 	@Test
 	public void getAll_PositiveTest() {
 
-			List<FrequencyMaster> frequencyMasterList = frequencyMasterService.getAll();
-			
-			assertEquals(3, frequencyMasterList.size());
-	
+			List<FrequencyMaster> frequencyMasterList = frequencyMasterService.getAll();			
+			assertEquals(3, frequencyMasterList.size());	
 	}
 
 }
