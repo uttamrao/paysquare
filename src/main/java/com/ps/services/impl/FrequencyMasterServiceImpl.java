@@ -53,7 +53,7 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		return frequencyMaster;
 	}
 
-	private FrequencyMaster validate(FrequencyMaster frequencyMaster) {
+	private void validate(FrequencyMaster frequencyMaster) {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("In validate method, Validating frequency master");
@@ -72,8 +72,6 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 			logger.debug("Validating frequency master, createdBy-> "+frequencyMaster.getCreatedBy());
 		if(StringUtils.isEmpty(frequencyMaster.getCreatedBy()))
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Created by is Invalid!");
-
-		return frequencyMaster;
 	}
 	
 	@Override

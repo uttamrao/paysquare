@@ -21,16 +21,14 @@ public class BusinessYearDefinition extends AbstractTimeEntity{
 	private int id;
 	
 	@Temporal(TemporalType.DATE)
-	@Column(name="businessYearFromDate")
 	private Date fromDate;
 	
 	@Temporal(TemporalType.DATE)
-	@Column(name="businessYearToDate")
 	private Date toDate;
 	
-	private String applicableTo;
+	private String description;
 
-	private boolean isActive;
+	private boolean isActive = true;
 
 	public int getId() {
 		return id;
@@ -55,21 +53,21 @@ public class BusinessYearDefinition extends AbstractTimeEntity{
 	public void setToDate(Date toDate) {
 		this.toDate = toDate;
 	}
-
-	public String getApplicableTo() {
-		return applicableTo;
-	}
-
-	public void setApplicableTo(String applicableTo) {
-		this.applicableTo = applicableTo;
-	}
-
+	
 	public boolean isActive() {
 		return isActive;
 	}
 
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 }

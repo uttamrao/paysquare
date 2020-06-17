@@ -64,7 +64,7 @@ public class FrequencyMasterResourceImpl extends AbstractResourceImpl implements
 			logger.debug("Sending request to Mapp entity list to responseDTO list");
 		List<FrequencyMasterResponseDTO> responseDTOList = frequencyMasterDTOMapper.entityListToDtoList(frequencyMasterList);
 		
-		return ResponseEntity.status(HttpStatus.CREATED)
+		return ResponseEntity.status(HttpStatus.OK)
 				.body(ResponseBuilder.builder()
 					.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
 							"Records retrieved successfully")

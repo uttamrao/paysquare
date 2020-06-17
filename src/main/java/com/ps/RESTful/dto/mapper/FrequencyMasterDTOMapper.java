@@ -52,7 +52,7 @@ public class FrequencyMasterDTOMapper implements
 			responseDTO.setCreatedBy(frequencyMaster.getCreatedBy());
 			responseDTO.setId(frequencyMaster.getId());
 			responseDTO.setName(frequencyMaster.getName());
-			responseDTO.setCreatedDateTime(DateUtils.getDateString(frequencyMaster.getCreateDateTime()));
+			responseDTO.setCreatedDateTime(DateUtils.getDateTimeString(frequencyMaster.getCreateDateTime()));
 		
 		
 		return responseDTO;

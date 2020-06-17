@@ -12,7 +12,7 @@ public class AbstractTimeEntity {
 	private String createdBy;
 	
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date createDate = new Date();
+	private Date createDateTime = new Date();
 	
 	private String lastModifiedBy;
 	
@@ -24,12 +24,6 @@ public class AbstractTimeEntity {
 	}
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
-	}
-	public Date getCreateDate() {
-		return createDate;
-	}
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
 	}
 	public String getLastModifiedBy() {
 		return lastModifiedBy;
@@ -43,6 +37,10 @@ public class AbstractTimeEntity {
 	public void setLastModifiedDateTime(Date lastModifiedDateTime) {
 		this.lastModifiedDateTime = lastModifiedDateTime;
 	}
-	
-	
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
 }
