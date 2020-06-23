@@ -3,7 +3,7 @@ package com.ps.dto;
 public class AbstractTimeDTO implements DTO{
 
 	private String createdBy;
-	private String createDate;
+	private String createDateTime;
 	private String lastModifiedBy;
 	private String lastModifiedDateTime;
 	
@@ -12,12 +12,6 @@ public class AbstractTimeDTO implements DTO{
 	}
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
-	}
-	public String getCreateDate() {
-		return createDate;
-	}
-	public void setCreateDate(String createDate) {
-		this.createDate = createDate;
 	}
 	public String getLastModifiedBy() {
 		return lastModifiedBy;
@@ -30,6 +24,12 @@ public class AbstractTimeDTO implements DTO{
 	}
 	public void setLastModifiedDateTime(String lastModifiedDateTime) {
 		this.lastModifiedDateTime = lastModifiedDateTime;
+	}
+	public String getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(String createDateTime) {
+		this.createDateTime = createDateTime;
 	}
 
 }

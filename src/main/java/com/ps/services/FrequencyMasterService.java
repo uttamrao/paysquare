@@ -9,5 +9,7 @@ public interface FrequencyMasterService {
 	public FrequencyMaster add(FrequencyMaster frequencyMaster);
 	
 	public List<FrequencyMaster> getAll();
+	
+	public FrequencyMaster getById(int id);
 
 }

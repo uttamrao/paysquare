@@ -8,7 +8,7 @@ public class BusinessYearDefinitionDTO {
 	
 	private String description;
 
-	private boolean isActive;
+	private boolean isActive = true;
 	
 	private String createdBy;
 

@@ -61,20 +61,20 @@ public class BusinessYearDefinitionDTOMapper implements
 			responseDTO.setId(businessYearDefinition.getId());
 			responseDTO.setFromDate(DateUtils.getDateMonthString(businessYearDefinition.getFromDate()));
 			responseDTO.setToDate(DateUtils.getDateMonthString(businessYearDefinition.getToDate()));			
-			responseDTO.setCreatedDateTime(DateUtils.getDateMonthString(businessYearDefinition.getCreateDateTime()));		
+			responseDTO.setCreateDateTime(DateUtils.getDateTimeString(businessYearDefinition.getCreateDateTime()));		
 		
 		return responseDTO;
 	}
 	
 	
-	public List<BusinessYearDefinitionResponseDTO> entityListToDtoList(List<BusinessYearDefinition> BusinessYearDefinitionList) {
+	public List<BusinessYearDefinitionResponseDTO> entityListToDtoList(List<BusinessYearDefinition> businessYearDefinitionList) {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("In BusinessYearDefinition dto mapper mapping entitylist to dtolist");
 		List<BusinessYearDefinitionResponseDTO> responseDTOList = new ArrayList<BusinessYearDefinitionResponseDTO>();
 		
-		if(!CollectionUtils.isEmpty(BusinessYearDefinitionList)) {
-			for (BusinessYearDefinition businessYearDefinition : BusinessYearDefinitionList) {
+		if(!CollectionUtils.isEmpty(businessYearDefinitionList)) {
+			for (BusinessYearDefinition businessYearDefinition : businessYearDefinitionList) {
 				BusinessYearDefinitionResponseDTO responseDTO = entityToDto(businessYearDefinition); 
 				if(responseDTO != null)
 					responseDTOList.add(responseDTO);

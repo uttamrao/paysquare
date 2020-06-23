@@ -9,5 +9,9 @@ public interface BusinessYearDefinitionService {
 	public BusinessYearDefinition add(BusinessYearDefinition frequencyMaster);
 	
 	public List<BusinessYearDefinition> getAll();
+	
+	public BusinessYearDefinition getById(int id);
+	
+	public void deleteById(int id);
 
 }

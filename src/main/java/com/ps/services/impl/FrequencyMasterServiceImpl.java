@@ -2,6 +2,7 @@ package com.ps.services.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,21 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		List<FrequencyMaster> frequencyMasters = frequencyMasterRepository.findAllByIsActive(true);
 		
 		return frequencyMasters;
+	}
+	
+	@Override
+	public FrequencyMaster getById(int id) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("In FrequencyMaster getById method getting frequency with id-> "+id);
+		if(id == 0)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency is Invalid!");
+		
+		Optional<FrequencyMaster> frequencyMaster = frequencyMasterRepository.findById(id);		
+		if(frequencyMaster.isEmpty())
+			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Frequency not found!");
+		
+		return frequencyMaster.get();
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.ps.entities.tenant;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,29 +9,34 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-
-import com.ps.entities.master.AbstractTimeEntity;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 @Entity
-public class BusinessCycle extends AbstractTimeEntity{
+@Table(name = "BusinessCycleDetails")
+public class BusinessCycle {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="businessCycleId")
+	@Column(name="businessCycleDetailsId")
 	private int id;
 	
-	private boolean isActive;
-	
-	@Column(name="businessCycleName")
-	private String name;
-	
 	@ManyToOne
-	@JoinColumn(name="frequencyMasterId",referencedColumnName = "frequencyMasterId")
-	private FrequencyMaster frequencyMaster;
+	@JoinColumn(name="businessCycleId",referencedColumnName = "businessCycleId")
+	private BusinessCycleDefinition businessCycle;
 	
-	@ManyToOne
-	@JoinColumn(name="businessYearDefinitionId",referencedColumnName = "businessYearDefinitionId")
-	private BusinessYearDefinition businessYearDefinition;
+	@Temporal(TemporalType.DATE)
+	private Date fromDate;
+	
+	@Temporal(TemporalType.DATE)
+	private Date toDate;
+	
+	private int periodId;
+	
+	private String periodName;
+	
+	private boolean isLocked;
 
 	public int getId() {
 		return id;
@@ -39,36 +46,51 @@ public class BusinessCycle extends AbstractTimeEntity{
 		this.id = id;
 	}
 
-	public boolean isActive() {
-		return isActive;
+	public BusinessCycleDefinition getBusinessCycle() {
+		return businessCycle;
 	}
 
-	public void setActive(boolean isActive) {
-		this.isActive = isActive;
+	public void setBusinessCycle(BusinessCycleDefinition businessCycle) {
+		this.businessCycle = businessCycle;
 	}
 
-	public String getName() {
-		return name;
+	public Date getFromDate() {
+		return fromDate;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
 	}
 
-	public FrequencyMaster getFrequencyMaster() {
-		return frequencyMaster;
+	public Date getToDate() {
+		return toDate;
 	}
 
-	public void setFrequencyMaster(FrequencyMaster frequencyMaster) {
-		this.frequencyMaster = frequencyMaster;
+	public void setToDate(Date toDate) {
+		this.toDate = toDate;
 	}
 
-	public BusinessYearDefinition getBusinessYearDefinition() {
-		return businessYearDefinition;
+	public int getPeriodId() {
+		return periodId;
 	}
 
-	public void setBusinessYearDefinition(BusinessYearDefinition businessYearDefinition) {
-		this.businessYearDefinition = businessYearDefinition;
+	public void setPeriodId(int periodId) {
+		this.periodId = periodId;
 	}
-	
+
+	public String getPeriodName() {
+		return periodName;
+	}
+
+	public void setPeriodName(String periodName) {
+		this.periodName = periodName;
+	}
+
+	public boolean isLocked() {
+		return isLocked;
+	}
+
+	public void setLocked(boolean isLocked) {
+		this.isLocked = isLocked;
+	}
 }

@@ -20,15 +20,16 @@ import com.ps.entities.tenant.FrequencyMaster;
 import com.ps.services.dao.repository.tenant.FrequencyMasterRepository;
 import com.ps.services.impl.FrequencyMasterServiceImpl;
 import com.ps.util.RequestUtils;
+import com.ps.utils.FrequencyMasterTestUtil;
 
 @RunWith(SpringRunner.class)
 public class FrequencyMasterServiceTest {
 
 	 @TestConfiguration
-	 static class EmployeeServiceImplTestContextConfiguration {	  
+	 static class FrequencyMasterServiceImplTestContextConfiguration {	  
 	       
 		 @Bean
-	        public FrequencyMasterService employeeService() {
+	        public FrequencyMasterService service() {
 	            return new FrequencyMasterServiceImpl();
 	        }
 	  }

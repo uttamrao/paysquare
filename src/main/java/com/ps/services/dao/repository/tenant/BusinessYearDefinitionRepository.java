@@ -7,5 +7,5 @@ import com.ps.entities.tenant.BusinessYearDefinition;
 public interface BusinessYearDefinitionRepository extends AbstractRepository<BusinessYearDefinition, Integer> {
 
 	List<BusinessYearDefinition> findAllByIsActive(boolean isActive);
-
+	
 }
