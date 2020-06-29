@@ -20,7 +20,7 @@ public class BusinessCycleDefinition extends AbstractTimeEntity{
 	@Column(name="businessCycleId")
 	private int id;
 	
-	private boolean isActive;
+	private boolean isActive = true;
 	
 	@Column(name="businessCycleName")
 	private String name;

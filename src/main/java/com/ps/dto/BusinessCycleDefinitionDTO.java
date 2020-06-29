@@ -2,7 +2,7 @@ package com.ps.dto;
 
 public class BusinessCycleDefinitionDTO extends AbstractTimeDTO{
 	
-	private boolean isActive;
+	private boolean isActive = true;
 	
 	private String name;
 	

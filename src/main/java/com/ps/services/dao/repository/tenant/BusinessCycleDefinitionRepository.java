@@ -14,7 +14,7 @@ public interface BusinessCycleDefinitionRepository extends AbstractRepository<Bu
 	
 	List<BusinessCycleDefinition> findAllByBusinessYearDefinition(BusinessYearDefinition businessYearDefinition);
 	
-	@Query("SELECT c FROM BusinessCycleDefinition c WHERE c.businessYearDefinitionId = (:businessYearDefinitionId)")
+	@Query("SELECT c FROM BusinessCycleDefinition c WHERE c.businessYearDefinition.id = (:businessYearDefinitionId)")
 	List<BusinessCycleDefinition> findAllByBusinessYearDefinitionId(@Param("businessYearDefinitionId") int businessYearDefinitionId);
 
 }

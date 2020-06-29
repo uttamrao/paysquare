@@ -3,6 +3,7 @@ package com.ps.services;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,19 +44,22 @@ public class FrequencyMasterServiceTest {
 	@MockBean
 	private FrequencyMasterRepository frequencyMasterRepository;
 	
-	FrequencyMaster frequencyMaster;
+	Optional<FrequencyMaster> frequencyMaster;
 	List<FrequencyMaster> frequencyMasterList;
 
 	@Before
 	public void setUp() throws Exception {		
 		//creating object for add test scenario
-			frequencyMaster = FrequencyMasterTestUtil.add();
+			frequencyMaster = Optional.of(FrequencyMasterTestUtil.add());
 			System.out.println("before mocking repository add");
 
 			Mockito.when(frequencyMasterRepository.save(Mockito.any(FrequencyMaster.class)))
-					.thenReturn(frequencyMaster);
+					.thenReturn(frequencyMaster.get());
 			System.out.println("after mocking repository add");
 		
+			Mockito.when(frequencyMasterRepository.findByName("YEARLY"))
+			.thenReturn(frequencyMaster);
+			
 		//creating object for getALl test scenario
 			System.out.println("before mocking repository getAll");
 
@@ -71,7 +75,7 @@ public class FrequencyMasterServiceTest {
 		Mockito.when(RequestUtils.getUserName())
 				.thenReturn(Mockito.anyString());
 		
-		frequencyMasterService.add(frequencyMaster);
+		frequencyMasterService.add(frequencyMaster.get());
 	}
 	
 	@Test
@@ -81,12 +85,27 @@ public class FrequencyMasterServiceTest {
 			Mockito.when(RequestUtils.getUserName())
 			.thenReturn("Test");
 	
-			frequencyMaster.setCreatedBy(null);
-			frequencyMasterService.add(frequencyMaster);
+			frequencyMaster.get().setCreatedBy(null);
+			frequencyMasterService.add(frequencyMaster.get());
 	
 		} catch (InvalidRequestException ex) {
 			assertEquals(ErrorCode.BAD_REQUEST, ex.getErrorCode());
 			assertEquals("Created by is Invalid!",ex.getDescription());
+		}		
+	}
+	
+	@Test
+	public void add_Duplicate_NegativeTest() {		
+		try {
+			
+			Mockito.when(RequestUtils.getUserName())
+			.thenReturn("Test");
+	
+			frequencyMasterService.add(frequencyMaster.get());
+	
+		} catch (InvalidRequestException ex) {
+			assertEquals(ErrorCode.BAD_REQUEST, ex.getErrorCode());
+			assertEquals("Frequency already exists!",ex.getDescription());
 		}		
 	}
 	
@@ -97,8 +116,8 @@ public class FrequencyMasterServiceTest {
 			Mockito.when(RequestUtils.getUserName())
 			.thenReturn("Test");
 	
-			frequencyMaster.setName(null);
-			frequencyMasterService.add(frequencyMaster);
+			frequencyMaster.get().setName(null);
+			frequencyMasterService.add(frequencyMaster.get());
 	
 		} catch (InvalidRequestException ex) {
 			assertEquals(ErrorCode.BAD_REQUEST, ex.getErrorCode());

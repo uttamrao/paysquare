@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.ps.RESTful.enums.ErrorCode;
+import com.ps.RESTful.enums.FrequencyEnum;
 import com.ps.RESTful.error.handler.InvalidRequestException;
 import com.ps.entities.tenant.FrequencyMaster;
 import com.ps.services.FrequencyMasterService;
@@ -47,9 +48,18 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		validate(frequencyMaster);		
 		if(logger.isDebugEnabled())	logger.debug("Frequency master data is valid, "
 				+ "saving into DB");
-		frequencyMaster.setName(frequencyMaster.getName().toUpperCase());
-		frequencyMasterRepository.save(frequencyMaster);
-		if(logger.isDebugEnabled()) logger.debug("Frequency master saved into DB");
+		frequencyMaster.setName(FrequencyEnum.valueOf(frequencyMaster.getName()).name());
+		
+		Optional<FrequencyMaster> existingFrequencyMaster = frequencyMasterRepository.findByName(frequencyMaster.getName());
+		
+		if(existingFrequencyMaster.isEmpty()) {
+			frequencyMasterRepository.save(frequencyMaster);
+			if(logger.isDebugEnabled()) logger.debug("Frequency master saved into DB");
+		} else {
+			if(logger.isDebugEnabled())
+				logger.debug("Frequency master record is already present in db with name-> "+frequencyMaster.getName());
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency already exists!");
+		}				
 		
 		return frequencyMaster;
 	}
@@ -66,8 +76,9 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating frequency master, name-> "+frequencyMaster.getName());
-		if(StringUtils.isEmpty(frequencyMaster.getName()))
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency name not found!");
+		if(StringUtils.isEmpty(frequencyMaster.getName())
+				|| !FrequencyEnum.isValid(frequencyMaster.getName()))
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency name is found!");
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating frequency master, createdBy-> "+frequencyMaster.getCreatedBy());

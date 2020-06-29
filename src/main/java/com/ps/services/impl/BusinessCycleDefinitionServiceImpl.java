@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.ps.RESTful.enums.ErrorCode;
+import com.ps.RESTful.enums.FrequencyEnum;
+import com.ps.RESTful.enums.ServiceTypeEnum;
 import com.ps.RESTful.error.handler.InvalidRequestException;
 import com.ps.entities.tenant.BusinessCycleDefinition;
 import com.ps.services.BusinessCycleDefinitionService;
@@ -46,6 +48,14 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		validate(businessCycleDefinition);		
 		if(logger.isDebugEnabled())	logger.debug("BusinessCycleDefinition data is valid, "
 				+ "saving into DB");
+		
+		ServiceTypeEnum serviceType = ServiceTypeEnum.valueOf(businessCycleDefinition.getServiceName());
+		FrequencyEnum frequency = FrequencyEnum.valueOf(businessCycleDefinition.getFrequencyMaster().getName());
+
+		businessCycleDefinition.setServiceName(serviceType.name());		
+		String cycleName = businessCycleDefinition.getName()+"_"+serviceType.getShortCode()+"_"+frequency.getShortCode();
+		
+		businessCycleDefinition.setName(cycleName);
 		businessCycleRepository.save(businessCycleDefinition);
 		if(logger.isDebugEnabled()) logger.debug("BusinessCycleDefinition saved into DB");
 		
@@ -55,12 +65,12 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 	private void validate(BusinessCycleDefinition businessCycleDefinition) {
 		
 		if(logger.isDebugEnabled())
-			logger.debug("In validate method, Validating businessYearDefinition");
+			logger.debug("In validate method, Validating businessCycleDefinitions");
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating businessCycleDefinition, object-> "+businessCycleDefinition);
 		if(businessCycleDefinition == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition not found!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition not found!");
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating if frequency is set in businessCycleDefinition, object-> "+businessCycleDefinition.getFrequencyMaster());
@@ -68,19 +78,20 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency not found!");
 		
 		if(logger.isDebugEnabled())
-			logger.debug("Validating businessYear is sedt in businessCycleDefinition, object-> "+businessCycleDefinition.getBusinessYearDefinition());
+			logger.debug("Validating if businessYear is set in businessCycleDefinition, object-> "+businessCycleDefinition.getBusinessYearDefinition());
 		if(businessCycleDefinition.getBusinessYearDefinition() == null)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year not found!");
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating businessCycleDefinition, name-> "+businessCycleDefinition.getName());
 		if(businessCycleDefinition.getName() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition name not found!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition name not found!");
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating businessCycleDefinition, serviceName-> "+businessCycleDefinition.getServiceName());
-		if(businessCycleDefinition.getServiceName() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition service name not found!");
+		if(businessCycleDefinition.getServiceName() == null
+				|| !ServiceTypeEnum.isValid(businessCycleDefinition.getServiceName()))
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition service name not found!");
 			
 		if(logger.isDebugEnabled())
 			logger.debug("Validating businessCycleDefinition, createdBy-> "+businessCycleDefinition.getCreatedBy());
