@@ -4,10 +4,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.ps.RESTful.enums.ErrorCode;
 import com.ps.RESTful.enums.FrequencyEnum;
@@ -39,7 +39,7 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 					+ "time to-> "+frequencyMaster.getCreateDateTime());
 		}
 		
-		if(frequencyMaster != null && StringUtils.isEmpty(frequencyMaster.getCreatedBy())) {
+		if(frequencyMaster != null && StringUtils.isBlank (frequencyMaster.getCreatedBy())) {
 			if(logger.isDebugEnabled()) logger.debug("Setting created by to logged in "
 					+ "user name-> "+frequencyMaster.getCreatedBy()+", as createdBy is not set in request"); 
 			frequencyMaster.setCreatedBy(requestUtils.getUserName());	
@@ -48,13 +48,19 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		validate(frequencyMaster);		
 		if(logger.isDebugEnabled())	logger.debug("Frequency master data is valid, "
 				+ "saving into DB");
-		frequencyMaster.setName(FrequencyEnum.valueOf(frequencyMaster.getName()).name());
 		
 		Optional<FrequencyMaster> existingFrequencyMaster = frequencyMasterRepository.findByName(frequencyMaster.getName());
 		
 		if(existingFrequencyMaster.isEmpty()) {
+			
+			if(frequencyMaster.getName() != FrequencyEnum.ADHOC_WEEKLY &&
+					frequencyMaster.getName() != FrequencyEnum.ADHOC_MONTHLY) {
+				frequencyMaster.setPaymentCount(frequencyMaster.getName().getPaymentCount());
+				frequencyMaster.setPaymentFrequency(frequencyMaster.getName().getPaymentFrequency());
+			}			
 			frequencyMasterRepository.save(frequencyMaster);
 			if(logger.isDebugEnabled()) logger.debug("Frequency master saved into DB");
+			
 		} else {
 			if(logger.isDebugEnabled())
 				logger.debug("Frequency master record is already present in db with name-> "+frequencyMaster.getName());
@@ -76,14 +82,26 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating frequency master, name-> "+frequencyMaster.getName());
-		if(StringUtils.isEmpty(frequencyMaster.getName())
-				|| !FrequencyEnum.isValid(frequencyMaster.getName()))
+		if(frequencyMaster.getName() == null)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency name is found!");
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating frequency master, createdBy-> "+frequencyMaster.getCreatedBy());
-		if(StringUtils.isEmpty(frequencyMaster.getCreatedBy()))
+		if(StringUtils.isBlank (frequencyMaster.getCreatedBy()))
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Created by is Invalid!");
+		
+		if(frequencyMaster.getName() == FrequencyEnum.ADHOC_WEEKLY ||
+				frequencyMaster.getName() == FrequencyEnum.ADHOC_MONTHLY) {
+			if(logger.isDebugEnabled())
+				logger.debug("Validating frequency master, paymentCount-> "+frequencyMaster.getPaymentCount());
+			if(frequencyMaster.getPaymentCount() == 0)
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Number of Payments is Invalid!");
+			
+			if(logger.isDebugEnabled())
+				logger.debug("Validating frequency master, paymentFrequency-> "+frequencyMaster.getPaymentFrequency());
+			if(frequencyMaster.getPaymentFrequency() == 0)
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Payment frequency is Invalid!");
+		}		
 	}
 	
 	@Override

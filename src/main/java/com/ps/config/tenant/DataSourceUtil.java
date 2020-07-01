@@ -4,8 +4,8 @@ import java.beans.PropertyVetoException;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
-import org.springframework.util.StringUtils;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.ps.entities.master.GroupCompanyMaster;
@@ -28,7 +28,7 @@ public final class DataSourceUtil {
 			//jdbc:sqlserver://SERVERNAME\INSTANCENAME;databaseName=EDS
 			
 			String serverAndInstanceName = masterTenant.getServerName();
-			if(!StringUtils.isEmpty(masterTenant.getInstanceName()))
+			if(!StringUtils.isBlank(masterTenant.getInstanceName()))
 				serverAndInstanceName = masterTenant.getServerName()+"\\"+masterTenant.getInstanceName();
 						
 			ds.setJdbcUrl("jdbc:sqlserver://"+serverAndInstanceName+";databaseName=" + masterTenant.getDatabaseName());

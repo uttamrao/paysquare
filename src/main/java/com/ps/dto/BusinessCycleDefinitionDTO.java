@@ -8,6 +8,9 @@ public class BusinessCycleDefinitionDTO extends AbstractTimeDTO{
 	
 	private String serviceName;
 	
+	private String weekStartDefinition;
+	
+	private int minDaysInCycle = 1;	
 
 	public boolean isActive() {
 		return isActive;
@@ -32,5 +35,21 @@ public class BusinessCycleDefinitionDTO extends AbstractTimeDTO{
 	public void setServiceName(String serviceName) {
 		this.serviceName = serviceName;
 	}
-	
+
+	public String getWeekStartDefinition() {
+		return weekStartDefinition;
+	}
+
+	public void setWeekStartDefinition(String weekStartDefinition) {
+		this.weekStartDefinition = weekStartDefinition;
+	}
+
+	public int getMinDaysInCycle() {
+		return minDaysInCycle;
+	}
+
+	public void setMinDaysInCycle(int minDaysInCycle) {
+		this.minDaysInCycle = minDaysInCycle;
+	}
+
 }

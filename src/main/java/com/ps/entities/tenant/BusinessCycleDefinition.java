@@ -2,22 +2,23 @@ package com.ps.entities.tenant;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 
+import com.ps.RESTful.enums.WeeksEnum;
 import com.ps.entities.master.AbstractTimeEntity;
 
 @Entity
-@Table(name = "BusinessCycle")
 public class BusinessCycleDefinition extends AbstractTimeEntity{
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="businessCycleId")
+	@Column(name="businessCycleDefinitionId")
 	private int id;
 	
 	private boolean isActive = true;
@@ -26,6 +27,11 @@ public class BusinessCycleDefinition extends AbstractTimeEntity{
 	private String name;
 	
 	private String serviceName;
+	
+	@Enumerated(EnumType.STRING)
+	private WeeksEnum weekStartDefinition;
+	
+	private int minDaysInCycle;
 	
 	@ManyToOne
 	@JoinColumn(name="frequencyMasterId",referencedColumnName = "frequencyMasterId")
@@ -82,5 +88,20 @@ public class BusinessCycleDefinition extends AbstractTimeEntity{
 	public void setServiceName(String serviceName) {
 		this.serviceName = serviceName;
 	}
-	
+
+	public int getMinDaysInCycle() {
+		return minDaysInCycle;
+	}
+
+	public void setMinDaysInCycle(int minDaysInCycle) {
+		this.minDaysInCycle = minDaysInCycle;
+	}
+
+	public WeeksEnum getWeekStartDefinition() {
+		return weekStartDefinition;
+	}
+
+	public void setWeekStartDefinition(WeeksEnum weekStartDefinition) {
+		this.weekStartDefinition = weekStartDefinition;
+	}
 }

@@ -1,10 +1,12 @@
 package com.ps.util;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
-import org.springframework.util.StringUtils;
 
 public class DateUtils {
 
@@ -21,7 +23,7 @@ public class DateUtils {
 		
 		Date date = null;
 		try {			
-			if(!StringUtils.isEmpty(inputDate)) {
+			if(!StringUtils.isBlank(inputDate)) {
 				if(logger.isDebugEnabled()) logger.debug("Parsing the input date-time string "+inputDate);
 				date = dateTimeFormatter.parse(inputDate);
 			}			
@@ -65,7 +67,7 @@ public class DateUtils {
 		
 		Date date = null;
 		try {			
-			if(!StringUtils.isEmpty(inputDate)) {
+			if(!StringUtils.isBlank(inputDate)) {
 				if(logger.isDebugEnabled()) logger.debug("Parsing the input date-month string "+inputDate);
 				date = dateMonthFormatter.parse(inputDate);
 			}			
@@ -102,4 +104,10 @@ public class DateUtils {
 		return date;
 	}
 	
+	public static Date convert(LocalDate date, ZoneId zoneId){
+		if(date == null)
+			return null;
+		else
+			return	Date.from(date.atStartOfDay(zoneId).toInstant());
+	}
 }

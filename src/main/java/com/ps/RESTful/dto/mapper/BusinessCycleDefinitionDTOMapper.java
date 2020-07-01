@@ -3,6 +3,7 @@ package com.ps.RESTful.dto.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.ps.RESTful.dto.request.BusinessCycleDefinitionRequestDTO;
 import com.ps.RESTful.dto.response.BusinessCycleDefinitionResponseDTO;
+import com.ps.RESTful.enums.WeeksEnum;
 import com.ps.entities.tenant.BusinessCycleDefinition;
 import com.ps.util.DateUtils;
 
@@ -35,6 +37,11 @@ public class BusinessCycleDefinitionDTOMapper implements
 			businessCycleDefinition.setCreatedBy(dto.getCreatedBy());
 			businessCycleDefinition.setName(dto.getName());
 			businessCycleDefinition.setServiceName(dto.getServiceName());
+			
+			if(!StringUtils.isBlank(dto.getWeekStartDefinition()) && WeeksEnum.isValid(dto.getWeekStartDefinition()))
+				businessCycleDefinition.setWeekStartDefinition(WeeksEnum.valueOf(dto.getWeekStartDefinition()));
+			
+			businessCycleDefinition.setMinDaysInCycle(dto.getMinDaysInCycle());
 			if(logger.isDebugEnabled())
 				logger.debug("After Maping dto to entity BusinessYearDefinition"
 						+", name-> "+businessCycleDefinition.getName()
@@ -60,6 +67,8 @@ public class BusinessCycleDefinitionDTOMapper implements
 						+", createdDateTime-> "+businessCycleDefinition.getCreateDateTime());
 			
 			responseDTO.setActive(businessCycleDefinition.isActive());
+			responseDTO.setWeekStartDefinition(businessCycleDefinition.getWeekStartDefinition().getValue());
+			responseDTO.setMinDaysInCycle(businessCycleDefinition.getMinDaysInCycle());
 			responseDTO.setCreatedBy(businessCycleDefinition.getCreatedBy());
 			responseDTO.setName(businessCycleDefinition.getName());
 			responseDTO.setServiceName(businessCycleDefinition.getServiceName());

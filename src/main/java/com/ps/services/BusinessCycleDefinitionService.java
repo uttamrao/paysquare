@@ -10,6 +10,8 @@ public interface BusinessCycleDefinitionService {
 	
 	public List<BusinessCycleDefinition> getAll();
 	
+	public BusinessCycleDefinition getById(int id);
+	
 	public void deleteByBusinessYearDefinitionId(int id);
 	
 }

@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ps.RESTful.enums.ErrorCode;
+import com.ps.RESTful.enums.FrequencyEnum;
 import com.ps.RESTful.error.handler.InvalidRequestException;
 import com.ps.entities.tenant.FrequencyMaster;
 import com.ps.services.dao.repository.tenant.FrequencyMasterRepository;
@@ -57,7 +58,7 @@ public class FrequencyMasterServiceTest {
 					.thenReturn(frequencyMaster.get());
 			System.out.println("after mocking repository add");
 		
-			Mockito.when(frequencyMasterRepository.findByName("YEARLY"))
+			Mockito.when(frequencyMasterRepository.findByName(FrequencyEnum.WEEKLY))
 			.thenReturn(frequencyMaster);
 			
 		//creating object for getALl test scenario

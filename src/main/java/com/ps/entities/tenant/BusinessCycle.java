@@ -9,22 +9,22 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.ps.entities.master.AbstractTimeEntity;
+
 @Entity
-@Table(name = "BusinessCycleDetails")
-public class BusinessCycle {
+public class BusinessCycle extends AbstractTimeEntity{
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="businessCycleDetailsId")
+	@Column(name="businessCycleId")
 	private int id;
 	
 	@ManyToOne
-	@JoinColumn(name="businessCycleId",referencedColumnName = "businessCycleId")
-	private BusinessCycleDefinition businessCycle;
+	@JoinColumn(name="businessCycleDefinitionId",referencedColumnName = "businessCycleDefinitionId")
+	private BusinessCycleDefinition businessCycleDefinition;
 	
 	@Temporal(TemporalType.DATE)
 	private Date fromDate;
@@ -46,12 +46,12 @@ public class BusinessCycle {
 		this.id = id;
 	}
 
-	public BusinessCycleDefinition getBusinessCycle() {
-		return businessCycle;
+	public BusinessCycleDefinition getBusinessCycleDefinition() {
+		return businessCycleDefinition;
 	}
 
-	public void setBusinessCycle(BusinessCycleDefinition businessCycle) {
-		this.businessCycle = businessCycle;
+	public void setBusinessCycleDefinition(BusinessCycleDefinition businessCycleDefinition) {
+		this.businessCycleDefinition = businessCycleDefinition;
 	}
 
 	public Date getFromDate() {

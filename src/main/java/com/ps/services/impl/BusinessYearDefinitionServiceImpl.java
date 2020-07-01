@@ -4,10 +4,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.ps.RESTful.enums.ErrorCode;
 import com.ps.RESTful.error.handler.InvalidRequestException;
@@ -38,7 +38,7 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 					+ "time to-> "+businessYearDefinition.getCreateDateTime());
 		}
 		
-		if(businessYearDefinition != null && StringUtils.isEmpty(businessYearDefinition.getCreatedBy())) {
+		if(businessYearDefinition != null && StringUtils.isBlank(businessYearDefinition.getCreatedBy())) {
 			if(logger.isDebugEnabled()) logger.debug("Setting created by to logged in "
 					+ "user name-> "+businessYearDefinition.getCreatedBy()+", as createdBy is not set in request"); 
 			businessYearDefinition.setCreatedBy(requestUtils.getUserName());	
@@ -75,12 +75,12 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 		
 //		if(logger.isDebugEnabled())
 //			logger.debug("Validating businessYearDefinition, applicableTo-> "+businessYearDefinition.getDescription());
-//		if(StringUtils.isEmpty(businessYearDefinition.getDescription()))
+//		if((businessYearDefinition.getDescription()))
 //			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year Definition description not found!");
 //		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating businessYearDefinition, createdBy-> "+businessYearDefinition.getCreatedBy());
-		if(StringUtils.isEmpty(businessYearDefinition.getCreatedBy()))
+		if(StringUtils.isBlank(businessYearDefinition.getCreatedBy()))
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Created by is Invalid!");
 	}
 	

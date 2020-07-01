@@ -3,12 +3,14 @@ package com.ps.RESTful.dto.mapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.ps.RESTful.dto.request.FrequencyMasterRequestDTO;
 import com.ps.RESTful.dto.response.FrequencyMasterResponseDTO;
+import com.ps.RESTful.enums.FrequencyEnum;
 import com.ps.entities.tenant.FrequencyMaster;
 import com.ps.util.DateUtils;
 
@@ -27,7 +29,10 @@ public class FrequencyMasterDTOMapper implements
 			frequencyMaster = new FrequencyMaster();
 			
 			frequencyMaster.setActive(dto.isActive());
-			frequencyMaster.setName(dto.getName());
+			if(!StringUtils.isBlank(dto.getName()) && FrequencyEnum.isValid(dto.getName().toUpperCase()))
+				frequencyMaster.setName(FrequencyEnum.valueOf(dto.getName().toUpperCase()));
+			else
+				frequencyMaster.setName(null);
 			frequencyMaster.setCreatedBy(dto.getCreatedBy());
 		}
 		
@@ -51,7 +56,7 @@ public class FrequencyMasterDTOMapper implements
 			responseDTO.setActive(frequencyMaster.isActive());
 			responseDTO.setCreatedBy(frequencyMaster.getCreatedBy());
 			responseDTO.setId(frequencyMaster.getId());
-			responseDTO.setName(frequencyMaster.getName());
+			responseDTO.setName(frequencyMaster.getName().getValue());
 			responseDTO.setCreateDateTime(DateUtils.getDateTimeString(frequencyMaster.getCreateDateTime()));
 		
 		

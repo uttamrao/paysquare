@@ -1,8 +1,8 @@
 package com.ps.config.tenant;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.jboss.logging.Logger;
-import org.springframework.util.StringUtils;
 
 
 public class CurrentTenantIdentifierResolverImpl
@@ -19,7 +19,7 @@ public class CurrentTenantIdentifierResolverImpl
     	if(logger.isDebugEnabled()) logger.debug("In resolveCurrentTenantIdentifier tenant "+tenant);
     	if(logger.isDebugEnabled()) logger.debug("In resolveCurrentTenantIdentifier DEFAULT_TENANT_ID "+DEFAULT_TENANT_ID);
 
-        return (!StringUtils.isEmpty(tenant)) ? tenant : DEFAULT_TENANT_ID;
+        return (!StringUtils.isBlank(tenant)) ? tenant : DEFAULT_TENANT_ID;
     }
 
     @Override

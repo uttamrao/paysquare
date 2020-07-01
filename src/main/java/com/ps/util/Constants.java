@@ -8,4 +8,7 @@ public class Constants {
     public static final String USER_DETAILS = "user-details";
     public static final String EMAIL_TEXT_CONTENT_TYPE = "text/plain";
     
+    public static final int MONTHS_IN_YEAR = 12;
+    public static final int WEEKS_IN_YEAR = 52;
+    
 }

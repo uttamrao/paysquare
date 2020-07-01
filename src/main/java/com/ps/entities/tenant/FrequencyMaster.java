@@ -4,11 +4,15 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import com.ps.RESTful.enums.FrequencyEnum;
 
 @Entity
 public class FrequencyMaster {
@@ -19,13 +23,20 @@ public class FrequencyMaster {
 	private int id;
 	
 	@Column(name="frequencyName")
-	private String name;
+	@Enumerated(EnumType.STRING)
+	private FrequencyEnum name;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDateTime = new Date();
 	
 	private String createdBy;
-		
+	
+	private String description;
+	
+	private int paymentCount;
+	
+	private int paymentFrequency;
+			
 	private boolean isActive = true;
 
 	public int getId() {
@@ -34,14 +45,6 @@ public class FrequencyMaster {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getCreatedBy() {
@@ -66,6 +69,38 @@ public class FrequencyMaster {
 
 	public void setCreateDateTime(Date createDateTime) {
 		this.createDateTime = createDateTime;
+	}
+
+	public int getPaymentCount() {
+		return paymentCount;
+	}
+
+	public void setPaymentCount(int paymentCount) {
+		this.paymentCount = paymentCount;
+	}
+
+	public int getPaymentFrequency() {
+		return paymentFrequency;
+	}
+
+	public void setPaymentFrequency(int paymentFrequency) {
+		this.paymentFrequency = paymentFrequency;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public FrequencyEnum getName() {
+		return name;
+	}
+
+	public void setName(FrequencyEnum name) {
+		this.name = name;
 	}
 	
 }

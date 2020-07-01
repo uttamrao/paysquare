@@ -2,15 +2,17 @@ package com.ps.services.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.ps.RESTful.enums.ErrorCode;
 import com.ps.RESTful.enums.FrequencyEnum;
 import com.ps.RESTful.enums.ServiceTypeEnum;
+import com.ps.RESTful.enums.WeeksEnum;
 import com.ps.RESTful.error.handler.InvalidRequestException;
 import com.ps.entities.tenant.BusinessCycleDefinition;
 import com.ps.services.BusinessCycleDefinitionService;
@@ -23,7 +25,7 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 	Logger logger = Logger.getLogger(BusinessCycleDefinitionServiceImpl.class);
 	
 	@Autowired
-	BusinessCycleDefinitionRepository businessCycleRepository;
+	BusinessCycleDefinitionRepository businessCycleDefinitionRepository;
 	
 	@Autowired
 	RequestUtils requestUtils;
@@ -39,7 +41,7 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 					+ "time to-> "+businessCycleDefinition.getCreateDateTime());
 		}
 		
-		if(businessCycleDefinition != null && StringUtils.isEmpty(businessCycleDefinition.getCreatedBy())) {
+		if(businessCycleDefinition != null && StringUtils.isBlank(businessCycleDefinition.getCreatedBy())) {
 			if(logger.isDebugEnabled()) logger.debug("Setting created by to logged in "
 					+ "user name-> "+businessCycleDefinition.getCreatedBy()+", as createdBy is not set in request"); 
 			businessCycleDefinition.setCreatedBy(requestUtils.getUserName());	
@@ -50,13 +52,15 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 				+ "saving into DB");
 		
 		ServiceTypeEnum serviceType = ServiceTypeEnum.valueOf(businessCycleDefinition.getServiceName());
-		FrequencyEnum frequency = FrequencyEnum.valueOf(businessCycleDefinition.getFrequencyMaster().getName());
+		FrequencyEnum frequency = businessCycleDefinition.getFrequencyMaster().getName();
 
+		if(businessCycleDefinition.getWeekStartDefinition() == null && frequency.name().contains(FrequencyEnum.WEEKLY.name()))
+			businessCycleDefinition.setWeekStartDefinition(WeeksEnum.SUNDAY);			
+			
 		businessCycleDefinition.setServiceName(serviceType.name());		
-		String cycleName = businessCycleDefinition.getName()+"_"+serviceType.getShortCode()+"_"+frequency.getShortCode();
-		
+		String cycleName = businessCycleDefinition.getName()+"_"+serviceType.getShortCode()+"_"+frequency.getShortCode();		
 		businessCycleDefinition.setName(cycleName);
-		businessCycleRepository.save(businessCycleDefinition);
+		businessCycleDefinitionRepository.save(businessCycleDefinition);
 		if(logger.isDebugEnabled()) logger.debug("BusinessCycleDefinition saved into DB");
 		
 		return businessCycleDefinition;
@@ -95,7 +99,7 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 			
 		if(logger.isDebugEnabled())
 			logger.debug("Validating businessCycleDefinition, createdBy-> "+businessCycleDefinition.getCreatedBy());
-		if(StringUtils.isEmpty(businessCycleDefinition.getCreatedBy()))
+		if(StringUtils.isBlank(businessCycleDefinition.getCreatedBy()))
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Created by is Invalid!");
 	}
 	
@@ -104,23 +108,38 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Getting all BusinessCycleDefinitionService records from DB");
-		List<BusinessCycleDefinition> businessCycleDefinitions = businessCycleRepository.findAllByIsActive(true);
+		List<BusinessCycleDefinition> businessCycleDefinitions = businessCycleDefinitionRepository.findAllByIsActive(true);
 		
 		return businessCycleDefinitions;
 	}
 
+	@Override
+	public BusinessCycleDefinition getById(int id) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("In BusinessCycleDefinition getById method getting business year with id-> "+id);
+		if(id == 0)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
+		
+		Optional<BusinessCycleDefinition> businessCycleDefinitionOptional = businessCycleDefinitionRepository.findById(id);		
+		if(businessCycleDefinitionOptional.isEmpty())
+			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
+		
+		return businessCycleDefinitionOptional.get();
+	}
+	
 	@Override
 	public void deleteByBusinessYearDefinitionId(int id) {
 		
 		if(logger.isDebugEnabled()) logger.debug("In BusinessCycleService deleteByBusinessYearId "
 				+ "service method for deleting business cycle from databse where businessYearDefinitionId is -> "+id);
 		
-		List<BusinessCycleDefinition> businessCycleDefinitionList = businessCycleRepository.findAllByBusinessYearDefinitionId(id);
+		List<BusinessCycleDefinition> businessCycleDefinitionList = businessCycleDefinitionRepository.findAllByBusinessYearDefinitionId(id);
 		
 		for (BusinessCycleDefinition businessCycleDefinition : businessCycleDefinitionList) {
 			//delete business cycles for each cycle definition
 			
-			businessCycleRepository.deleteById(businessCycleDefinition.getId());
+			businessCycleDefinitionRepository.deleteById(businessCycleDefinition.getId());
 		}		
 	}
 
