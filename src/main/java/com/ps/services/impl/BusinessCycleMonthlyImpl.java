@@ -99,13 +99,16 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 
 			LocalDate startDate = nextCycleStartDate;
 			LocalDate endDate = null;
+			String periodName = null;
 			
 			if(!createByDate){
 				endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
 				nextCycleStartDate = endDate.plusMonths(1).withDayOfMonth(1);
+				periodName = endDate.getMonth().name();
 			}else{
 				endDate = startDate.plusMonths(1).minusDays(1);
 				nextCycleStartDate = endDate.plusDays(1);
+				periodName = startDate.getMonth()+"-"+endDate.getMonth().name();
 			}			
 
 			BusinessCycle cycle = new BusinessCycle();
@@ -113,7 +116,7 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 			cycle.setToDate(DateUtils.convert(endDate, ZoneId.systemDefault()));
 			cycle.setBusinessCycleDefinition(businessCycleDefinition);
 			cycle.setPeriodId(period);
-			cycle.setPeriodName(endDate.getMonth().name());
+			cycle.setPeriodName(periodName);
 			businessCycleList.add(cycle);
 			if (logger.isDebugEnabled())
 				logger.debug("No of cycle for businessYearDefinitionId-> " + cycle.getBusinessCycleDefinition().getId()

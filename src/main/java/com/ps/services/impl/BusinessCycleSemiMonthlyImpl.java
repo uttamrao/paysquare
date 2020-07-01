@@ -78,7 +78,12 @@ public class BusinessCycleSemiMonthlyImpl implements BusinessCycleCommand {
 
 		int period = 1;
 		boolean create = true;		
+		boolean createByDate = false;
 		LocalDate nextCycleStartDate = cycleStartDate;
+		LocalDate monthFirstCycleStartDate = cycleStartDate;
+		
+		if(cycleStartDate.getDayOfMonth() != 1)
+			createByDate = true;
 		
 		while(create) {
 			
@@ -94,14 +99,21 @@ public class BusinessCycleSemiMonthlyImpl implements BusinessCycleCommand {
 			//Month's 1st cycle is odd
 			if(period % 2 != 0) {
 				startDate = nextCycleStartDate;
+				monthFirstCycleStartDate = startDate;
 				TemporalAdjuster temporalAdjuster = t -> t.plus(Period.ofDays(14));
 				endDate = startDate.with(temporalAdjuster);
 				nextCycleStartDate = endDate;
 			}
 			else {
 				startDate = nextCycleStartDate.plusDays(1);
-				endDate =  startDate.withDayOfMonth(startDate.lengthOfMonth());	
-				nextCycleStartDate = endDate.plusMonths(1).withDayOfMonth(1);;
+				
+				if(!createByDate) {
+					endDate =  startDate.withDayOfMonth(startDate.lengthOfMonth());	
+					nextCycleStartDate = endDate.plusMonths(1).withDayOfMonth(1);
+				}else {
+					endDate =  monthFirstCycleStartDate.plusMonths(1).minusDays(1);	
+					nextCycleStartDate = endDate.plusDays(1);
+				}
 			}
 			
 			BusinessCycle cycle = new BusinessCycle();			
