@@ -40,16 +40,14 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 	static Map<FrequencyEnum,BusinessCycleCommand> businessCycleCommandObject = null;
 	
 	static {		
-		if(CollectionUtils.isEmpty(businessCycleCommandObject)) {
-			//create new object only if the map is null;
-			businessCycleCommandObject = new HashMap<FrequencyEnum,BusinessCycleCommand>();
-			
-			businessCycleCommandObject.put(FrequencyEnum.MONTHLY, new BusinessCycleMonthlyImpl());
-			businessCycleCommandObject.put(FrequencyEnum.SEMI_MONTHLY, new BusinessCycleSemiMonthlyImpl());
-			businessCycleCommandObject.put(FrequencyEnum.ADHOC_MONTHLY, new BusinessCycleAdhocMonthlyImpl());
-			businessCycleCommandObject.put(FrequencyEnum.WEEKLY, new BusinessCycleWeeklyImpl());
-			businessCycleCommandObject.put(FrequencyEnum.BI_WEEKLY, new BusinessCycleBiWeeklyImpl());
-			businessCycleCommandObject.put(FrequencyEnum.ADHOC_WEEKLY, new BusinessCycleAdhocWeeklyImpl());
+		if(CollectionUtils.isEmpty(businessCycleCommandObject)) {			
+				businessCycleCommandObject = new HashMap<FrequencyEnum,BusinessCycleCommand>();			
+				businessCycleCommandObject.put(FrequencyEnum.MONTHLY, new BusinessCycleMonthlyImpl());
+				businessCycleCommandObject.put(FrequencyEnum.SEMI_MONTHLY, new BusinessCycleSemiMonthlyImpl());
+				businessCycleCommandObject.put(FrequencyEnum.ADHOC_MONTHLY, new BusinessCycleAdhocMonthlyImpl());
+				businessCycleCommandObject.put(FrequencyEnum.WEEKLY, new BusinessCycleWeeklyImpl());
+				businessCycleCommandObject.put(FrequencyEnum.BI_WEEKLY, new BusinessCycleBiWeeklyImpl());
+				businessCycleCommandObject.put(FrequencyEnum.ADHOC_WEEKLY, new BusinessCycleAdhocWeeklyImpl());
 		}		
 	}
 	
@@ -57,14 +55,14 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 	public  void add(BusinessCycleBean businessCycleBean) {
 		
 		if(logger.isDebugEnabled()) logger.debug("In add BusinessCycleDefinition");
-		validate(businessCycleBean);
+		validate(businessCycleBean);		
+		
+		FrequencyEnum frequency = businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster().getName();
+		if(logger.isDebugEnabled()) logger.debug("Initializing businessCycle creation for frequency-> "+frequency);
 		
 		// check last created cycle year and create cycle from that year till the noOfYears requested
 		//i.e set start year to the year last cycle was created
 		//based on the the duration it shouled be decided if cycle should be created for this year or next
-		FrequencyEnum frequency = businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster().getName();
-		if(logger.isDebugEnabled()) logger.debug("Initializing businessCycle creation for frequency-> "+frequency.name());
-		
 		List<BusinessCycle> businessCycles = businessCycleRepository.findLatestByCycleId(businessCycleBean.getBusinessCycleDefinition().getId());
 		if(!CollectionUtils.isEmpty(businessCycles)) {
 			BusinessCycle businessCycle = businessCycles.get(businessCycles.size()-1);
@@ -75,6 +73,8 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		BusinessCycleCommand businessCycleCommand = businessCycleCommandObject.get(frequency);		
 		List<BusinessCycle> cycleList = businessCycleInvoker.createCycle(businessCycleCommand, businessCycleBean);
 					
+		if (logger.isDebugEnabled())
+			logger.debug("Saving  cycles->" +cycleList.size()+" into db");
 		
 		if(!CollectionUtils.isEmpty(cycleList))
 			businessCycleRepository.saveAll(cycleList);			
@@ -91,6 +91,11 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 			logger.debug("Validating BusinessCycleBean cycle definition, object-> "+businessCycleBean.getBusinessCycleDefinition());
 		if(businessCycleBean.getBusinessCycleDefinition() == null)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle definition not found!");		
+		
+		if(logger.isDebugEnabled())
+			logger.debug("Validating BusinessCycleBean cycle definition, object-> "+businessCycleBean.getBusinessCycleDefinition());
+		if(businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster() == null)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle frequency not found!");
 	}
 	
 	@Override

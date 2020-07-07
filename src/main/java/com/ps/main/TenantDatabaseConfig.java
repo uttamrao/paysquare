@@ -99,8 +99,8 @@ public class TenantDatabaseConfig {
         // "org.hibernate.cfg.ImprovedNamingStrategy");
         properties.put(org.hibernate.cfg.Environment.DIALECT,
                 "org.hibernate.dialect.SQLServerDialect");
-        properties.put(org.hibernate.cfg.Environment.SHOW_SQL, true);
-        properties.put(org.hibernate.cfg.Environment.FORMAT_SQL, true);
+        properties.put(org.hibernate.cfg.Environment.SHOW_SQL, false);
+        properties.put(org.hibernate.cfg.Environment.FORMAT_SQL, false);
         properties.put(org.hibernate.cfg.Environment.HBM2DDL_AUTO, "update");
 
         emfBean.setJpaPropertyMap(properties);

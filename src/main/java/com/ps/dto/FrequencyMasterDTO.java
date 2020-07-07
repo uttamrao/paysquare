@@ -5,6 +5,10 @@ public class FrequencyMasterDTO extends AbstractDTO {
 	private String name;
 				
 	private String createdBy;
+	
+	private int paymentFrequency;
+	
+	private int paymentCount;
 		
 	private boolean isActive = true;
 
@@ -30,5 +34,21 @@ public class FrequencyMasterDTO extends AbstractDTO {
 
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
+	}
+
+	public int getPaymentFrequency() {
+		return paymentFrequency;
+	}
+
+	public void setPaymentFrequency(int paymentFrequency) {
+		this.paymentFrequency = paymentFrequency;
+	}
+
+	public int getPaymentCount() {
+		return paymentCount;
+	}
+
+	public void setPaymentCount(int paymentCount) {
+		this.paymentCount = paymentCount;
 	}
 }

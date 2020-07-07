@@ -8,8 +8,6 @@ import java.util.List;
 import org.jboss.logging.Logger;
 import org.springframework.stereotype.Service;
 
-import com.ps.RESTful.enums.ErrorCode;
-import com.ps.RESTful.error.handler.InvalidRequestException;
 import com.ps.beans.BusinessCycleBean;
 import com.ps.entities.tenant.BusinessCycle;
 import com.ps.entities.tenant.BusinessCycleDefinition;
@@ -17,14 +15,13 @@ import com.ps.entities.tenant.BusinessYearDefinition;
 import com.ps.entities.tenant.FrequencyMaster;
 import com.ps.services.BusinessCycleCommand;
 import com.ps.util.BusinessCycleUtils;
-import com.ps.util.DateUtils;
 import com.ps.util.LocalDateUtils;
 
 @Service("BusinessCycleMonthlyImpl")
 public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 
 	Logger logger = Logger.getLogger(BusinessCycleMonthlyImpl.class);	
-	List<BusinessCycle> businessCycleList = new ArrayList<BusinessCycle>();
+	List<BusinessCycle> businessCycleList = null;
 	
 	@Override
 	public List<BusinessCycle> create(BusinessCycleBean businessCycleBean) {			
@@ -32,7 +29,7 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 		if(logger.isDebugEnabled())
 			logger.debug("In cycle creation method");
 		
-		validate(businessCycleBean);
+		BusinessCycleUtils.validate(businessCycleBean);
 		
 		BusinessCycleDefinition businessCycleDefinition = businessCycleBean.getBusinessCycleDefinition();  		
 		BusinessYearDefinition businessYearDefinition = businessCycleDefinition.getBusinessYearDefinition(); 		
@@ -51,6 +48,7 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 		else
 			currentYear = LocalDate.now().getYear();
 		LocalDate cycleStartDate = LocalDate.of(currentYear, businessYearFrom.getMonth(), businessYearFrom.getDayOfMonth());
+		businessCycleList =  new ArrayList<BusinessCycle>();
 		
 		for (int i = 0; i < businessCycleBean.getNoOfYears(); i++) {
 						
@@ -69,6 +67,8 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 				logger.debug("lastCreateCycleDate-> " + lastCreateCycleDate + " cycleStartDate-> " + cycleStartDate);
 		}		
 	
+		if (logger.isDebugEnabled())
+			logger.debug("Total cycles created ->" +businessCycleList.size());
 		return businessCycleList;
 	}
 	
@@ -99,25 +99,17 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 
 			LocalDate startDate = nextCycleStartDate;
 			LocalDate endDate = null;
-			String periodName = null;
 			
 			if(!createByDate){
 				endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
 				nextCycleStartDate = endDate.plusMonths(1).withDayOfMonth(1);
-				periodName = endDate.getMonth().name();
 			}else{
 				endDate = startDate.plusMonths(1).minusDays(1);
 				nextCycleStartDate = endDate.plusDays(1);
-				periodName = startDate.getMonth()+"-"+endDate.getMonth().name();
 			}			
 
-			BusinessCycle cycle = new BusinessCycle();
-			cycle.setFromDate(DateUtils.convert(startDate, ZoneId.systemDefault()));
-			cycle.setToDate(DateUtils.convert(endDate, ZoneId.systemDefault()));
-			cycle.setBusinessCycleDefinition(businessCycleDefinition);
-			cycle.setPeriodId(period);
-			cycle.setPeriodName(periodName);
-			businessCycleList.add(cycle);
+			BusinessCycle cycle = BusinessCycleUtils.setCycle(startDate, endDate, businessCycleDefinition, period);			
+			businessCycleList.add(cycle);			
 			if (logger.isDebugEnabled())
 				logger.debug("No of cycle for businessYearDefinitionId-> " + cycle.getBusinessCycleDefinition().getId()
 						+ " period-> " + cycle.getPeriodId() + " periodName-> " + cycle.getPeriodName() + " start -> "
@@ -132,26 +124,4 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 		
 		return nextCycleStartDate;
 	}
-	
-	void validate(BusinessCycleBean businessCycleBean){
-		
-		if(logger.isDebugEnabled())
-			logger.debug("Validating businessCycleBean before creating cycles");
-		
-		if(businessCycleBean == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business cycle details not found!");  
-		
-		if(businessCycleBean.getBusinessCycleDefinition() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business cycle definition not found!");  
-		
-		if(businessCycleBean.getBusinessCycleDefinition().getBusinessYearDefinition() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business year definition not found!");  
-		
-		if(businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency not found!");		
-	
-		if(logger.isDebugEnabled())
-			logger.debug("Returning, businessCycleBean is valid");
-	}
-	
 }
