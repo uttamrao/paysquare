@@ -44,10 +44,9 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 				businessCycleCommandObject = new HashMap<FrequencyEnum,BusinessCycleCommand>();			
 				businessCycleCommandObject.put(FrequencyEnum.MONTHLY, new BusinessCycleMonthlyImpl());
 				businessCycleCommandObject.put(FrequencyEnum.SEMI_MONTHLY, new BusinessCycleSemiMonthlyImpl());
-				businessCycleCommandObject.put(FrequencyEnum.ADHOC_MONTHLY, new BusinessCycleAdhocMonthlyImpl());
 				businessCycleCommandObject.put(FrequencyEnum.WEEKLY, new BusinessCycleWeeklyImpl());
 				businessCycleCommandObject.put(FrequencyEnum.BI_WEEKLY, new BusinessCycleBiWeeklyImpl());
-				businessCycleCommandObject.put(FrequencyEnum.ADHOC_WEEKLY, new BusinessCycleAdhocWeeklyImpl());
+				businessCycleCommandObject.put(FrequencyEnum.ADHOC, new BusinessCycleAdhocImpl());
 		}		
 	}
 	

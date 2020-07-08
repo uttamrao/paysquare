@@ -41,7 +41,7 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 		LocalDate businessYearTo = LocalDateUtils.convert(businessYearDefinition.getToDate(), ZoneId.systemDefault());	
 
 		int duration = BusinessCycleUtils.getMonths(businessYearFrom, businessYearTo);
-		int noOfCycles = BusinessCycleUtils.computeCycleCount(duration, frequencyMaster);
+		int noOfCycles = BusinessCycleUtils.computeCycleCount(duration, 1,1);
 		int currentYear = 0;
 		if(businessCycleBean.getLastCreatedYear() != 0)
 			currentYear = businessCycleBean.getLastCreatedYear();

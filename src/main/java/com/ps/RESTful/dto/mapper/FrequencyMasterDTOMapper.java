@@ -34,7 +34,6 @@ public class FrequencyMasterDTOMapper implements
 			else
 				frequencyMaster.setName(null);
 			frequencyMaster.setCreatedBy(dto.getCreatedBy());
-			frequencyMaster.setPaymentCount(dto.getPaymentCount());
 		}
 		
 		return frequencyMaster;
@@ -58,8 +57,6 @@ public class FrequencyMasterDTOMapper implements
 			responseDTO.setCreatedBy(frequencyMaster.getCreatedBy());
 			responseDTO.setId(frequencyMaster.getId());
 			responseDTO.setName(frequencyMaster.getName().getValue());
-			responseDTO.setPaymentFrequency(frequencyMaster.getPaymentFrequency());
-			responseDTO.setPaymentCount(frequencyMaster.getPaymentCount());
 			responseDTO.setCreateDateTime(DateUtils.getDateTimeString(frequencyMaster.getCreateDateTime()));
 		
 		

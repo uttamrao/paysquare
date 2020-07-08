@@ -2,12 +2,11 @@ package com.ps.RESTful.enums;
 
 public enum FrequencyEnum {
 	
-	MONTHLY("Monthly","MO",1,1),
-	WEEKLY("Weekly","WK",1,1),
-	BI_WEEKLY("Bi-Weekly","BW",1,2),
-	SEMI_MONTHLY("Semi-Monthly","SM",2,1),
-	ADHOC_MONTHLY("Adhoc-Monthly","AD",0,0),
-	ADHOC_WEEKLY("Adhoc-Weekly","AD",0,0);
+	MONTHLY("Monthly","MO"),
+	WEEKLY("Weekly","WK"),
+	BI_WEEKLY("Bi-Weekly","BW"),
+	SEMI_MONTHLY("Semi-Monthly","SM"),
+	ADHOC("Adhoc-Monthly","AD");
 	
 	private String value;
 	
@@ -17,11 +16,9 @@ public enum FrequencyEnum {
 
 	private int paymentFrequency;
 
-	private FrequencyEnum(String value,String shortCode, int paymentCount, int paymentFrequency) {
+	private FrequencyEnum(String value,String shortCode) {
 		this.value = value;
-		this.shortCode = shortCode;
-		this.paymentCount = paymentCount;
-		this.paymentFrequency = paymentFrequency;
+		this.shortCode = shortCode;		
 	}
 	
 	public String getValue() {

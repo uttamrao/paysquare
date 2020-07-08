@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ps.RESTful.enums.ErrorCode;
-import com.ps.RESTful.enums.FrequencyEnum;
 import com.ps.RESTful.error.handler.InvalidRequestException;
 import com.ps.entities.tenant.FrequencyMaster;
 import com.ps.services.FrequencyMasterService;
@@ -53,11 +52,6 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		
 		if(existingFrequencyMaster.isEmpty()) {
 			
-			if(frequencyMaster.getName() != FrequencyEnum.ADHOC_WEEKLY &&
-					frequencyMaster.getName() != FrequencyEnum.ADHOC_MONTHLY) {
-				frequencyMaster.setPaymentCount(frequencyMaster.getName().getPaymentCount());
-				frequencyMaster.setPaymentFrequency(frequencyMaster.getName().getPaymentFrequency());
-			}			
 			frequencyMasterRepository.save(frequencyMaster);
 			if(logger.isDebugEnabled()) logger.debug("Frequency master saved into DB");
 			
@@ -88,20 +82,7 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		if(logger.isDebugEnabled())
 			logger.debug("Validating frequency master, createdBy-> "+frequencyMaster.getCreatedBy());
 		if(StringUtils.isBlank (frequencyMaster.getCreatedBy()))
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Created by is Invalid!");
-		
-		if(frequencyMaster.getName() == FrequencyEnum.ADHOC_WEEKLY ||
-				frequencyMaster.getName() == FrequencyEnum.ADHOC_MONTHLY) {
-			if(logger.isDebugEnabled())
-				logger.debug("Validating frequency master, paymentCount-> "+frequencyMaster.getPaymentCount());
-			if(frequencyMaster.getPaymentCount() == 0)
-				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Number of Payments is Invalid!");
-			
-			if(logger.isDebugEnabled())
-				logger.debug("Validating frequency master, paymentFrequency-> "+frequencyMaster.getPaymentFrequency());
-			if(frequencyMaster.getPaymentFrequency() == 0)
-				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Payment frequency is Invalid!");
-		}		
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Created by is Invalid!");		
 	}
 	
 	@Override

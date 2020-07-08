@@ -12,7 +12,6 @@ import com.ps.RESTful.error.handler.InvalidRequestException;
 import com.ps.beans.BusinessCycleBean;
 import com.ps.entities.tenant.BusinessCycle;
 import com.ps.entities.tenant.BusinessCycleDefinition;
-import com.ps.entities.tenant.FrequencyMaster;
 
 public class BusinessCycleUtils {
 
@@ -44,18 +43,15 @@ public class BusinessCycleUtils {
 		return (int)weeks;		
 	}
 	
-	public static int computeCycleCount(int duration, FrequencyMaster frequencyMaster){
+	public static int computeCycleCount(double duration, double paymentCount, double frequency){
 		
-		if(duration < frequencyMaster.getPaymentFrequency())
+		if(duration < frequency)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business year period is less than payment frequency!");  
 		
 		if(logger.isDebugEnabled())
-			logger.debug("frequencyMaster PaymentCount "+frequencyMaster.getPaymentCount()+" frequencyMaster PaymentFrequency "+frequencyMaster.getPaymentFrequency());		
+			logger.debug("PaymentCount "+paymentCount+" PaymentFrequency "+frequency+" for duration "+duration);
 		
-		double paymentCount = frequencyMaster.getPaymentCount();
-		double paymentFrequency = frequencyMaster.getPaymentFrequency();
-		
-		double noOfCycles = (paymentCount / paymentFrequency) * duration;
+		double noOfCycles = (paymentCount / frequency) * duration;
 		
 		if(logger.isDebugEnabled())
 			logger.debug("No of cycle for duration-> +"+duration+" is-> "+noOfCycles);

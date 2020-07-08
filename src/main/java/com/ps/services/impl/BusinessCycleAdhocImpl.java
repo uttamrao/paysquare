@@ -17,13 +17,14 @@ import com.ps.entities.tenant.BusinessCycleDefinition;
 import com.ps.entities.tenant.BusinessYearDefinition;
 import com.ps.entities.tenant.FrequencyMaster;
 import com.ps.services.BusinessCycleCommand;
+import com.ps.util.BusinessCycleUtils;
 import com.ps.util.DateUtils;
 import com.ps.util.LocalDateUtils;
 
 @Service("BusinessCycleAdhocMonthlyImpl")
-public class BusinessCycleAdhocMonthlyImpl implements BusinessCycleCommand {
+public class BusinessCycleAdhocImpl implements BusinessCycleCommand {
 
-	Logger logger = Logger.getLogger(BusinessCycleAdhocMonthlyImpl.class);
+	Logger logger = Logger.getLogger(BusinessCycleAdhocImpl.class);
 	
 	@Override
 	public List<BusinessCycle> create(BusinessCycleBean businessCycleBean) {			
@@ -96,13 +97,7 @@ public class BusinessCycleAdhocMonthlyImpl implements BusinessCycleCommand {
 		int noOfMonths = duration.getMonths()+1;	
 		if(logger.isDebugEnabled())
 			logger.debug("Duration of business year from-to is-> "+noOfMonths);
-		if(logger.isDebugEnabled())
-			logger.debug("No of payments ->"+frequencyMaster.getPaymentCount()+", payment frequency in months-> "+frequencyMaster.getPaymentFrequency());
-		
-		if(noOfMonths < frequencyMaster.getPaymentFrequency())
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business year period is less than payment frequency!");  
-		
-		int noOfCycles = (frequencyMaster.getPaymentCount() / frequencyMaster.getPaymentFrequency()) * noOfMonths;
+		int noOfCycles = BusinessCycleUtils.computeCycleCount(noOfMonths, 2,1);
 		if(logger.isDebugEnabled())
 			logger.debug("No of cycle for business year fromTime-> "+from+", toTime->"+to+" is-> "+noOfCycles);
 		

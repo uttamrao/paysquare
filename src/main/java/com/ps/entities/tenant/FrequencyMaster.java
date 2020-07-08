@@ -32,10 +32,6 @@ public class FrequencyMaster {
 	private String createdBy;
 	
 	private String description;
-	
-	private int paymentCount;
-	
-	private int paymentFrequency;
 			
 	private boolean isActive = true;
 
@@ -69,22 +65,6 @@ public class FrequencyMaster {
 
 	public void setCreateDateTime(Date createDateTime) {
 		this.createDateTime = createDateTime;
-	}
-
-	public int getPaymentCount() {
-		return paymentCount;
-	}
-
-	public void setPaymentCount(int paymentCount) {
-		this.paymentCount = paymentCount;
-	}
-
-	public int getPaymentFrequency() {
-		return paymentFrequency;
-	}
-
-	public void setPaymentFrequency(int paymentFrequency) {
-		this.paymentFrequency = paymentFrequency;
 	}
 
 	public String getDescription() {

@@ -43,7 +43,7 @@ public class BusinessCycleBiWeeklyImpl implements BusinessCycleCommand {
 		LocalDate businessYearTo = LocalDateUtils.convert(businessYearDefinition.getToDate(), ZoneId.systemDefault());	
 		
 		int duration = BusinessCycleUtils.getWeeks(businessYearFrom, businessYearTo);
-		int noOfCycles = BusinessCycleUtils.computeCycleCount(duration, frequencyMaster);
+		int noOfCycles = BusinessCycleUtils.computeCycleCount(duration, 2,1);
 		int currentYear = 0;
 		if(businessCycleBean.getLastCreatedYear() != 0)
 			currentYear = businessCycleBean.getLastCreatedYear();
