@@ -17,20 +17,20 @@ public class BusinessCycleUtils {
 
 	static Logger logger = Logger.getLogger(BusinessCycleUtils.class);
 
-	public static int getMonths(LocalDate from, LocalDate to){
+	public static int getMonthsBetween(LocalDate from, LocalDate to){
 		
 		if(to.compareTo(from) <= 0)
 			to = to.plusYears(1);
 		
 		Period duration = Period.between(from, to);		
-		int months = duration.getMonths()+1;	
+		int months = duration.getMonths()+1;
 		if(logger.isDebugEnabled())
 			logger.debug("Duration of business year  between fromDate-> "+from+" and toDate-> "+to+" is noOfMonths-> "+months);
 		
 		return months;		
 	}
 	
-	public static int getWeeks(LocalDate from, LocalDate to){
+	public static int getWeeksBetween(LocalDate from, LocalDate to){
 		
 		if(to.compareTo(from) <= 0)
 			to = to.plusYears(1);
@@ -89,22 +89,28 @@ public class BusinessCycleUtils {
 	public static void validate(BusinessCycleBean businessCycleBean){
 		
 		if(logger.isDebugEnabled())
-			logger.debug("Validating businessCycleBean before creating cycles");
-		
+			logger.debug("Validating BusinessCycleBean, object-> "+businessCycleBean);
 		if(businessCycleBean == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business cycle details not found!");  
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle details not found!");
 		
-		if(businessCycleBean.getBusinessCycleDefinition() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business cycle definition not found!");  
-		
-		if(businessCycleBean.getBusinessCycleDefinition().getBusinessYearDefinition() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business year definition not found!");  
-		
-		if(businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency not found!");		
-	
 		if(logger.isDebugEnabled())
-			logger.debug("Returning, businessCycleBean is valid");
+			logger.debug("Validating BusinessCycleBean cycle definition, object-> "+businessCycleBean.getBusinessCycleDefinition());
+		if(businessCycleBean.getBusinessCycleDefinition() == null)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle definition not found!");		
+		
+		if(logger.isDebugEnabled())
+			logger.debug("Validating BusinessCycleBean cycle definition, object-> "+businessCycleBean.getBusinessCycleDefinition());
+		if(businessCycleBean.getBusinessCycleDefinition().getBusinessYearDefinition() == null)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business year definition not found!");	
+
+		if(logger.isDebugEnabled())
+			logger.debug("Validating BusinessCycleBean cycle definition, object-> "+businessCycleBean.getBusinessCycleDefinition());
+		if(businessCycleBean.getBusinessCycleDefinition().getReoccuranceDays() == 0) {			
+			if(logger.isDebugEnabled())
+				logger.debug("Validating if frequency is set in businessCycleDefinition, object-> "+businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster());
+			if(businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster() == null)
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle frequency not found!");		
+		}	
 	}
 	
 }

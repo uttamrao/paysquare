@@ -10,5 +10,7 @@ public interface BusinessCycleService {
 	public void add(BusinessCycleBean businessCycleBean);
 	
 	public List<BusinessCycle> getAll();
+	
+	public List<BusinessCycle> getByCycleDefinition(int id);
 		
 }

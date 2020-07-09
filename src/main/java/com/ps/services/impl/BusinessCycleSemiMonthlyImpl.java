@@ -14,7 +14,6 @@ import com.ps.beans.BusinessCycleBean;
 import com.ps.entities.tenant.BusinessCycle;
 import com.ps.entities.tenant.BusinessCycleDefinition;
 import com.ps.entities.tenant.BusinessYearDefinition;
-import com.ps.entities.tenant.FrequencyMaster;
 import com.ps.services.BusinessCycleCommand;
 import com.ps.util.BusinessCycleUtils;
 import com.ps.util.LocalDateUtils;
@@ -35,26 +34,31 @@ public class BusinessCycleSemiMonthlyImpl implements BusinessCycleCommand {
 		
 		BusinessCycleDefinition businessCycleDefinition = businessCycleBean.getBusinessCycleDefinition();  		
 		BusinessYearDefinition businessYearDefinition = businessCycleDefinition.getBusinessYearDefinition(); 		
-		FrequencyMaster frequencyMaster = businessCycleDefinition.getFrequencyMaster();
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Converting business year from and to dates to java8 LocalDate object, as all the operations will be performed using its methods");  
 		LocalDate businessYearFrom = LocalDateUtils.convert(businessYearDefinition.getFromDate(), ZoneId.systemDefault());	
 		LocalDate businessYearTo = LocalDateUtils.convert(businessYearDefinition.getToDate(), ZoneId.systemDefault());	
 		
-		int duration = BusinessCycleUtils.getMonths(businessYearFrom, businessYearTo);
-		int noOfCycles = BusinessCycleUtils.computeCycleCount(duration, 2,1);
 		int currentYear = 0;
 		if(businessCycleBean.getLastCreatedYear() != 0)
 			currentYear = businessCycleBean.getLastCreatedYear();
 		else
 			currentYear = LocalDate.now().getYear();
-		LocalDate cycleStartDate = LocalDate.of(currentYear, businessYearFrom.getMonth(), businessYearFrom.getDayOfMonth());
+		
+		businessYearFrom = businessYearFrom.withYear(currentYear);
+		businessYearTo = businessYearTo.withYear(currentYear);
+		
+		if(businessYearTo.compareTo(businessYearFrom) <= 0)
+			businessYearTo = businessYearTo.plusYears(1);
+		
+		int duration = BusinessCycleUtils.getMonthsBetween(businessYearFrom, businessYearTo);
+		int noOfCycles = BusinessCycleUtils.computeCycleCount(duration, 2,1);	
 		businessCycleList =  new ArrayList<BusinessCycle>();
 		
 		for (int i = 0; i < businessCycleBean.getNoOfYears(); i++) {
 			
-			LocalDate lastCreateCycleDate = generateCycles(cycleStartDate, noOfCycles, businessCycleDefinition);		
+			LocalDate lastCreateCycleDate = generateCycles(businessYearFrom, businessYearTo, noOfCycles, businessCycleDefinition);		
 			if (logger.isDebugEnabled())
 				logger.debug("lastCreateCycleDate-> " + lastCreateCycleDate);
 		
@@ -63,10 +67,8 @@ public class BusinessCycleSemiMonthlyImpl implements BusinessCycleCommand {
 			else 
 				lastCreateCycleDate = lastCreateCycleDate.plusDays(1);
 			
-			cycleStartDate = cycleStartDate.withYear(lastCreateCycleDate.getYear());
-			
-			if (logger.isDebugEnabled())
-				logger.debug("lastCreateCycleDate-> " + lastCreateCycleDate + " cycleStartDate-> " + cycleStartDate);
+			businessYearFrom = businessYearFrom.withYear(lastCreateCycleDate.getYear());
+			businessYearTo = businessYearTo.plusYears(1);			
 		}
 		
 		if (logger.isDebugEnabled())
@@ -74,10 +76,9 @@ public class BusinessCycleSemiMonthlyImpl implements BusinessCycleCommand {
 		return businessCycleList;
 	}
 	
-	LocalDate generateCycles(LocalDate cycleStartDate, int noOfCycles, BusinessCycleDefinition businessCycleDefinition) {
+	LocalDate generateCycles(LocalDate cycleStartDate, LocalDate cycleEndDate, int noOfCycles, BusinessCycleDefinition businessCycleDefinition) {
 
 		int period = 1;
-		boolean create = true;		
 		boolean createByDate = false;
 		LocalDate nextCycleStartDate = cycleStartDate;
 		LocalDate monthFirstCycleStartDate = cycleStartDate;
@@ -85,11 +86,7 @@ public class BusinessCycleSemiMonthlyImpl implements BusinessCycleCommand {
 		if(cycleStartDate.getDayOfMonth() != 1)
 			createByDate = true;
 		
-		while(create) {
-			
-			if(period >= noOfCycles)
-				create = false;
-			
+		do {
 			//could get nextCycleStartDate from last added cycle's endDate from the cycleList but instead of
 			// traversing through the entire list just to get a date its better to store it locally
 			LocalDate startDate = null ;	
@@ -125,7 +122,8 @@ public class BusinessCycleSemiMonthlyImpl implements BusinessCycleCommand {
 						+" start -> "+cycle.getFromDate()+", end-> "+cycle.getToDate());
 	
 			period++;
-		}
+		} while (cycleEndDate.compareTo(nextCycleStartDate) >= 0);
+		
 		return nextCycleStartDate;
 	}
 

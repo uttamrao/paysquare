@@ -44,31 +44,33 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl im
 	
 	@Override
 	public ResponseEntity<Response> add(BusinessCycleDefinitionRequestDTO requestDTO) {
-		
-		if(logger.isDebugEnabled())
+
+		if (logger.isDebugEnabled())
 			logger.debug("In BusinessCycleDefinition add EP");
 		BusinessCycleDefinition businessCycleDefinition = businessCycleDefinitionDTOMapper.dtoToEntity(requestDTO);
-		
-		if(logger.isDebugEnabled())
-			logger.debug("In BusinessCycleDefinition add EP, finding businessYearDifinition object in db with id-> "+requestDTO.getBusinessYearDefinitionId());
+
+		if (logger.isDebugEnabled())
+			logger.debug("In BusinessCycleDefinition add EP, finding businessYearDifinition object in db with id-> "
+					+ requestDTO.getBusinessYearDefinitionId());
 		BusinessYearDefinition businessYearDefinition = businessYearDefinitionService
 				.getById(requestDTO.getBusinessYearDefinitionId());
-				businessCycleDefinition.setBusinessYearDefinition(businessYearDefinition);
+		businessCycleDefinition.setBusinessYearDefinition(businessYearDefinition);
+
+		if(requestDTO.getFrequencyMasterId() != 0) {
+			if (logger.isDebugEnabled())
+				logger.debug("In BusinessCycleDefinition add EP, finding frequencyMaster object in db with id-> "
+						+ requestDTO.getFrequencyMasterId());
+			FrequencyMaster frequencyMaster = frequencyMasterService.getById(requestDTO.getFrequencyMasterId());
+			businessCycleDefinition.setFrequencyMaster(frequencyMaster);
+		}
 		
-				if(logger.isDebugEnabled())
-					logger.debug("In BusinessCycleDefinition add EP, finding frequencyMaster object in db with id-> "+requestDTO.getFrequencyMasterId());
-		FrequencyMaster frequencyMaster = frequencyMasterService.getById(requestDTO.getFrequencyMasterId());
-				businessCycleDefinition.setFrequencyMaster(frequencyMaster);
-		
-		if(logger.isDebugEnabled())
-			logger.debug("Sending request to businessCycleDefinition service add method to add data into DB"); 
+		if (logger.isDebugEnabled())
+			logger.debug("Sending request to businessCycleDefinition service add method to add data into DB");
 		businessCycleDefinitionService.add(businessCycleDefinition);
-		
+
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(ResponseBuilder.builder()
-					.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
-							"Business Cycle Definition added successfully.")
-					.build());
+				.body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
+						"Business Cycle Definition added successfully.").build());
 	}
 
 	@Override

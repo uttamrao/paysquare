@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,16 +57,21 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		if(logger.isDebugEnabled()) logger.debug("In add BusinessCycleDefinition");
 		validate(businessCycleBean);		
 		
-		FrequencyEnum frequency = businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster().getName();
-		if(logger.isDebugEnabled()) logger.debug("Initializing businessCycle creation for frequency-> "+frequency);
+		FrequencyEnum frequency = null;
+				
+		if(businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster() != null)
+			frequency = businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster().getName();
+		else
+			frequency = FrequencyEnum.ADHOC;
+				
+		if(logger.isDebugEnabled()) logger.debug("Initializing businessCycle creation for frequency-> "+frequency);					
 		
 		// check last created cycle year and create cycle from that year till the noOfYears requested
 		//i.e set start year to the year last cycle was created
 		//based on the the duration it shouled be decided if cycle should be created for this year or next
-		List<BusinessCycle> businessCycles = businessCycleRepository.findLatestByCycleId(businessCycleBean.getBusinessCycleDefinition().getId());
-		if(!CollectionUtils.isEmpty(businessCycles)) {
-			BusinessCycle businessCycle = businessCycles.get(businessCycles.size()-1);
-			LocalDate fromDate = LocalDateUtils.convert(businessCycle.getToDate(), ZoneId.systemDefault());
+		Optional<BusinessCycle> businessCycle = businessCycleRepository.findTopByBusinessCycleDefinitionOrderByFromDateDesc(businessCycleBean.getBusinessCycleDefinition());
+		if(businessCycle.isPresent()) {
+			LocalDate fromDate = LocalDateUtils.convert(businessCycle.get().getToDate(), ZoneId.systemDefault());
 			businessCycleBean.setLastCreatedYear(fromDate.plusDays(1).getYear());			
 		}		
 			
@@ -93,13 +99,38 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating BusinessCycleBean cycle definition, object-> "+businessCycleBean.getBusinessCycleDefinition());
-		if(businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle frequency not found!");
+		if(businessCycleBean.getBusinessCycleDefinition().getBusinessYearDefinition() == null)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business year definition not found!");	
+
+		if(logger.isDebugEnabled())
+			logger.debug("Validating BusinessCycleBean cycle definition, object-> "+businessCycleBean.getBusinessCycleDefinition());
+		if(businessCycleBean.getBusinessCycleDefinition().getReoccuranceDays() == 0) {			
+			if(logger.isDebugEnabled())
+				logger.debug("Validating if frequency is set in businessCycleDefinition, object-> "+businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster());
+			if(businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster() == null)
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle frequency not found!");		
+		}	
 	}
 	
 	@Override
 	public List<BusinessCycle> getAll() {				
 		return null;
+	}
+
+	@Override
+	public List<BusinessCycle> getByCycleDefinition(int id) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("In BusinessCycle getByCycleDefinition method, businessCycleDefinitionId-> "+id);
+		if(id == 0)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
+		
+		List<BusinessCycle> businessCycleList = businessCycleRepository.findAllByCycleDefinitionId(id);		
+		
+		if(businessCycleList.isEmpty())
+			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
+		
+		return businessCycleList;
 	}
 
 }

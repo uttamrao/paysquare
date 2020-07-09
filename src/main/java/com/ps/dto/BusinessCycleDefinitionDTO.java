@@ -10,8 +10,10 @@ public class BusinessCycleDefinitionDTO extends AbstractTimeDTO{
 	
 	private String weekStartDefinition;
 	
-	private int minDaysInCycle = 1;	
-
+	private int reOccuranceDays;
+	
+	private boolean forceToBusinessYearEnd;
+	
 	public boolean isActive() {
 		return isActive;
 	}
@@ -44,12 +46,20 @@ public class BusinessCycleDefinitionDTO extends AbstractTimeDTO{
 		this.weekStartDefinition = weekStartDefinition;
 	}
 
-	public int getMinDaysInCycle() {
-		return minDaysInCycle;
+	public int getReOccuranceDays() {
+		return reOccuranceDays;
 	}
 
-	public void setMinDaysInCycle(int minDaysInCycle) {
-		this.minDaysInCycle = minDaysInCycle;
+	public void setReOccuranceDays(int reOccuranceDays) {
+		this.reOccuranceDays = reOccuranceDays;
+	}
+
+	public boolean isForceToBusinessYearEnd() {
+		return forceToBusinessYearEnd;
+	}
+
+	public void setForceToBusinessYearEnd(boolean forceToBusinessYearEnd) {
+		this.forceToBusinessYearEnd = forceToBusinessYearEnd;
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.ps.RESTful.resources.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.logging.Logger;
@@ -65,19 +66,26 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 	}
 
 	@Override
-	public ResponseEntity<Response> getAll() {
+	public ResponseEntity<Response> getAll(Integer cycleDefinitionId) {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("In businessCycle getAll EP");
 		
-		if(logger.isDebugEnabled())
-			logger.debug("Sending request to businessCycle service getAll method"); 
-		List<BusinessCycle> businessCycleList= businessCycleService.getAll();
+		List<BusinessCycle> businessCycleList = new ArrayList<BusinessCycle>();
+		
+		if(cycleDefinitionId != null) {
+			if(logger.isDebugEnabled())
+				logger.debug("Sending request to businessCycle service getByCycleID method for cycleDefiniitonID-> "+cycleDefinitionId); 
+			businessCycleList= businessCycleService.getByCycleDefinition(cycleDefinitionId);
+		}else {
+			if(logger.isDebugEnabled())
+				logger.debug("Sending request to businessCycle service getAll method"); 
+			businessCycleList= businessCycleService.getAll();
+		}
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Sending request to businessCycle dto mapper to map entity list to responseDTO list");
-		List<BusinessCycleResponseDTO> responseDTOList = businessCycleDTOMapper
-				.entityListToDtoList(businessCycleList);
+		List<BusinessCycleResponseDTO> responseDTOList = businessCycleDTOMapper.entityListToDtoList(businessCycleList);
 		
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(ResponseBuilder.builder()

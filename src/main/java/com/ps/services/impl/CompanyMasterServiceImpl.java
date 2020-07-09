@@ -18,8 +18,7 @@ public class CompanyMasterServiceImpl implements CompanyMasterService {
 	Logger logger = Logger.getLogger(CompanyMasterServiceImpl.class);
 	
 	@Autowired
-	CompanyMasterRepository companyMasterRepository;
-	
+	CompanyMasterRepository companyMasterRepository;	
 	
 	@Override
 	public CompanyMaster getById(int id) {

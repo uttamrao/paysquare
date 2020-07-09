@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.ps.RESTful.dto.request.BusinessCycleRequestDTO;
 import com.ps.RESTful.resources.response.handler.Response;
@@ -22,5 +23,5 @@ public interface BusinessCycleResource {
 	@GetMapping(
 			produces = MediaType.APPLICATION_JSON_VALUE
 			)
-	public ResponseEntity<Response> getAll();
+	public ResponseEntity<Response> getAll(@RequestParam(name = "cycleDefinitionId",required = false) Integer cycleDefinitionId);
 }

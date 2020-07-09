@@ -30,8 +30,10 @@ public class BusinessCycleDefinition extends AbstractTimeEntity{
 	
 	@Enumerated(EnumType.STRING)
 	private WeeksEnum weekStartDefinition;
+		
+	private int reoccuranceDays;
 	
-	private int minDaysInCycle;
+	private boolean forceToBusinessYearEnd;
 	
 	@ManyToOne
 	@JoinColumn(name="frequencyMasterId",referencedColumnName = "frequencyMasterId")
@@ -89,14 +91,6 @@ public class BusinessCycleDefinition extends AbstractTimeEntity{
 		this.serviceName = serviceName;
 	}
 
-	public int getMinDaysInCycle() {
-		return minDaysInCycle;
-	}
-
-	public void setMinDaysInCycle(int minDaysInCycle) {
-		this.minDaysInCycle = minDaysInCycle;
-	}
-
 	public WeeksEnum getWeekStartDefinition() {
 		return weekStartDefinition;
 	}
@@ -104,4 +98,21 @@ public class BusinessCycleDefinition extends AbstractTimeEntity{
 	public void setWeekStartDefinition(WeeksEnum weekStartDefinition) {
 		this.weekStartDefinition = weekStartDefinition;
 	}
+
+	public boolean isForceToBusinessYearEnd() {
+		return forceToBusinessYearEnd;
+	}
+
+	public void setForceToBusinessYearEnd(boolean forceToBusinessYearEnd) {
+		this.forceToBusinessYearEnd = forceToBusinessYearEnd;
+	}
+
+	public int getReoccuranceDays() {
+		return reoccuranceDays;
+	}
+
+	public void setReoccuranceDays(int reoccuranceDays) {
+		this.reoccuranceDays = reoccuranceDays;
+	}
+
 }

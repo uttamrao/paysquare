@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ps.RESTful.enums.ErrorCode;
-import com.ps.RESTful.enums.FrequencyEnum;
 import com.ps.RESTful.enums.ServiceTypeEnum;
-import com.ps.RESTful.enums.WeeksEnum;
 import com.ps.RESTful.error.handler.InvalidRequestException;
 import com.ps.entities.tenant.BusinessCycleDefinition;
 import com.ps.services.BusinessCycleDefinitionService;
@@ -51,14 +49,14 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		if(logger.isDebugEnabled())	logger.debug("BusinessCycleDefinition data is valid, "
 				+ "saving into DB");
 		
-		ServiceTypeEnum serviceType = ServiceTypeEnum.valueOf(businessCycleDefinition.getServiceName());
-		FrequencyEnum frequency = businessCycleDefinition.getFrequencyMaster().getName();
-
-		if(businessCycleDefinition.getWeekStartDefinition() == null && frequency.name().contains(FrequencyEnum.WEEKLY.name()))
-			businessCycleDefinition.setWeekStartDefinition(WeeksEnum.SUNDAY);			
-			
+		ServiceTypeEnum serviceType = ServiceTypeEnum.valueOf(businessCycleDefinition.getServiceName());		
+		String shortCode = "";
+		
+		if(businessCycleDefinition.getFrequencyMaster() != null) {
+			shortCode = businessCycleDefinition.getFrequencyMaster().getName().getShortCode();
+		}		
 		businessCycleDefinition.setServiceName(serviceType.name());		
-		String cycleName = businessCycleDefinition.getName()+"_"+serviceType.getShortCode()+"_"+frequency.getShortCode();		
+		String cycleName = businessCycleDefinition.getName()+"_"+serviceType.getShortCode()+"_"+shortCode;		
 		businessCycleDefinition.setName(cycleName);
 		businessCycleDefinitionRepository.save(businessCycleDefinition);
 		if(logger.isDebugEnabled()) logger.debug("BusinessCycleDefinition saved into DB");
@@ -76,15 +74,17 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		if(businessCycleDefinition == null)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition not found!");
 		
-		if(logger.isDebugEnabled())
-			logger.debug("Validating if frequency is set in businessCycleDefinition, object-> "+businessCycleDefinition.getFrequencyMaster());
-		if(businessCycleDefinition.getFrequencyMaster() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency not found!");
+		if(businessCycleDefinition.getReoccuranceDays() == 0) {			
+			if(logger.isDebugEnabled())
+				logger.debug("Validating if frequency is set in businessCycleDefinition, object-> "+businessCycleDefinition.getFrequencyMaster());
+			if(businessCycleDefinition.getFrequencyMaster() == null)
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency not found!");		
+		}	
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating if businessYear is set in businessCycleDefinition, object-> "+businessCycleDefinition.getBusinessYearDefinition());
 		if(businessCycleDefinition.getBusinessYearDefinition() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year not found!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year not found!");	
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating businessCycleDefinition, name-> "+businessCycleDefinition.getName());
