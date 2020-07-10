@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.ps.RESTful.enums.ErrorCode;
 import com.ps.RESTful.error.handler.InvalidRequestException;
 import com.ps.entities.tenant.BusinessYearDefinition;
+import com.ps.services.BusinessCycleDefinitionService;
 import com.ps.services.BusinessYearDefinitionService;
 import com.ps.services.dao.repository.tenant.BusinessYearDefinitionRepository;
 import com.ps.util.RequestUtils;
@@ -23,6 +24,9 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 	
 	@Autowired
 	BusinessYearDefinitionRepository businessYearDefinitionRepository;
+	
+	@Autowired
+	BusinessCycleDefinitionService businessCycleDefinitionService;
 	
 	@Autowired
 	RequestUtils requestUtils;
@@ -96,6 +100,10 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 	
 	@Override
 	public void deleteById(int id) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("Calling cycle definition service for Deleting business cycle definition record with business year  id-> "+id);		
+		businessCycleDefinitionService.deleteByBusinessYearDefinitionId(id);
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Deleting business year record from DB, id-> "+id);

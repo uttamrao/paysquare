@@ -14,4 +14,6 @@ public interface BusinessCycleDefinitionService {
 	
 	public void deleteByBusinessYearDefinitionId(int id);
 	
+	public BusinessCycleDefinition update(BusinessCycleDefinition businessCycleDefinition);
+	
 }

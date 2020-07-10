@@ -2,6 +2,7 @@ package com.ps.services.dao.repository.tenant;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -17,4 +18,8 @@ public interface BusinessCycleDefinitionRepository extends AbstractRepository<Bu
 	@Query("SELECT c FROM BusinessCycleDefinition c WHERE c.businessYearDefinition.id = (:businessYearDefinitionId)")
 	List<BusinessCycleDefinition> findAllByBusinessYearDefinitionId(@Param("businessYearDefinitionId") int businessYearDefinitionId);
 
+	@Modifying
+	@Query("DELETE FROM BusinessCycleDefinition c WHERE c.id in (:ids)")
+	void deleteAllByIds(List<Integer> ids);
+	
 }

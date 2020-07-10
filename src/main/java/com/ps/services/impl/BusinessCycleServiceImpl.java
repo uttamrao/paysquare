@@ -114,7 +114,14 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 	
 	@Override
 	public List<BusinessCycle> getAll() {				
-		return null;
+		if(logger.isDebugEnabled())
+			logger.debug("In BusinessCycle getAll");
+		
+		List<BusinessCycle> businessCycleList = businessCycleRepository.findAll();
+		if(businessCycleList.isEmpty())
+			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
+		
+		return businessCycleList;
 	}
 
 	@Override

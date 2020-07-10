@@ -74,6 +74,53 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl im
 	}
 
 	@Override
+	public ResponseEntity<Response> update(int resourceId, BusinessCycleDefinitionRequestDTO requestDTO) {
+
+		if (logger.isDebugEnabled())
+			logger.debug("In BusinessCycleDefinition update EP, calling service method to find cycleDefinition with id-> "+resourceId);				
+		BusinessCycleDefinition dbBusinessCycleDefinition = businessCycleDefinitionService.getById(resourceId);
+		
+		if (logger.isDebugEnabled())
+			logger.debug("Mapping request dto to entity");
+		BusinessCycleDefinition businessCycleDefinition = businessCycleDefinitionDTOMapper.dtoToEntity(requestDTO);
+		
+		if (logger.isDebugEnabled())
+			logger.debug("In BusinessCycleDefinition update EP, finding businessYearDifinition object in db with id-> "
+					+ requestDTO.getBusinessYearDefinitionId());
+		BusinessYearDefinition businessYearDefinition = businessYearDefinitionService
+				.getById(requestDTO.getBusinessYearDefinitionId());
+		businessCycleDefinition.setBusinessYearDefinition(businessYearDefinition);
+
+		if(requestDTO.getFrequencyMasterId() != 0) {
+			if (logger.isDebugEnabled())
+				logger.debug("In BusinessCycleDefinition add EP, finding frequencyMaster object in db with id-> "
+						+ requestDTO.getFrequencyMasterId());
+			FrequencyMaster frequencyMaster = frequencyMasterService.getById(requestDTO.getFrequencyMasterId());
+			businessCycleDefinition.setFrequencyMaster(frequencyMaster);
+		}
+		
+		businessCycleDefinition = overrideRequestForUpdate(dbBusinessCycleDefinition, businessCycleDefinition);
+		if (logger.isDebugEnabled())
+			logger.debug("Sending request to businessCycleDefinition service add method to add data into DB");
+		businessCycleDefinitionService.update(businessCycleDefinition);
+
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
+						"Business Cycle Definition updated successfully.").build());
+	}
+	
+	private BusinessCycleDefinition overrideRequestForUpdate(BusinessCycleDefinition dbCycleDefinitionObject, BusinessCycleDefinition requestCycleDefinitionObject) {
+		
+		requestCycleDefinitionObject.setId(dbCycleDefinitionObject.getId());
+		requestCycleDefinitionObject.setCreateDateTime(dbCycleDefinitionObject.getCreateDateTime());
+		requestCycleDefinitionObject.setCreatedBy(dbCycleDefinitionObject.getCreatedBy());
+		requestCycleDefinitionObject.setServiceName(dbCycleDefinitionObject.getServiceName());
+		requestCycleDefinitionObject.setName(dbCycleDefinitionObject.getName());		
+		
+		return requestCycleDefinitionObject;
+	}
+	
+	@Override
 	public ResponseEntity<Response> getAll() {
 		
 		if(logger.isDebugEnabled())

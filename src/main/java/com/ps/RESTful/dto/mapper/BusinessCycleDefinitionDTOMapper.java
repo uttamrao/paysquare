@@ -71,7 +71,6 @@ public class BusinessCycleDefinitionDTOMapper implements
 			responseDTO.setActive(businessCycleDefinition.isActive());
 			responseDTO.setReOccuranceDays(businessCycleDefinition.getReoccuranceDays());
 			responseDTO.setForceToBusinessYearEnd(businessCycleDefinition.isForceToBusinessYearEnd());
-			responseDTO.setWeekStartDefinition(businessCycleDefinition.getWeekStartDefinition().getValue());
 			responseDTO.setCreatedBy(businessCycleDefinition.getCreatedBy());
 			responseDTO.setName(businessCycleDefinition.getName());
 			responseDTO.setServiceName(businessCycleDefinition.getServiceName());
