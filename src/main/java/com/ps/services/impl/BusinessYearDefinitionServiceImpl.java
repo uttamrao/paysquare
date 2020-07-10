@@ -107,7 +107,7 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Deleting business year record from DB, id-> "+id);
-		businessYearDefinitionRepository.deleteById(id);		
+		businessYearDefinitionRepository.softDeleteById(id);		
 	}
 
 	@Override

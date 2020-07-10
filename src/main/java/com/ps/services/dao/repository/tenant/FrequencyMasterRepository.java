@@ -10,5 +10,5 @@ public interface FrequencyMasterRepository extends AbstractRepository<FrequencyM
 	
 	List<FrequencyMaster> findAllByIsActive(boolean isActive);
 	
-	Optional<FrequencyMaster> findByName(FrequencyEnum name);
+	Optional<FrequencyMaster> findByNameAndIsActive(FrequencyEnum name, boolean isActive);
 }

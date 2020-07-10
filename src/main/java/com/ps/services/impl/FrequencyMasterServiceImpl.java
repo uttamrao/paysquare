@@ -48,7 +48,7 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		if(logger.isDebugEnabled())	logger.debug("Frequency master data is valid, "
 				+ "saving into DB");
 		
-		Optional<FrequencyMaster> existingFrequencyMaster = frequencyMasterRepository.findByName(frequencyMaster.getName());
+		Optional<FrequencyMaster> existingFrequencyMaster = frequencyMasterRepository.findByNameAndIsActive(frequencyMaster.getName(), true);
 		
 		if(existingFrequencyMaster.isEmpty()) {
 			

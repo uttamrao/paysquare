@@ -76,7 +76,7 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 		if(cycleDefinitionId != null) {
 			if(logger.isDebugEnabled())
 				logger.debug("Sending request to businessCycle service getByCycleID method for cycleDefiniitonID-> "+cycleDefinitionId); 
-			businessCycleList= businessCycleService.getByCycleDefinition(cycleDefinitionId);
+			businessCycleList= businessCycleService.getAllByCycleDefinition(cycleDefinitionId);
 		}else {
 			if(logger.isDebugEnabled())
 				logger.debug("Sending request to businessCycle service getAll method"); 

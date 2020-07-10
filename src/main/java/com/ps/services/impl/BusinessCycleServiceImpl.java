@@ -125,7 +125,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 	}
 
 	@Override
-	public List<BusinessCycle> getByCycleDefinition(int id) {
+	public List<BusinessCycle> getAllByCycleDefinition(int id) {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("In BusinessCycle getByCycleDefinition method, businessCycleDefinitionId-> "+id);
@@ -134,10 +134,18 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		
 		List<BusinessCycle> businessCycleList = businessCycleRepository.findAllByCycleDefinitionId(id);		
 		
-		if(businessCycleList.isEmpty())
-			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
-		
 		return businessCycleList;
+	}
+	
+	@Override
+	public void deleteByCycleDefinitionIds(List<Integer> ids) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("In BusinessCycle getByCycleDefinition method, businessCycleDefinitionId-> "+ids);
+		if(CollectionUtils.isEmpty(ids))
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
+		
+		businessCycleRepository.deleteAllByBusinessCycleDefinitionId(ids);
 	}
 
 }

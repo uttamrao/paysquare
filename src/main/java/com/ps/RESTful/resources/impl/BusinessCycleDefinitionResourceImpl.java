@@ -99,25 +99,13 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl im
 			businessCycleDefinition.setFrequencyMaster(frequencyMaster);
 		}
 		
-		businessCycleDefinition = overrideRequestForUpdate(dbBusinessCycleDefinition, businessCycleDefinition);
 		if (logger.isDebugEnabled())
 			logger.debug("Sending request to businessCycleDefinition service add method to add data into DB");
-		businessCycleDefinitionService.update(businessCycleDefinition);
+		businessCycleDefinitionService.update(dbBusinessCycleDefinition, businessCycleDefinition);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
 						"Business Cycle Definition updated successfully.").build());
-	}
-	
-	private BusinessCycleDefinition overrideRequestForUpdate(BusinessCycleDefinition dbCycleDefinitionObject, BusinessCycleDefinition requestCycleDefinitionObject) {
-		
-		requestCycleDefinitionObject.setId(dbCycleDefinitionObject.getId());
-		requestCycleDefinitionObject.setCreateDateTime(dbCycleDefinitionObject.getCreateDateTime());
-		requestCycleDefinitionObject.setCreatedBy(dbCycleDefinitionObject.getCreatedBy());
-		requestCycleDefinitionObject.setServiceName(dbCycleDefinitionObject.getServiceName());
-		requestCycleDefinitionObject.setName(dbCycleDefinitionObject.getName());		
-		
-		return requestCycleDefinitionObject;
 	}
 	
 	@Override

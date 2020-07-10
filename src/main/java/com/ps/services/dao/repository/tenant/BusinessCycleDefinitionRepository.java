@@ -13,13 +13,13 @@ public interface BusinessCycleDefinitionRepository extends AbstractRepository<Bu
 
 	List<BusinessCycleDefinition> findAllByIsActive(boolean isActive);
 	
-	List<BusinessCycleDefinition> findAllByBusinessYearDefinition(BusinessYearDefinition businessYearDefinition);
+	List<BusinessCycleDefinition> findAllByBusinessYearDefinitionAndIsActive(BusinessYearDefinition businessYearDefinition, boolean isActive);
 	
-	@Query("SELECT c FROM BusinessCycleDefinition c WHERE c.businessYearDefinition.id = (:businessYearDefinitionId)")
+	@Query("SELECT cd FROM BusinessCycleDefinition cd WHERE cd.isActive = false and cd.businessYearDefinition.id = (:businessYearDefinitionId)")
 	List<BusinessCycleDefinition> findAllByBusinessYearDefinitionId(@Param("businessYearDefinitionId") int businessYearDefinitionId);
 
 	@Modifying
-	@Query("DELETE FROM BusinessCycleDefinition c WHERE c.id in (:ids)")
-	void deleteAllByIds(List<Integer> ids);
+	@Query("UPDATE BusinessCycleDefinition cd SET cd.isActive = false WHERE cd.id in (:ids)")
+	void softDeleteAllByIds(List<Integer> ids);
 	
 }

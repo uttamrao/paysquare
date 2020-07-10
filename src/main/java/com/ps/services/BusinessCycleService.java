@@ -11,6 +11,8 @@ public interface BusinessCycleService {
 	
 	public List<BusinessCycle> getAll();
 	
-	public List<BusinessCycle> getByCycleDefinition(int id);
+	public List<BusinessCycle> getAllByCycleDefinition(int id);
+	
+	public void deleteByCycleDefinitionIds(List<Integer> ids);
 		
 }
