@@ -58,7 +58,7 @@ public class FrequencyMasterServiceTest {
 					.thenReturn(frequencyMaster.get());
 			System.out.println("after mocking repository add");
 		
-			Mockito.when(frequencyMasterRepository.findByName(FrequencyEnum.WEEKLY))
+			Mockito.when(frequencyMasterRepository.findByNameAndIsActive(FrequencyEnum.WEEKLY,true))
 			.thenReturn(frequencyMaster);
 			
 		//creating object for getALl test scenario
