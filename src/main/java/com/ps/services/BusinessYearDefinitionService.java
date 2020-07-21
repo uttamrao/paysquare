@@ -12,6 +12,6 @@ public interface BusinessYearDefinitionService {
 	
 	public BusinessYearDefinition getById(int id);
 	
-	public void deleteById(int id);
+	public void softDeleteById(int id);
 
 }

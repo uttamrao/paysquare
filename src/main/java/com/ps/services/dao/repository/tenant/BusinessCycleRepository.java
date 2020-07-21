@@ -15,13 +15,13 @@ public interface BusinessCycleRepository extends AbstractRepository<BusinessCycl
 	Optional<BusinessCycle> findTopByBusinessCycleDefinitionOrderByFromDateDesc(BusinessCycleDefinition businessCycleDefinition);
 	
 	@Query("Select c from BusinessCycle c where c.businessCycleDefinition.id = :id")
-	List<BusinessCycle> findAllByCycleDefinitionId(int id);
+	List<BusinessCycle> findAllByCycleDefinitionId(@Param("id")int id);
 	
 	@Query("Select c from BusinessCycle c where c.isLocked = false and c.businessCycleDefinition.businessYearDefinition.id = :yearDefinitionId")
 	List<BusinessCycle> findAllByBusinessYearDefinitionId(@Param("yearDefinitionId")int yearDefinitionId);
 	
 	@Modifying
-	@Query("DELETE FROM BusinessCycle c where c.businessCycleDefinition.id in (:cycleDefinitionIds) and c.isLocked = false")
-	List<BusinessCycle> deleteAllByBusinessCycleDefinitionId(@Param("cycleDefinitionIds")List<Integer> cycleDefinitionIds);
+	@Query("DELETE FROM BusinessCycle c where c.businessCycleDefinition.id in ?1")
+	void deleteAllByBusinessCycleDefinitionIds(List<Integer> cycleDefinitionIds);
 	
 }

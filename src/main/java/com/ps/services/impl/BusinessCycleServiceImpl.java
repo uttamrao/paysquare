@@ -2,6 +2,7 @@ package com.ps.services.impl;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,10 +118,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		if(logger.isDebugEnabled())
 			logger.debug("In BusinessCycle getAll");
 		
-		List<BusinessCycle> businessCycleList = businessCycleRepository.findAll();
-		if(businessCycleList.isEmpty())
-			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
-		
+		List<BusinessCycle> businessCycleList = businessCycleRepository.findAll();		
 		return businessCycleList;
 	}
 
@@ -128,7 +126,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 	public List<BusinessCycle> getAllByCycleDefinition(int id) {
 		
 		if(logger.isDebugEnabled())
-			logger.debug("In BusinessCycle getByCycleDefinition method, businessCycleDefinitionId-> "+id);
+			logger.debug("In BusinessCycle Definition getByCycleDefinition method, businessCycleDefinitionId-> "+id);
 		if(id == 0)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
 		
@@ -138,14 +136,40 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 	}
 	
 	@Override
-	public void deleteByCycleDefinitionIds(List<Integer> ids) {
+	public List<BusinessCycle> getAllByBusinessYearDefinitionId(int id) {
 		
 		if(logger.isDebugEnabled())
-			logger.debug("In BusinessCycle getByCycleDefinition method, businessCycleDefinitionId-> "+ids);
+			logger.debug("In BusinessCycleDefinition getAllByBusinessYearDefinitionId method, BusinessYearDefinitionId-> "+id);
+		if(id == 0)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business year definition is Invalid!");
+		
+		List<BusinessCycle> businessCycleList = businessCycleRepository.findAllByBusinessYearDefinitionId(id);		
+		
+		return businessCycleList;
+	}
+
+	@Override
+	public void deleteAllByCycleDefinitionIds(List<Integer> ids) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("In BusinessCycle deleteByCycleDefinitionIds method, businessCycleDefinitionId-> "+ids);
 		if(CollectionUtils.isEmpty(ids))
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
 		
-		businessCycleRepository.deleteAllByBusinessCycleDefinitionId(ids);
+		businessCycleRepository.deleteAllByBusinessCycleDefinitionIds(ids);
+	}
+
+	@Override
+	public void deleteAllByCycleDefinitionId(int id) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("In BusinessCycle deleteByCycleDefinitionId method, businessCycleDefinitionId-> "+id);
+		if(id == 0)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
+		
+		List<Integer> cycleDefinitionId = new ArrayList<Integer>();
+		cycleDefinitionId.add(id);
+		businessCycleRepository.deleteAllByBusinessCycleDefinitionIds(cycleDefinitionId);
 	}
 
 }

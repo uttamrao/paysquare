@@ -37,6 +37,8 @@ public class BusinessCycle extends AbstractTimeEntity{
 	private String periodName;
 	
 	private boolean isLocked;
+	
+	private boolean isActive = true;
 
 	public int getId() {
 		return id;
@@ -92,5 +94,13 @@ public class BusinessCycle extends AbstractTimeEntity{
 
 	public void setLocked(boolean isLocked) {
 		this.isLocked = isLocked;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 }

@@ -12,7 +12,9 @@ public interface BusinessCycleDefinitionService {
 	
 	public BusinessCycleDefinition getById(int id);
 	
-	public void deleteByBusinessYearDefinitionId(int id);
+	public void softDeleteByBusinessYearDefinitionId(int id);
+	
+	public void softDeleteById(int id);
 	
 	public BusinessCycleDefinition update(BusinessCycleDefinition existingBusinessCycleDefinition, BusinessCycleDefinition updatedBusinessCycleDefinition);
 	

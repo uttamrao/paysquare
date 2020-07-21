@@ -6,6 +6,7 @@ import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -72,4 +73,17 @@ public class BusinessYearDefinitionResourceImpl extends AbstractResourceImpl imp
 					.build());
 	}
 
+	@Override
+	public ResponseEntity<Response> delete(@PathVariable("resourceId") int resourceId){
+		
+		if(logger.isDebugEnabled())
+			logger.debug("In businessYearDefinition delete EP for id-> "+resourceId);
+		businessYearDefinitionService.softDeleteById(resourceId);
+		
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(ResponseBuilder.builder()
+					.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
+							"Record deleted successfully")
+					.build());
+	}
 }

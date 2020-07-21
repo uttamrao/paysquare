@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ps.RESTful.enums.ErrorCode;
 import com.ps.RESTful.error.handler.InvalidRequestException;
@@ -99,11 +100,12 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 	}
 	
 	@Override
-	public void deleteById(int id) {
+	@Transactional("tenantTransactionManager")
+	public void softDeleteById(int id) {
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Calling cycle definition service for Deleting business cycle definition record with business year  id-> "+id);		
-		businessCycleDefinitionService.deleteByBusinessYearDefinitionId(id);
+		businessCycleDefinitionService.softDeleteByBusinessYearDefinitionId(id);
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Deleting business year record from DB, id-> "+id);
@@ -118,7 +120,7 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 		if(id == 0)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year Definition is Invalid!");
 		
-		Optional<BusinessYearDefinition> businessYearOptional = businessYearDefinitionRepository.findById(id);		
+		Optional<BusinessYearDefinition> businessYearOptional = businessYearDefinitionRepository.findByIdAndIsActive(id, true);		
 		if(businessYearOptional.isEmpty())
 			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Year Definition not found!");
 		

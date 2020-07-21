@@ -14,7 +14,7 @@ import com.ps.RESTful.resources.response.handler.Response;
 public interface BusinessCycleDefinitionResource {
 
 	public final static String RESOURCE_PATH = "/business-cycle-definition";
-	public final static String UPDATE_PATH = "/{resourceId}";
+	public final static String RESOURCE_ID_PATH = "/{resourceId}";
 	
 	@PostMapping(
 			consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -23,7 +23,7 @@ public interface BusinessCycleDefinitionResource {
 	public ResponseEntity<Response> add(@RequestBody BusinessCycleDefinitionRequestDTO requestDTO);
 	
 	@PutMapping(
-			path = UPDATE_PATH,
+			path = RESOURCE_ID_PATH,
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE
 			)
@@ -33,4 +33,5 @@ public interface BusinessCycleDefinitionResource {
 			produces = MediaType.APPLICATION_JSON_VALUE
 			)
 	public ResponseEntity<Response> getAll();
+	
 }

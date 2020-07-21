@@ -1,6 +1,5 @@
 package com.ps.services.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import com.ps.RESTful.enums.ErrorCode;
@@ -211,40 +211,46 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
 
 		Optional<BusinessCycleDefinition> businessCycleDefinitionOptional = businessCycleDefinitionRepository
-				.findById(id);
+				.findByIdAndIsActive(id, true);
 		if (businessCycleDefinitionOptional.isEmpty())
 			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
 
 		return businessCycleDefinitionOptional.get();
 	}
-
+	
 	@Override
-	public void deleteByBusinessYearDefinitionId(int id) {
-
+	@Transactional("tenantTransactionManager")
+	public void softDeleteById(int id) {
+		
 		if (logger.isDebugEnabled())
-			logger.debug("In BusinessCycleService deleteByBusinessYearId "
-					+ "service method for deleting business cycle from databse where businessYearDefinitionId is -> "
-					+ id);
+			logger.debug("In BusinessCycleService deleteById "
+					+ "service method for deleting business cycle definition from databse where id is -> "
+					+ id);		
+		if (id == 0)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
 
 		List<BusinessCycle> businessCycleList = businessCycleService.getAllByCycleDefinition(id);
 		if (businessCycleList.isEmpty())
 			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
+		
+		businessCycleService.deleteAllByCycleDefinitionId(id);		
+		businessCycleDefinitionRepository.softDeleteById(id);
+	}
 
+	@Override
+	@Transactional("tenantTransactionManager")
+	public void softDeleteByBusinessYearDefinitionId(int id) {
+
+		if (logger.isDebugEnabled())
+			logger.debug("In BusinessCycleDefinitionService deleteByBusinessYearId "
+					+ "service method for deleting business cycle from databse where businessYearDefinitionId is -> "
+					+ id);
+
+		List<BusinessCycle> businessCycleList = businessCycleService.getAllByBusinessYearDefinitionId(id);		
+		if (logger.isDebugEnabled())
+			logger.debug("businessCycleList -> "+businessCycleList.size());
 		if (CollectionUtils.isEmpty(businessCycleList)) {
-
-			if (logger.isDebugEnabled())
-				logger.debug("No created business cycle is locked for business year id-> " + id
-						+ ",  deleteing all records");
-
-			List<BusinessCycleDefinition> businessCycleDefinitionList = businessCycleDefinitionRepository
-					.findAllByBusinessYearDefinitionId(id);
-			List<Integer> businessCycleDefinitionIds = new ArrayList<Integer>();
-			for (BusinessCycleDefinition businessCycleDefinition : businessCycleDefinitionList) {
-				businessCycleDefinitionIds.add(businessCycleDefinition.getId());
-			}
-
-			businessCycleService.deleteByCycleDefinitionIds(businessCycleDefinitionIds);
-			businessCycleDefinitionRepository.softDeleteAllByIds(businessCycleDefinitionIds);
+			businessCycleDefinitionRepository.softDeleteAllByBusinessYearDefinitionId(id);
 		} else {
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST,
 					"Business cycle definition cannot be deleted as cycles are already created");

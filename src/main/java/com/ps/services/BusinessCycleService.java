@@ -13,6 +13,10 @@ public interface BusinessCycleService {
 	
 	public List<BusinessCycle> getAllByCycleDefinition(int id);
 	
-	public void deleteByCycleDefinitionIds(List<Integer> ids);
-		
+	public List<BusinessCycle> getAllByBusinessYearDefinitionId(int id);
+	
+	public void deleteAllByCycleDefinitionIds(List<Integer> ids);
+	
+	public void deleteAllByCycleDefinitionId(int ids);
+			
 }

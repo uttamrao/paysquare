@@ -1,7 +1,7 @@
 package com.ps.services.dao.repository.tenant;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +12,7 @@ public interface BusinessYearDefinitionRepository extends AbstractRepository<Bus
 
 	List<BusinessYearDefinition> findAllByIsActive(boolean isActive);
 	
-	BusinessYearDefinition findAllByFromDateAndToDateAndIsActive(Date from, Date to, boolean isActive);
+	Optional<BusinessYearDefinition> findByIdAndIsActive(int id, boolean isActive);
 	
 	@Modifying
 	@Query("UPDATE BusinessYearDefinition c SET c.isActive = false WHERE c.id = :id")
