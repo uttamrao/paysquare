@@ -90,7 +90,7 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(ResponseBuilder.builder()
 					.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
-							"Records retrieved successfully")
+							"Business Cycle records retrieved successfully")
 					.results(responseDTOList)
 					.build());
 	}

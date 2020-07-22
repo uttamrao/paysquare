@@ -68,7 +68,7 @@ public class BusinessYearDefinitionResourceImpl extends AbstractResourceImpl imp
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(ResponseBuilder.builder()
 					.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
-							"Records retrieved successfully")
+							"Business Year Definition records retrieved successfully")
 					.results(responseDTOList)
 					.build());
 	}
@@ -83,7 +83,7 @@ public class BusinessYearDefinitionResourceImpl extends AbstractResourceImpl imp
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(ResponseBuilder.builder()
 					.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
-							"Record deleted successfully")
+							"Business Year Definition record deleted successfully")
 					.build());
 	}
 }

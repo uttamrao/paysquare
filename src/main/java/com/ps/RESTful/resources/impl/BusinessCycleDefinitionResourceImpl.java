@@ -127,7 +127,7 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl im
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(ResponseBuilder.builder()
 					.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
-							"Records retrieved successfully")
+							"Business Cycle Definition records retrieved successfully")
 					.results(responseDTOList)
 					.build());
 	}
@@ -142,7 +142,7 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl im
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(ResponseBuilder.builder()
 					.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
-							"Record deleted successfully")
+							"Business Cycle Definition record deleted successfully")
 					.build());
 	}
 

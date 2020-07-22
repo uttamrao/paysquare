@@ -67,7 +67,7 @@ public class FrequencyMasterResourceImpl extends AbstractResourceImpl implements
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(ResponseBuilder.builder()
 					.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
-							"Records retrieved successfully")
+							"Frequency records retrieved successfully")
 					.results(responseDTOList)
 					.build());
 	}
