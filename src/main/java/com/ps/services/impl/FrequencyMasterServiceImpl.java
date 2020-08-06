@@ -77,7 +77,7 @@ public class FrequencyMasterServiceImpl implements FrequencyMasterService {
 		if(logger.isDebugEnabled())
 			logger.debug("Validating frequency master, name-> "+frequencyMaster.getName());
 		if(frequencyMaster.getName() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency name is found!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency name not found!");
 		
 		if(logger.isDebugEnabled())
 			logger.debug("Validating frequency master, createdBy-> "+frequencyMaster.getCreatedBy());

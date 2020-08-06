@@ -12,9 +12,9 @@ public class DateUtils {
 
 	static Logger logger = Logger.getLogger(DateUtils.class);
 	
-	static SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	static SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	static SimpleDateFormat dateMonthFormatter = new SimpleDateFormat("MM/dd");
+	static SimpleDateFormat dateMonthFormatter = new SimpleDateFormat("MM-dd");
 
 	public static Date getDateTime(String inputDate){
 		
