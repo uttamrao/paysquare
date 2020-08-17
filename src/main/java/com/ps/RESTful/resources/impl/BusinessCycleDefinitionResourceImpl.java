@@ -133,6 +133,29 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl im
 	}
 	
 	@Override
+	public ResponseEntity<Response> get(@PathVariable("resourceId") int resourceId) {
+		
+		if(logger.isDebugEnabled())
+			logger.debug("In businessCycleDefinition get EP");
+		
+		if(logger.isDebugEnabled())
+			logger.debug("Sending request to businessCycleDefinition service get method"); 
+		BusinessCycleDefinition businessCycleDefinition= businessCycleDefinitionService.getById(resourceId);
+		
+		if(logger.isDebugEnabled())
+			logger.debug("Sending request to businessCycleDefinition dto mapper to map entity list to responseDTO list");
+		BusinessCycleDefinitionResponseDTO responseDTO = businessCycleDefinitionDTOMapper
+				.entityToDto(businessCycleDefinition);
+		
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(ResponseBuilder.builder()
+					.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
+							"Business Cycle Definition records retrieved successfully")
+					.result(responseDTO)
+					.build());
+	}
+	
+	@Override
 	public ResponseEntity<Response> delete(@PathVariable("resourceId") int resourceId){
 		
 		if(logger.isDebugEnabled())
