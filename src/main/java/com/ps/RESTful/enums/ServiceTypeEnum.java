@@ -5,6 +5,7 @@ public enum ServiceTypeEnum {
 	PAYROLL("Payroll","PY"),
 	LEAVE("Leave","LV"),
 	ATTENDANCE("Attendance","AT"),
+	INVESTMENT("Investment","IN"),
 	REIMBURSEMENT("Reimbursement","RE");
 	
 	private String value;
