@@ -15,7 +15,7 @@ import javax.persistence.TemporalType;
 import com.ps.entities.master.AbstractTimeEntity;
 
 @Entity
-public class BusinessCycle extends AbstractTimeEntity{
+public class BusinessCycle {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

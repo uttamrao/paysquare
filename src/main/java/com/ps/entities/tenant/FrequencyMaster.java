@@ -31,7 +31,7 @@ public class FrequencyMaster {
 	
 	private String createdBy;
 	
-	private String description;
+	//private String description;
 			
 	private boolean isActive = true;
 
@@ -67,13 +67,13 @@ public class FrequencyMaster {
 		this.createDateTime = createDateTime;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
+//	public String getDescription() {
+//		return description;
+//	}
+//
+//	public void setDescription(String description) {
+//		this.description = description;
+//	}
 
 	public FrequencyEnum getName() {
 		return name;

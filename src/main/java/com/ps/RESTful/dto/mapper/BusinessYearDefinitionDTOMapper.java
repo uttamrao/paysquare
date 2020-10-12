@@ -29,12 +29,11 @@ public class BusinessYearDefinitionDTOMapper implements
 			businessYearDefinition.setCreatedBy(dto.getCreatedBy());
 			businessYearDefinition.setFromDate(DateUtils.getDateMonth(dto.getFromDate()));
 			businessYearDefinition.setToDate(DateUtils.getDateMonth(dto.getToDate()));
-			businessYearDefinition.setDescription(dto.getDescription());
+			//businessYearDefinition.setDescription(dto.getDescription());
 			
 			if(logger.isDebugEnabled())
 				logger.debug("After Maping dto to entity BusinessYearDefinition fromDate-> "+businessYearDefinition.getFromDate()
 						+", toDate-> "+businessYearDefinition.getToDate()
-						+", description-> "+businessYearDefinition.getDescription()
 						+", createdBy-> "+businessYearDefinition.getCreatedBy());
 		}
 		
@@ -57,7 +56,7 @@ public class BusinessYearDefinitionDTOMapper implements
 			
 			responseDTO.setActive(businessYearDefinition.isActive());
 			responseDTO.setCreatedBy(businessYearDefinition.getCreatedBy());
-			responseDTO.setDescription(businessYearDefinition.getDescription());
+		//	responseDTO.setDescription(businessYearDefinition.getDescription());
 			responseDTO.setId(businessYearDefinition.getId());
 			responseDTO.setFromDate(DateUtils.getDateMonthString(businessYearDefinition.getFromDate()));
 			responseDTO.setToDate(DateUtils.getDateMonthString(businessYearDefinition.getToDate()));			

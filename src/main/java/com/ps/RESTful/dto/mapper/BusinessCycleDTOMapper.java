@@ -38,16 +38,16 @@ public class BusinessCycleDTOMapper implements
 			
 		BusinessCycleResponseDTO responseDTO = new BusinessCycleResponseDTO();
 
-			if(logger.isDebugEnabled())
-				logger.debug("Maping BusinessCycle"
-						+", period-> "+businessCycle.getPeriodId()
-						+", period name-> "+businessCycle.getPeriodName()
-						+", business-cycle-definition id-> "+businessCycle.getBusinessCycleDefinition().getId()
-						+", from date-> "+businessCycle.getFromDate()
-						+", to date-> "+businessCycle.getToDate()
-						+", createdBy-> "+businessCycle.getCreatedBy()
-						+", id-> "+businessCycle.getId()
-						+", createdDateTime-> "+businessCycle.getCreateDateTime());
+//			if(logger.isDebugEnabled())
+//				logger.debug("Maping BusinessCycle"
+//						+", period-> "+businessCycle.getPeriodId()
+//						+", period name-> "+businessCycle.getPeriodName()
+//						+", business-cycle-definition id-> "+businessCycle.getBusinessCycleDefinition().getId()
+//						+", from date-> "+businessCycle.getFromDate()
+//						+", to date-> "+businessCycle.getToDate()
+//						+", createdBy-> "+businessCycle.getCreatedBy()
+//						+", id-> "+businessCycle.getId()
+//						+", createdDateTime-> "+businessCycle.getCreateDateTime());
 			
 			responseDTO.setLocked(businessCycle.isLocked());
 			responseDTO.setPeriodId(businessCycle.getPeriodId());
@@ -56,7 +56,7 @@ public class BusinessCycleDTOMapper implements
 			responseDTO.setToDate(DateUtils.getDateTimeString(businessCycle.getToDate()));
 			responseDTO.setBusinessCycleDefinition(businessCycleDefinitionDTOMapper.entityToDto(businessCycle.getBusinessCycleDefinition())); 
 			responseDTO.setId(businessCycle.getId());
-			responseDTO.setCreateDateTime(DateUtils.getDateTimeString(businessCycle.getCreateDateTime()));		
+			//responseDTO.setCreateDateTime(DateUtils.getDateTimeString(businessCycle.getCreateDateTime()));		
 		
 		return responseDTO;
 	}

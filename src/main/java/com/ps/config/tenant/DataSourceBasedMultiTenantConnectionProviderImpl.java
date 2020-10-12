@@ -48,7 +48,7 @@ public class DataSourceBasedMultiTenantConnectionProviderImpl
             logger.info(">>>> selectAnyDataSource() -- Total tenants:" + masterTenants.size());
             for (GroupCompanyMaster masterTenant : masterTenants) {
             	logger.info(">>>> selectAnyDataSource() --creating for client  datasource:" + masterTenant.getDatabaseName());
-            	dataSourcesMap.put(masterTenant.getCompanyName(),
+            	dataSourcesMap.put(masterTenant.getGroupName(),
                         DataSourceUtil.createAndConfigureDataSource(masterTenant));
             }
         }
@@ -69,7 +69,7 @@ public class DataSourceBasedMultiTenantConnectionProviderImpl
         	if(logger.isDebugEnabled()) logger.debug(
                     ">>>> selectDataSource() -- tenant:" + tenantIdentifier + " Total tenants:" + masterTenants.size());
             for (GroupCompanyMaster masterTenant : masterTenants) {
-                dataSourcesMap.put(masterTenant.getCompanyName(),
+                dataSourcesMap.put(masterTenant.getGroupName(),
                         DataSourceUtil.createAndConfigureDataSource(masterTenant));
             }
         }

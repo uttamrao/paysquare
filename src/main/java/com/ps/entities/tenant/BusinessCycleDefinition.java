@@ -23,17 +23,18 @@ public class BusinessCycleDefinition extends AbstractTimeEntity{
 	
 	private boolean isActive = true;
 	
-	@Column(name="businessCycleName")
+	@Column(name="cycleName")
 	private String name;
 	
 	private String serviceName;
 	
-	@Enumerated(EnumType.STRING)
-	private WeeksEnum weekStartDefinition;
+//	@Enumerated(EnumType.STRING)
+//	private WeeksEnum weekStartDefinition;
 		
 	private int reoccuranceDays;
 	
-	private boolean forceToBusinessYearEnd;
+	@Column(name="isForceYearEnd")
+	private boolean forceToBusinessYearEnd=false;
 	
 	@ManyToOne
 	@JoinColumn(name="frequencyMasterId",referencedColumnName = "frequencyMasterId")
@@ -91,13 +92,13 @@ public class BusinessCycleDefinition extends AbstractTimeEntity{
 		this.serviceName = serviceName;
 	}
 
-	public WeeksEnum getWeekStartDefinition() {
-		return weekStartDefinition;
-	}
-
-	public void setWeekStartDefinition(WeeksEnum weekStartDefinition) {
-		this.weekStartDefinition = weekStartDefinition;
-	}
+//	public WeeksEnum getWeekStartDefinition() {
+//		return weekStartDefinition;
+//	}
+//
+//	public void setWeekStartDefinition(WeeksEnum weekStartDefinition) {
+//		this.weekStartDefinition = weekStartDefinition;
+//	}
 
 	public boolean isForceToBusinessYearEnd() {
 		return forceToBusinessYearEnd;

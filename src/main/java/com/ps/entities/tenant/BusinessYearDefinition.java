@@ -26,7 +26,7 @@ public class BusinessYearDefinition extends AbstractTimeEntity{
 	@Temporal(TemporalType.DATE)
 	private Date toDate;
 	
-	private String description;
+//	private String description;
 
 	private boolean isActive = true;
 
@@ -62,12 +62,12 @@ public class BusinessYearDefinition extends AbstractTimeEntity{
 		this.isActive = isActive;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
+//	public String getDescription() {
+//		return description;
+//	}
+//
+//	public void setDescription(String description) {
+//		this.description = description;
+//	}
 
 }

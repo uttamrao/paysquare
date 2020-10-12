@@ -4,11 +4,11 @@ import java.beans.PropertyVetoException;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.ps.entities.master.GroupCompanyMaster;
+
 
 
 public final class DataSourceUtil {
@@ -20,15 +20,14 @@ public final class DataSourceUtil {
 		
 		try {
 			if(logger.isDebugEnabled()) logger.debug("In createAndConfigureDataSource method creating datasource for "
-					+ "tenant-> "+masterTenant.getCompanyName());
+					+ "tenant-> "+masterTenant.getGroupName());
 			
 			ComboPooledDataSource ds = new ComboPooledDataSource();
 			ds.setUser(masterTenant.getUserName());
 			ds.setPassword(masterTenant.getPassword());
-			//jdbc:sqlserver://SERVERNAME\INSTANCENAME;databaseName=EDS
 			
 			String serverAndInstanceName = masterTenant.getServerName();
-			if(!StringUtils.isBlank(masterTenant.getInstanceName()))
+			if (masterTenant.getInstanceName() != null && !masterTenant.getInstanceName().isBlank())
 				serverAndInstanceName = masterTenant.getServerName()+"\\"+masterTenant.getInstanceName();
 						
 			ds.setJdbcUrl("jdbc:sqlserver://"+serverAndInstanceName+";databaseName=" + masterTenant.getDatabaseName());
@@ -39,9 +38,9 @@ public final class DataSourceUtil {
 
 			ds.setInitialPoolSize(20);
 
-			String tenantId = masterTenant.getCompanyName();
+			String tenantId = masterTenant.getGroupName();
 			String tenantConnectionPoolName = tenantId + "-connection-pool";
-			logger.info("Configured datasource:" + masterTenant.getCompanyName() + ". Connection poolname:"
+			logger.info("Configured datasource:" + masterTenant.getGroupName() + ". Connection poolname:"
 					+ tenantConnectionPoolName);
 			return ds;
 		} catch (PropertyVetoException e) {

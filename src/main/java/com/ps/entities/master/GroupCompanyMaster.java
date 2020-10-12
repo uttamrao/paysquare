@@ -16,7 +16,7 @@ import javax.persistence.TemporalType;
 public class GroupCompanyMaster {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="groupDBMasterId")
 	private int groupCompanyMasterId;
 	
@@ -26,20 +26,18 @@ public class GroupCompanyMaster {
 	
 	private String databaseName;
 	
-	private String companyName;
+	private String groupName;
 	
 	private String userName;
 	
 	private String password;
-	
-	private String language;
 	
 	private String currency;
 	
 	private String createdBy;
 	
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date createDate;
+	private Date createDateTime;
 	
 	private boolean isActive;
 	
@@ -67,12 +65,7 @@ public class GroupCompanyMaster {
 	public void setDatabaseName(String databaseName) {
 		this.databaseName = databaseName;
 	}
-	public String getCompanyName() {
-		return companyName;
-	}
-	public void setCompanyName(String companyName) {
-		this.companyName = companyName;
-	}
+	
 	public String getUserName() {
 		return userName;
 	}
@@ -85,12 +78,7 @@ public class GroupCompanyMaster {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public String getLanguage() {
-		return language;
-	}
-	public void setLanguage(String language) {
-		this.language = language;
-	}
+
 	public String getCurrency() {
 		return currency;
 	}
@@ -103,16 +91,26 @@ public class GroupCompanyMaster {
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
-	public Date getCreateDate() {
-		return createDate;
-	}
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
+	
 	public boolean isActive() {
 		return isActive;
 	}
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
+	}
+	
+	public Date getCreateDateTime() {
+		return createDateTime;
+	}
+	public void setCreateDateTime(Date createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+	public String getGroupName() {
+		return groupName;
+	}
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
 	}	
+	
+	
 }
