@@ -1,5 +1,6 @@
 package com.ps.services.dao.repository.tenant;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +15,11 @@ public interface BusinessYearDefinitionRepository extends AbstractRepository<Bus
 	
 	Optional<BusinessYearDefinition> findByIdAndIsActive(int id, boolean isActive);
 	
+	Optional<BusinessYearDefinition> findByIdAndIsActiveAndIsUsed(int id,boolean isActive,boolean isUsed );
+	
 	@Modifying
-	@Query("UPDATE BusinessYearDefinition c SET c.isActive = false WHERE c.id = :id")
+	@Query("UPDATE BusinessYearDefinition c SET c.isActive = false , c.isUsed = false WHERE c.id = :id")
 	void softDeleteById(int id);
+	
+	BusinessYearDefinition findByfromDateAndToDate(Date fromDate, Date toDate);
 }

@@ -6,7 +6,14 @@ public class BusinessYearDefinitionResponseDTO extends BusinessYearDefinitionDTO
 
 	private int id;
 	
+	private String yearDefinition;
+	
 	private String createDateTime;
+
+	
+	public BusinessYearDefinitionResponseDTO() {
+		super();
+	}
 
 	public int getId() {
 		return id;
@@ -24,4 +31,13 @@ public class BusinessYearDefinitionResponseDTO extends BusinessYearDefinitionDTO
 		this.createDateTime = createDateTime;
 	}
 
+	public String getYearDefinition() {
+		return yearDefinition;
+	}
+
+	public void setYearDefinition(String yearDefinition) {
+		this.yearDefinition = yearDefinition;
+	}
+
+	
 }

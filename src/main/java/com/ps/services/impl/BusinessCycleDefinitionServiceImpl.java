@@ -16,10 +16,12 @@ import com.ps.RESTful.enums.ServiceTypeEnum;
 import com.ps.RESTful.error.handler.InvalidRequestException;
 import com.ps.entities.tenant.BusinessCycle;
 import com.ps.entities.tenant.BusinessCycleDefinition;
+import com.ps.entities.tenant.BusinessYearDefinition;
 import com.ps.services.BusinessCycleDefinitionService;
 import com.ps.services.BusinessCycleService;
 import com.ps.services.dao.repository.tenant.BusinessCycleDefinitionRepository;
 import com.ps.services.dao.repository.tenant.BusinessCycleRepository;
+import com.ps.services.dao.repository.tenant.BusinessYearDefinitionRepository;
 import com.ps.util.RequestUtils;
 
 @Service
@@ -29,6 +31,9 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 
 	@Autowired
 	BusinessCycleDefinitionRepository businessCycleDefinitionRepository;
+	
+	@Autowired
+	BusinessYearDefinitionRepository businessYearDefinitionRepository;
 
 	@Autowired
 	BusinessCycleRepository businessCycleRepository;
@@ -69,8 +74,18 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 			shortCode = businessCycleDefinition.getFrequencyMaster().getName().getShortCode();
 		}
 		businessCycleDefinition.setServiceName(serviceType.name());
+		
 		String cycleName = businessCycleDefinition.getName() + "_" + serviceType.getShortCode() + "_" + shortCode;
 		businessCycleDefinition.setName(cycleName);
+		
+		//set isUesd field from business year definition=1
+		Optional<BusinessYearDefinition> businessYearOptional = businessYearDefinitionRepository.findByIdAndIsActive(businessCycleDefinition.getBusinessYearDefinition().getId(), true);		
+		if(businessYearOptional.isEmpty())
+			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Year Definition not found!");
+		
+		businessYearOptional.get().setIsUsed(true);
+		businessYearDefinitionRepository.save(businessYearOptional.get());
+		System.out.println("businessYearOptional.get(): "+businessYearOptional.get());
 		businessCycleDefinitionRepository.save(businessCycleDefinition);
 		if (logger.isDebugEnabled())
 			logger.debug("BusinessCycleDefinition saved into DB");

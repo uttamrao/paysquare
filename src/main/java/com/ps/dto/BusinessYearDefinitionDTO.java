@@ -2,15 +2,26 @@ package com.ps.dto;
 
 public class BusinessYearDefinitionDTO {
 	
+	private int id;
+	
 	private String fromDate;
 	
 	private String toDate;
 	
 	private String description;
 
+	private boolean isUsed;
+	
 	private boolean isActive = true;
 	
 	private String createdBy;
+	
+	
+
+	public BusinessYearDefinitionDTO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 	public String getFromDate() {
 		return fromDate;
@@ -51,4 +62,30 @@ public class BusinessYearDefinitionDTO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public boolean isUsed() {
+		return isUsed;
+	}
+
+	public void setIsUSed(boolean isUsed) {
+		this.isUsed = isUsed;
+	}
+
+	@Override
+	public String toString() {
+		return "BusinessYearDefinitionDTO [id=" + id + ", fromDate=" + fromDate + ", toDate=" + toDate
+				+ ", description=" + description + ", isUsed=" + isUsed + ", isActive=" + isActive + ", createdBy="
+				+ createdBy + "]";
+	}
+
 }
+
+

@@ -14,4 +14,6 @@ public interface BusinessYearDefinitionService {
 	
 	public void softDeleteById(int id);
 
+	public BusinessYearDefinition updateByBusinessYearId(int businessYearDefinitionId, BusinessYearDefinition businessYearDefinition);
+
 }
