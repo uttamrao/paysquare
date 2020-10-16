@@ -106,11 +106,19 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 		if(logger.isDebugEnabled())
 			logger.debug(" Deleting business year definition record with business year  id-> "+id);	
 
+		if(id == 0) {
+			logger.error("Business Year Definition id is Invalid!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year Definition is Invalid!");
+		}
+		
 		Optional<BusinessYearDefinition> businessYearOptional=businessYearDefinitionRepository.findByIdAndIsActive(id, true);
-		if(businessYearOptional.isEmpty())
+		if(businessYearOptional.isEmpty()) {
+			logger.error("Business Year Definition not found!");
 			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Year Definition not found!");
+		}
 
 		if(businessYearOptional.get().isUsed()) {
+			logger.error("Business Year Definition is used can not delete!");
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year Definition is used can not delete!");
 		}
 
@@ -124,12 +132,16 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 
 		if(logger.isDebugEnabled())
 			logger.debug("In BusinessYearDefinition getById method getting business year with id-> "+id);
-		if(id == 0)
+		if(id == 0) {
+			logger.error("Business Year Definition id is Invalid!");
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year Definition is Invalid!");
+		}
 
 		Optional<BusinessYearDefinition> businessYearOptional = businessYearDefinitionRepository.findByIdAndIsActive(id, true);		
-		if(businessYearOptional.isEmpty())
+		if(businessYearOptional.isEmpty()) {
+			logger.error("Business Year Definition not found!");
 			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Year Definition not found!");
+		}
 
 		return businessYearOptional.get();
 	}
@@ -137,8 +149,42 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 	@Override
 	public BusinessYearDefinition updateByBusinessYearId(int businessYearDefinitionId,
 			BusinessYearDefinition businessYearDefinition) {
-		// TODO Auto-generated method stub
-		return null;
+		if(logger.isDebugEnabled()) logger.debug("In add BusinessYearDefinition");
+
+		if(logger.isDebugEnabled())
+			logger.debug("In BusinessYearDefinition getById method getting business year with id-> "+businessYearDefinitionId);
+		
+		if(businessYearDefinitionId == 0) {
+			logger.error("Business Year Definition id is Invalid!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year Definition is Invalid!");
+		}
+
+		Optional<BusinessYearDefinition> businessYearOptional = businessYearDefinitionRepository.findByIdAndIsActive(businessYearDefinitionId, true);		
+		if(businessYearOptional.isEmpty()) {
+			logger.error("Business Year Definition not found!");
+			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Year Definition not found!");
+		}
+
+		if(businessYearOptional.get().isUsed()) {
+			logger.error("Business Year Definition is used can not delete!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year Definition is used can not delete!");
+		}
+		
+		validate(businessYearDefinition);
+
+		if(logger.isDebugEnabled())	logger.debug("BusinessYearDefinition data is valid, "
+				+ "updating into DB");
+		
+		businessYearOptional.get().setFromDate(businessYearDefinition.getFromDate());
+		businessYearOptional.get().setToDate(businessYearDefinition.getToDate());
+		businessYearOptional.get().setDescription(businessYearDefinition.getDescription());
+		businessYearOptional.get().setLastModifiedBy("Anagha");
+		businessYearOptional.get().setLastModifiedDateTime(new Date());
+		businessYearDefinitionRepository.save(businessYearOptional.get());
+		
+		if(logger.isDebugEnabled()) logger.debug("BusinessYearDefinition updated into DB: "+businessYearOptional.get());
+
+		return businessYearOptional.get();
 	}
 
 }

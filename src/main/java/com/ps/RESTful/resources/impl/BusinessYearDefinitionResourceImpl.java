@@ -123,6 +123,8 @@ public class BusinessYearDefinitionResourceImpl extends AbstractResourceImpl imp
 
 		BusinessYearDefinition businessYearDefinition = businessYearDefinitionDTOMapper.dtoToEntity(requestDTO);
 
+		if(logger.isDebugEnabled())
+			logger.debug("Sending request to businessYearDefinition service updateByBusinessYearId method");
 		businessYearDefinition = businessYearDefinitionService.updateByBusinessYearId(resourceId, businessYearDefinition);
 
 		BusinessYearDefinitionResponseDTO responseDTO = businessYearDefinitionDTOMapper.entityToDto(businessYearDefinition);
@@ -140,6 +142,4 @@ public class BusinessYearDefinitionResourceImpl extends AbstractResourceImpl imp
 								"Business Year Definition updated Successfully")
 						.result(responseDTO).build());
 	}
-
-
 }

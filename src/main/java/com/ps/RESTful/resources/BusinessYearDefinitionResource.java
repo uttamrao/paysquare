@@ -14,7 +14,7 @@ import com.ps.RESTful.resources.response.handler.Response;
 public interface BusinessYearDefinitionResource {
 
 	public final static String RESOURCE_PATH = "/business-year"; 
-	public final static String UPDATE_PATH = "/business-year/update/{resourceId}"; 
+	public final static String UPDATE_PATH = "/update/{resourceId}"; 
 	
 	
 	@PostMapping(
