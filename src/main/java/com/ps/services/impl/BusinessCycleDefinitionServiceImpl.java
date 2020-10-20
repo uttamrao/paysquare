@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -31,7 +32,7 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 
 	@Autowired
 	BusinessCycleDefinitionRepository businessCycleDefinitionRepository;
-	
+
 	@Autowired
 	BusinessYearDefinitionRepository businessYearDefinitionRepository;
 
@@ -45,55 +46,104 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 	RequestUtils requestUtils;
 
 	@Override
+	@Transactional("tenantTransactionManager")
 	public BusinessCycleDefinition add(BusinessCycleDefinition businessCycleDefinition) {
-
 		if (logger.isDebugEnabled())
 			logger.debug("In add BusinessCycleDefinition");
-
-		if (businessCycleDefinition != null && businessCycleDefinition.getCreateDateTime() == null) {
-			businessCycleDefinition.setCreateDateTime(new Date());
-			if (logger.isDebugEnabled())
-				logger.debug("Changed create date " + "time to-> " + businessCycleDefinition.getCreateDateTime());
-		}
-
-		if (businessCycleDefinition != null && StringUtils.isBlank(businessCycleDefinition.getCreatedBy())) {
-			if (logger.isDebugEnabled())
-				logger.debug("Setting created by to logged in " + "user name-> "
-						+ businessCycleDefinition.getCreatedBy() + ", as createdBy is not set in request");
-			businessCycleDefinition.setCreatedBy(requestUtils.getUserName());
-		}
 
 		validate(businessCycleDefinition);
 		if (logger.isDebugEnabled())
 			logger.debug("BusinessCycleDefinition data is valid");
 
-		ServiceTypeEnum serviceType = ServiceTypeEnum.valueOf(businessCycleDefinition.getServiceName());
+		ServiceTypeEnum serviceType = ServiceTypeEnum.valueOf(businessCycleDefinition.getServiceName().toUpperCase());
 		String shortCode = "";
-
+		String frequncyName = "";
 		if (businessCycleDefinition.getFrequencyMaster() != null) {
 			shortCode = businessCycleDefinition.getFrequencyMaster().getName().getShortCode();
+			frequncyName = businessCycleDefinition.getFrequencyMaster().getName().getValue();
 		}
-		businessCycleDefinition.setServiceName(serviceType.name());
-		
-		String cycleName = businessCycleDefinition.getName() + "_" + serviceType.getShortCode() + "_" + shortCode;
+
+		String description = businessCycleDefinition.getName() + " " + frequncyName + " " + serviceType.getValue() + " "
+				+ "Cycle";
+		businessCycleDefinition.setDescription(description);
+
+		String cycleName = businessCycleDefinition.getName() + "_" + shortCode + "_" + serviceType.getShortCode();
 		businessCycleDefinition.setName(cycleName);
-		
-		//set isUesd field from business year definition=1
-		Optional<BusinessYearDefinition> businessYearOptional = businessYearDefinitionRepository.findByIdAndIsActive(businessCycleDefinition.getBusinessYearDefinition().getId(), true);		
-		if(businessYearOptional.isEmpty())
-			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Year Definition not found!");
-		
-		businessYearOptional.get().setIsUsed(true);
-		businessYearDefinitionRepository.save(businessYearOptional.get());
-		System.out.println("businessYearOptional.get(): "+businessYearOptional.get());
-		businessCycleDefinitionRepository.save(businessCycleDefinition);
+
+		businessCycleDefinition.setServiceName(serviceType.getValue());
+		businessCycleDefinition.setCreatedBy("Anagha");
+		businessCycleDefinition.setActive(true);
+
+		// set isUsed field from business year definition=1
+		setBusinessYear(businessCycleDefinition);
+
+		try {
+			businessCycleDefinitionRepository.save(businessCycleDefinition);
+		} catch (DataIntegrityViolationException e) {
+			logger.error("Business year Definition, Frequency master and service name combination should be unique");
+			logger.error("Business Cycle Definition already exist");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition already exist");
+		}
 		if (logger.isDebugEnabled())
 			logger.debug("BusinessCycleDefinition saved into DB");
 
 		return businessCycleDefinition;
 	}
 
+	private void setBusinessYear(BusinessCycleDefinition businessCycleDefinition) {
+		Optional<BusinessYearDefinition> businessYearOptional = businessYearDefinitionRepository
+				.findByIdAndIsActive(businessCycleDefinition.getBusinessYearDefinition().getId(), true);
+
+		if (businessYearOptional.isEmpty())
+			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Year Definition not found!");
+
+		businessYearOptional.get().setIsUsed(true);
+		businessYearDefinitionRepository.save(businessYearOptional.get());
+
+		if (logger.isDebugEnabled())
+			logger.debug("Business year Definition IsUsed field updated in table to: true");
+	}
+
+	private void validate(BusinessCycleDefinition businessCycleDefinition) {
+
+		if (logger.isDebugEnabled())
+			logger.debug("In validate method, Validating businessCycleDefinitions");
+
+		if (logger.isDebugEnabled())
+			logger.debug("Validating businessCycleDefinition, object-> " + businessCycleDefinition);
+		if (businessCycleDefinition == null)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition not found!");
+
+		if (businessCycleDefinition.getReoccuranceDays() == 0) {
+			if (logger.isDebugEnabled())
+				logger.debug("Validating if frequency is set in businessCycleDefinition, object-> "
+						+ businessCycleDefinition.getFrequencyMaster());
+			if (businessCycleDefinition.getFrequencyMaster() == null)
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency not found!");
+		}
+
+		if (logger.isDebugEnabled())
+			logger.debug("Validating if businessYear is set in businessCycleDefinition, object-> "
+					+ businessCycleDefinition.getBusinessYearDefinition());
+		if (businessCycleDefinition.getBusinessYearDefinition() == null)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year not found!");
+
+		System.out.println("businessCycleDefinition:  " + businessCycleDefinition);
+		if (logger.isDebugEnabled())
+			logger.debug("Validating businessCycleDefinition, name-> " + businessCycleDefinition.getName());
+		if (businessCycleDefinition.getName() == null || businessCycleDefinition.getName().isEmpty())
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition name not found!");
+
+		if (logger.isDebugEnabled())
+			logger.debug(
+					"Validating businessCycleDefinition, serviceName-> " + businessCycleDefinition.getServiceName());
+		if (businessCycleDefinition.getServiceName() == null
+				|| !ServiceTypeEnum.isValid(businessCycleDefinition.getServiceName()))
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition service name not found!");
+	}
+
 	@Override
+	@Transactional("tenantTransactionManager")
 	public BusinessCycleDefinition update(BusinessCycleDefinition existingBusinessCycleDefinition,
 			BusinessCycleDefinition updatedBusinessCycleDefinition) {
 
@@ -142,11 +192,12 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business cycles are already created!");
 			}
 		}
-		if (logger.isDebugEnabled())
-			logger.debug("Validating businessCycleDefinition, lastModifiedBy-> "
-					+ updatedBusinessCycleDefinition.getLastModifiedBy());
-		if (StringUtils.isBlank(updatedBusinessCycleDefinition.getLastModifiedBy()))
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Modified by is Invalid!");
+		// if (logger.isDebugEnabled())
+		// logger.debug("Validating businessCycleDefinition, lastModifiedBy-> "
+		// + updatedBusinessCycleDefinition.getLastModifiedBy());
+		// if (StringUtils.isBlank(updatedBusinessCycleDefinition.getLastModifiedBy()))
+		// throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Modified by is
+		// Invalid!");
 
 		validate(updatedBusinessCycleDefinition);
 
@@ -164,60 +215,17 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		return requestCycleDefinitionObject;
 	}
 
-	private void validate(BusinessCycleDefinition businessCycleDefinition) {
-
-		if (logger.isDebugEnabled())
-			logger.debug("In validate method, Validating businessCycleDefinitions");
-
-		if (logger.isDebugEnabled())
-			logger.debug("Validating businessCycleDefinition, object-> " + businessCycleDefinition);
-		if (businessCycleDefinition == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition not found!");
-
-		if (businessCycleDefinition.getReoccuranceDays() == 0) {
-			if (logger.isDebugEnabled())
-				logger.debug("Validating if frequency is set in businessCycleDefinition, object-> "
-						+ businessCycleDefinition.getFrequencyMaster());
-			if (businessCycleDefinition.getFrequencyMaster() == null)
-				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency not found!");
-		}
-
-		if (logger.isDebugEnabled())
-			logger.debug("Validating if businessYear is set in businessCycleDefinition, object-> "
-					+ businessCycleDefinition.getBusinessYearDefinition());
-		if (businessCycleDefinition.getBusinessYearDefinition() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year not found!");
-
-		if (logger.isDebugEnabled())
-			logger.debug("Validating businessCycleDefinition, name-> " + businessCycleDefinition.getName());
-		if (businessCycleDefinition.getName() == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition name not found!");
-
-		if (logger.isDebugEnabled())
-			logger.debug(
-					"Validating businessCycleDefinition, serviceName-> " + businessCycleDefinition.getServiceName());
-		if (businessCycleDefinition.getServiceName() == null
-				|| !ServiceTypeEnum.isValid(businessCycleDefinition.getServiceName()))
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition service name not found!");
-
-		if (logger.isDebugEnabled())
-			logger.debug("Validating businessCycleDefinition, createdBy-> " + businessCycleDefinition.getCreatedBy());
-		if (StringUtils.isBlank(businessCycleDefinition.getCreatedBy()))
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Created by is Invalid!");
-	}
-
 	@Override
+	@Transactional("tenantTransactionManager")
 	public List<BusinessCycleDefinition> getAll() {
 
 		if (logger.isDebugEnabled())
 			logger.debug("Getting all BusinessCycleDefinitionService records from DB");
-		List<BusinessCycleDefinition> businessCycleDefinitions = businessCycleDefinitionRepository
-				.findAllByIsActive(true);
-
-		return businessCycleDefinitions;
+		return businessCycleDefinitionRepository.findAllByIsActive(true);
 	}
 
 	@Override
+	@Transactional("tenantTransactionManager")
 	public BusinessCycleDefinition getById(int id) {
 
 		if (logger.isDebugEnabled())
@@ -230,25 +238,31 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		if (businessCycleDefinitionOptional.isEmpty())
 			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
 
-		return businessCycleDefinitionOptional.get();
+		BusinessCycleDefinition businessCycle = new BusinessCycleDefinition(businessCycleDefinitionOptional.get());
+		String name = businessCycle.getName();
+		name = name.substring(0, name.indexOf('_'));
+		businessCycle.setName(name);
+
+		if (logger.isDebugEnabled())
+			logger.debug("In BusinessCycleDefinition getById method getting business -> " + businessCycle);
+		return businessCycle;
 	}
-	
+
 	@Override
 	@Transactional("tenantTransactionManager")
 	public void softDeleteById(int id) {
-		
+
 		if (logger.isDebugEnabled())
 			logger.debug("In BusinessCycleService deleteById "
-					+ "service method for deleting business cycle definition from databse where id is -> "
-					+ id);		
+					+ "service method for deleting business cycle definition from databse where id is -> " + id);
 		if (id == 0)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
 
 		List<BusinessCycle> businessCycleList = businessCycleService.getAllByCycleDefinition(id);
 		if (businessCycleList.isEmpty())
 			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
-		
-		businessCycleService.deleteAllByCycleDefinitionId(id);		
+
+		// businessCycleService.deleteAllByCycleDefinitionId(id);
 		businessCycleDefinitionRepository.softDeleteById(id);
 	}
 
@@ -261,9 +275,9 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 					+ "service method for deleting business cycle from databse where businessYearDefinitionId is -> "
 					+ id);
 
-		List<BusinessCycle> businessCycleList = businessCycleService.getAllByBusinessYearDefinitionId(id);		
+		List<BusinessCycle> businessCycleList = businessCycleService.getAllByBusinessYearDefinitionId(id);
 		if (logger.isDebugEnabled())
-			logger.debug("businessCycleList -> "+businessCycleList.size());
+			logger.debug("businessCycleList -> " + businessCycleList.size());
 		if (CollectionUtils.isEmpty(businessCycleList)) {
 			businessCycleDefinitionRepository.softDeleteAllByBusinessYearDefinitionId(id);
 		} else {

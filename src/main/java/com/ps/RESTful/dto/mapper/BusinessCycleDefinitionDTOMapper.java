@@ -39,14 +39,10 @@ public class BusinessCycleDefinitionDTOMapper implements
 //			if(!StringUtils.isBlank(dto.getWeekStartDefinition()) && WeeksEnum.isValid(dto.getWeekStartDefinition()))
 //				businessCycleDefinition.setWeekStartDefinition(WeeksEnum.valueOf(dto.getWeekStartDefinition()));
 
-			businessCycleDefinition.setReoccuranceDays(dto.getReOccuranceDays());
-			businessCycleDefinition.setForceToBusinessYearEnd(dto.isForceToBusinessYearEnd());
-
-			if (logger.isDebugEnabled())
-				logger.debug("After Maping dto to entity BusinessYearDefinition" + ", name-> "
-						+ businessCycleDefinition.getName() + ", serviceName-> "
-						+ businessCycleDefinition.getServiceName() + ", createdBy-> "
-						+ businessCycleDefinition.getCreatedBy());
+//			businessCycleDefinition.setReoccuranceDays(dto.getReOccuranceDays());
+//			businessCycleDefinition.setForceToBusinessYearEnd(dto.isForceToBusinessYearEnd());
+			businessCycleDefinition.setDescription(dto.getDescription());
+			businessCycleDefinition.setIsUsed(dto.getIsUsed());
 		}
 
 		return businessCycleDefinition;
@@ -59,16 +55,14 @@ public class BusinessCycleDefinitionDTOMapper implements
 
 		BusinessCycleDefinitionResponseDTO responseDTO = new BusinessCycleDefinitionResponseDTO();
 
-		if (logger.isDebugEnabled())
-			logger.debug(
-					"Maping BusinessYearDefinition" + ", name-> " + businessCycleDefinition.getName() + ", createdBy-> "
-							+ businessCycleDefinition.getCreatedBy() + ", id-> " + businessCycleDefinition.getId()
-							+ ", createdDateTime-> " + businessCycleDefinition.getCreateDateTime());
-
 		responseDTO.setActive(businessCycleDefinition.isActive());
-		responseDTO.setReOccuranceDays(businessCycleDefinition.getReoccuranceDays());
-		responseDTO.setForceToBusinessYearEnd(businessCycleDefinition.isForceToBusinessYearEnd());
+//		responseDTO.setReOccuranceDays(businessCycleDefinition.getReoccuranceDays());
+//		responseDTO.setForceToBusinessYearEnd(businessCycleDefinition.isForceToBusinessYearEnd());
 		responseDTO.setCreatedBy(businessCycleDefinition.getCreatedBy());
+//		String name = businessCycleDefinition.getName();
+//		name = name.substring(0, name.indexOf('_'));
+//		responseDTO.setName(name);
+		// businessCycleDefinitionOptional.get().setName(name);
 		responseDTO.setName(businessCycleDefinition.getName());
 		responseDTO.setServiceName(businessCycleDefinition.getServiceName());
 		responseDTO.setBusinessYearDefinition(
@@ -76,7 +70,8 @@ public class BusinessCycleDefinitionDTOMapper implements
 		responseDTO.setFrequency(frequencyMasterDTOMapper.entityToDto(businessCycleDefinition.getFrequencyMaster()));
 		responseDTO.setId(businessCycleDefinition.getId());
 		responseDTO.setCreateDateTime(DateUtils.getDateTimeString(businessCycleDefinition.getCreateDateTime()));
-
+		responseDTO.setDescription(businessCycleDefinition.getDescription());
+		responseDTO.setIsUsed(businessCycleDefinition.getIsUsed());
 		return responseDTO;
 	}
 

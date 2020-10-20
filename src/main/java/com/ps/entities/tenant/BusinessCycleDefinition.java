@@ -2,47 +2,63 @@ package com.ps.entities.tenant;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.ps.RESTful.enums.WeeksEnum;
 import com.ps.entities.master.AbstractTimeEntity;
 
 @Entity
-public class BusinessCycleDefinition extends AbstractTimeEntity{
+public class BusinessCycleDefinition extends AbstractTimeEntity {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="businessCycleDefinitionId")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "businessCycleDefinitionId")
 	private int id;
-	
-	private boolean isActive = true;
-	
-	@Column(name="cycleName")
+
+	private boolean isActive;
+
+	@Column(name = "cycleName")
 	private String name;
-	
+
 	private String serviceName;
-	
-//	@Enumerated(EnumType.STRING)
-//	private WeeksEnum weekStartDefinition;
-		
+
 	private int reoccuranceDays;
-	
-	@Column(name="isForceYearEnd")
-	private boolean forceToBusinessYearEnd=false;
-	
+
+	@Column(name = "isForceYearEnd")
+	private boolean forceToBusinessYearEnd = false;
+
+	private boolean isUsed;
+
+	private String description;
+
 	@ManyToOne
-	@JoinColumn(name="frequencyMasterId",referencedColumnName = "frequencyMasterId")
+	@JoinColumn(name = "frequencyMasterId", referencedColumnName = "frequencyMasterId")
 	private FrequencyMaster frequencyMaster;
-	
+
 	@ManyToOne
-	@JoinColumn(name="businessYearDefinitionId",referencedColumnName = "businessYearDefinitionId")
+	@JoinColumn(name = "businessYearDefinitionId", referencedColumnName = "businessYearDefinitionId")
 	private BusinessYearDefinition businessYearDefinition;
+
+	public BusinessCycleDefinition() {
+		super();
+	}
+
+	// copy constructor
+	public BusinessCycleDefinition(BusinessCycleDefinition businessCycleDefinition) {
+		id = businessCycleDefinition.id;
+		isActive = businessCycleDefinition.isActive;
+		name = businessCycleDefinition.name;
+		serviceName = businessCycleDefinition.serviceName;
+		reoccuranceDays = businessCycleDefinition.reoccuranceDays;
+		forceToBusinessYearEnd = businessCycleDefinition.forceToBusinessYearEnd;
+		isUsed = businessCycleDefinition.isUsed;
+		description = businessCycleDefinition.description;
+		frequencyMaster = businessCycleDefinition.frequencyMaster;
+		businessYearDefinition = businessCycleDefinition.businessYearDefinition;
+	}
 
 	public int getId() {
 		return id;
@@ -114,6 +130,30 @@ public class BusinessCycleDefinition extends AbstractTimeEntity{
 
 	public void setReoccuranceDays(int reoccuranceDays) {
 		this.reoccuranceDays = reoccuranceDays;
+	}
+
+	public boolean getIsUsed() {
+		return isUsed;
+	}
+
+	public void setIsUsed(boolean isUsed) {
+		this.isUsed = isUsed;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	@Override
+	public String toString() {
+		return "BusinessCycleDefinition [id=" + id + ", isActive=" + isActive + ", name=" + name + ", serviceName="
+				+ serviceName + ", reoccuranceDays=" + reoccuranceDays + ", forceToBusinessYearEnd="
+				+ forceToBusinessYearEnd + ", isUsed=" + isUsed + ", description=" + description + ", frequencyMaster="
+				+ frequencyMaster + ", businessYearDefinition=" + businessYearDefinition + "]";
 	}
 
 }
