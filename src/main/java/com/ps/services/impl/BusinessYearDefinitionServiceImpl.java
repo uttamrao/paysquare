@@ -86,8 +86,7 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 
 		if (businessYear != null) {
 			logger.error("From date and To date combination already exist");
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST,
-					" From date and To date combination should be unique");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, " Business Year Definition record alreay exist");
 		}
 	}
 

@@ -1,10 +1,8 @@
 package com.ps.services.impl;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,13 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import com.ps.RESTful.enums.ErrorCode;
-import com.ps.RESTful.enums.ServiceTypeEnum;
 import com.ps.RESTful.error.handler.InvalidRequestException;
+import com.ps.entities.master.ServiceCode;
 import com.ps.entities.tenant.BusinessCycle;
 import com.ps.entities.tenant.BusinessCycleDefinition;
 import com.ps.entities.tenant.BusinessYearDefinition;
 import com.ps.services.BusinessCycleDefinitionService;
 import com.ps.services.BusinessCycleService;
+import com.ps.services.dao.repository.master.ServiceCodeRepository;
 import com.ps.services.dao.repository.tenant.BusinessCycleDefinitionRepository;
 import com.ps.services.dao.repository.tenant.BusinessCycleRepository;
 import com.ps.services.dao.repository.tenant.BusinessYearDefinitionRepository;
@@ -40,6 +39,9 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 	BusinessCycleRepository businessCycleRepository;
 
 	@Autowired
+	ServiceCodeRepository serviceCodeRepository;
+
+	@Autowired
 	BusinessCycleService businessCycleService;
 
 	@Autowired
@@ -55,7 +57,11 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		if (logger.isDebugEnabled())
 			logger.debug("BusinessCycleDefinition data is valid");
 
-		ServiceTypeEnum serviceType = ServiceTypeEnum.valueOf(businessCycleDefinition.getServiceName().toUpperCase());
+		// replacing service type from enum to table entity
+		// ServiceTypeEnum serviceType =
+		// ServiceTypeEnum.valueOf(businessCycleDefinition.getServiceName().toUpperCase());
+
+		ServiceCode serviceType = serviceCodeRepository.findByServiceName(businessCycleDefinition.getServiceName());
 		String shortCode = "";
 		String frequncyName = "";
 		if (businessCycleDefinition.getFrequencyMaster() != null) {
@@ -63,14 +69,14 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 			frequncyName = businessCycleDefinition.getFrequencyMaster().getName().getValue();
 		}
 
-		String description = businessCycleDefinition.getName() + " " + frequncyName + " " + serviceType.getValue() + " "
-				+ "Cycle";
+		String description = businessCycleDefinition.getName() + " " + frequncyName + " " + serviceType.getServiceName()
+				+ " " + "Cycle";
 		businessCycleDefinition.setDescription(description);
 
-		String cycleName = businessCycleDefinition.getName() + "_" + shortCode + "_" + serviceType.getShortCode();
+		String cycleName = businessCycleDefinition.getName() + "_" + shortCode + "_" + serviceType.getServiceCode();
 		businessCycleDefinition.setName(cycleName);
 
-		businessCycleDefinition.setServiceName(serviceType.getValue());
+		businessCycleDefinition.setServiceName(serviceType.getServiceName());
 		businessCycleDefinition.setCreatedBy("Anagha");
 		businessCycleDefinition.setActive(true);
 
@@ -128,7 +134,6 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		if (businessCycleDefinition.getBusinessYearDefinition() == null)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year not found!");
 
-		System.out.println("businessCycleDefinition:  " + businessCycleDefinition);
 		if (logger.isDebugEnabled())
 			logger.debug("Validating businessCycleDefinition, name-> " + businessCycleDefinition.getName());
 		if (businessCycleDefinition.getName() == null || businessCycleDefinition.getName().isEmpty())
@@ -137,41 +142,43 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		if (logger.isDebugEnabled())
 			logger.debug(
 					"Validating businessCycleDefinition, serviceName-> " + businessCycleDefinition.getServiceName());
-		if (businessCycleDefinition.getServiceName() == null
-				|| !ServiceTypeEnum.isValid(businessCycleDefinition.getServiceName()))
+		// !ServiceTypeEnum.isValid(businessCycleDefinition.getServiceName())
+		if (businessCycleDefinition.getServiceName() == null || businessCycleDefinition.getServiceName().isEmpty())
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition service name not found!");
+
+		ServiceCode serviceType = serviceCodeRepository.findByServiceName(businessCycleDefinition.getServiceName());
+		if (serviceType == null)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition service name is invalid!");
+
+		// to check unique constraint
+		BusinessCycleDefinition businessCycleDef = businessCycleDefinitionRepository
+				.findByBusinessYearDefinitionAndFrequencyMasterAndServiceNameAndIsActive(
+						businessCycleDefinition.getBusinessYearDefinition().getId(),
+						businessCycleDefinition.getFrequencyMaster().getId(), businessCycleDefinition.getServiceName());
+
+		if (businessCycleDef != null) {
+			logger.error("BusinessYearDefinition, FrequencyMaster and ServiceName combination already exist");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, " Business cycle Definition record alreay exist");
+		}
 	}
 
 	@Override
 	@Transactional("tenantTransactionManager")
 	public BusinessCycleDefinition update(BusinessCycleDefinition existingBusinessCycleDefinition,
 			BusinessCycleDefinition updatedBusinessCycleDefinition) {
-
-		if (updatedBusinessCycleDefinition != null
-				&& updatedBusinessCycleDefinition.getLastModifiedDateTime() == null) {
-			updatedBusinessCycleDefinition.setLastModifiedDateTime(new Date());
-			if (logger.isDebugEnabled())
-				logger.debug("Changed last modified date " + "time to-> "
-						+ updatedBusinessCycleDefinition.getLastModifiedDateTime());
-		}
-
-		if (updatedBusinessCycleDefinition != null
-				&& StringUtils.isBlank(updatedBusinessCycleDefinition.getLastModifiedBy())) {
-			if (logger.isDebugEnabled())
-				logger.debug("Setting LastModifiedBy to logged in " + "user name-> "
-						+ updatedBusinessCycleDefinition.getLastModifiedBy() + ", as createdBy is not set in request");
-			updatedBusinessCycleDefinition.setLastModifiedBy(requestUtils.getUserName());
-		}
+		if (logger.isDebugEnabled())
+			logger.debug("In update BusinessCycleDefinition service method");
 
 		validateUpdateRequest(existingBusinessCycleDefinition, updatedBusinessCycleDefinition);
 		if (logger.isDebugEnabled())
-			logger.debug("BusinessCycleDefinition data is valid, " + "saving into DB");
+			logger.debug("BusinessCycleDefinition data is valid, " + "updating into DB");
 
-		updatedBusinessCycleDefinition = overrideForUpdate(existingBusinessCycleDefinition,
-				updatedBusinessCycleDefinition);
+		overrideForUpdate(existingBusinessCycleDefinition, updatedBusinessCycleDefinition);
+		updatedBusinessCycleDefinition.setLastModifiedBy("Anagha");
 		businessCycleDefinitionRepository.save(updatedBusinessCycleDefinition);
+
 		if (logger.isDebugEnabled())
-			logger.debug("BusinessCycleDefinition saved into DB");
+			logger.debug("BusinessCycleDefinition updated into DB");
 
 		return updatedBusinessCycleDefinition;
 	}
@@ -180,7 +187,7 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 			BusinessCycleDefinition updatedBusinessCycleDefinition) {
 
 		if (logger.isDebugEnabled())
-			logger.debug("In update BusinessCycleDefinition");
+			logger.debug("In validateUpdateRequest BusinessCycleDefinition");
 
 		if (existingBusinessCycleDefinition != null) {
 			List<BusinessCycle> businessCycles = businessCycleService
@@ -192,25 +199,16 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business cycles are already created!");
 			}
 		}
-		// if (logger.isDebugEnabled())
-		// logger.debug("Validating businessCycleDefinition, lastModifiedBy-> "
-		// + updatedBusinessCycleDefinition.getLastModifiedBy());
-		// if (StringUtils.isBlank(updatedBusinessCycleDefinition.getLastModifiedBy()))
-		// throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Modified by is
-		// Invalid!");
-
 		validate(updatedBusinessCycleDefinition);
-
 	}
 
 	private BusinessCycleDefinition overrideForUpdate(BusinessCycleDefinition dbCycleDefinitionObject,
 			BusinessCycleDefinition requestCycleDefinitionObject) {
 
-		requestCycleDefinitionObject.setId(dbCycleDefinitionObject.getId());
-		requestCycleDefinitionObject.setCreateDateTime(dbCycleDefinitionObject.getCreateDateTime());
-		requestCycleDefinitionObject.setCreatedBy(dbCycleDefinitionObject.getCreatedBy());
 		requestCycleDefinitionObject.setServiceName(dbCycleDefinitionObject.getServiceName());
 		requestCycleDefinitionObject.setName(dbCycleDefinitionObject.getName());
+		requestCycleDefinitionObject.setCreateDateTime(dbCycleDefinitionObject.getCreateDateTime());
+		requestCycleDefinitionObject.setCreatedBy(dbCycleDefinitionObject.getCreatedBy());
 
 		return requestCycleDefinitionObject;
 	}

@@ -13,20 +13,27 @@ import com.ps.entities.tenant.BusinessYearDefinition;
 public interface BusinessCycleDefinitionRepository extends AbstractRepository<BusinessCycleDefinition, Integer> {
 
 	List<BusinessCycleDefinition> findAllByIsActive(boolean isActive);
-	
-	Optional<BusinessCycleDefinition> findByIdAndIsActive(int id,boolean isActive);
-	
-	List<BusinessCycleDefinition> findAllByBusinessYearDefinitionAndIsActive(BusinessYearDefinition businessYearDefinition, boolean isActive);
-	
+
+	Optional<BusinessCycleDefinition> findByIdAndIsActive(int id, boolean isActive);
+
+	List<BusinessCycleDefinition> findAllByBusinessYearDefinitionAndIsActive(
+			BusinessYearDefinition businessYearDefinition, boolean isActive);
+
 	@Query("SELECT cd FROM BusinessCycleDefinition cd WHERE cd.isActive = true and cd.businessYearDefinition.id = (:businessYearDefinitionId)")
-	List<BusinessCycleDefinition> findAllByBusinessYearDefinitionId(@Param("businessYearDefinitionId") int businessYearDefinitionId);
+	List<BusinessCycleDefinition> findAllByBusinessYearDefinitionId(
+			@Param("businessYearDefinitionId") int businessYearDefinitionId);
 
 	@Modifying
 	@Query("UPDATE BusinessCycleDefinition cd SET cd.isActive = false WHERE cd.businessYearDefinition.id = :id")
 	void softDeleteAllByBusinessYearDefinitionId(int id);
-	
+
 	@Modifying
 	@Query("UPDATE BusinessCycleDefinition cd SET cd.isActive = false WHERE cd.id = :id")
 	void softDeleteById(int id);
-	
+
+	// to check unique constraint
+	@Query("SELECT cd FROM BusinessCycleDefinition cd WHERE cd.isActive = true and cd.businessYearDefinition.id = (:businessYearDefinitionId) and cd.frequencyMaster.id=(:frequencyMasterId) and cd.serviceName=(:serviceName)")
+	BusinessCycleDefinition findByBusinessYearDefinitionAndFrequencyMasterAndServiceNameAndIsActive(
+			@Param("businessYearDefinitionId") int businessYearDefinitionId,
+			@Param("frequencyMasterId") int frequencyMasterId, String serviceName);
 }

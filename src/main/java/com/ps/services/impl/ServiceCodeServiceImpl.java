@@ -20,15 +20,13 @@ public class ServiceCodeServiceImpl implements ServiceCodeService {
 
 	@Autowired
 	ServiceCodeService serviceCodeService;
-	
+
 	@Override
 	public List<ServiceCode> getAll() {
 
-		if(logger.isDebugEnabled())
+		if (logger.isDebugEnabled())
 			logger.debug("Getting all Service code records from DB");
-		List<ServiceCode> serviceCode = serviceCodeRepository.findAll();
-
-		return serviceCode;
+		return serviceCodeRepository.findAll();
 	}
 
 }

@@ -58,8 +58,10 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 					+ requestDTO.getBusinessYearDefinitionId());
 		BusinessYearDefinition businessYearDefinition = businessYearDefinitionService
 				.getById(requestDTO.getBusinessYearDefinitionId());
+
 		if (businessYearDefinition == null)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year Definition not found!");
+
 		businessCycleDefinition.setBusinessYearDefinition(businessYearDefinition);
 
 		if (requestDTO.getFrequencyMasterId() != 0) {
@@ -67,8 +69,10 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 				logger.debug("In BusinessCycleDefinition add EP, finding frequencyMaster object in db with id-> "
 						+ requestDTO.getFrequencyMasterId());
 			FrequencyMaster frequencyMaster = frequencyMasterService.getById(requestDTO.getFrequencyMasterId());
+
 			if (frequencyMaster == null)
 				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency master not found!");
+
 			businessCycleDefinition.setFrequencyMaster(frequencyMaster);
 		}
 
