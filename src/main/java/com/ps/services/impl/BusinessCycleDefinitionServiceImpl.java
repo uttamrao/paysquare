@@ -230,8 +230,10 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 
 		if (logger.isDebugEnabled())
 			logger.debug("In BusinessCycleDefinition getById method getting business year with id-> " + id);
-		if (id == 0)
+		if (id == 0) {
+			logger.error("Business Year Definition id is Invalid!");
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
+		}
 
 		Optional<BusinessCycleDefinition> businessCycleDefinitionOptional = businessCycleDefinitionRepository
 				.findByIdAndIsActive(id, true);
@@ -253,17 +255,35 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 	public void softDeleteById(int id) {
 
 		if (logger.isDebugEnabled())
-			logger.debug("In BusinessCycleService deleteById "
+			logger.debug("In BusinessCycleService softDeleteById "
 					+ "service method for deleting business cycle definition from databse where id is -> " + id);
-		if (id == 0)
+		if (id == 0) {
+			logger.error("Business Cycle Definition id is Invalid!");
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
+		}
 
-		List<BusinessCycle> businessCycleList = businessCycleService.getAllByCycleDefinition(id);
-		if (businessCycleList.isEmpty())
+		Optional<BusinessCycleDefinition> businessCycleDefinitionOptional = businessCycleDefinitionRepository
+				.findByIdAndIsActive(id, true);
+		if (businessCycleDefinitionOptional.isEmpty()) {
+			logger.error("Business Cycle Definition not found!");
 			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
+		}
 
+		if (businessCycleDefinitionOptional.get().getIsUsed()) {
+			logger.error("Business Cycle Definition is used can not delete!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST,
+					"Business Cycle Definition is used can not delete!");
+		}
+
+		// List<BusinessCycle> businessCycleList =
+		// businessCycleService.getAllByCycleDefinition(id);
+		// if (businessCycleList.isEmpty())
+		// throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business
+		// Cycle Definition not found!");
 		// businessCycleService.deleteAllByCycleDefinitionId(id);
 		businessCycleDefinitionRepository.softDeleteById(id);
+		if (logger.isDebugEnabled())
+			logger.debug("Soft deleted business cycle definition record with business year id-> " + id);
 	}
 
 	@Override

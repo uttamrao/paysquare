@@ -96,9 +96,7 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 
 		if (logger.isDebugEnabled())
 			logger.debug("Getting all BusinessYearDefinition records from DB");
-		List<BusinessYearDefinition> businessYearDefinitions = businessYearDefinitionRepository.findAllByIsActive(true);
-
-		return businessYearDefinitions;
+		return businessYearDefinitionRepository.findAllByIsActive(true);
 	}
 
 	@Override
