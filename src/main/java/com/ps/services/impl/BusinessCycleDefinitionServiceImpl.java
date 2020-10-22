@@ -1,17 +1,18 @@
 package com.ps.services.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import com.ps.RESTful.enums.ErrorCode;
 import com.ps.RESTful.error.handler.InvalidRequestException;
+import com.ps.beans.BusinessCycleDefinitionBean;
 import com.ps.entities.master.ServiceCode;
 import com.ps.entities.tenant.BusinessCycle;
 import com.ps.entities.tenant.BusinessCycleDefinition;
@@ -49,19 +50,45 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 
 	@Override
 	@Transactional("tenantTransactionManager")
-	public BusinessCycleDefinition add(BusinessCycleDefinition businessCycleDefinition) {
+	public void add(BusinessCycleDefinitionBean businessCycleDefinitionBean) {
 		if (logger.isDebugEnabled())
 			logger.debug("In add BusinessCycleDefinition");
 
-		validate(businessCycleDefinition);
+		List<String> serviceNames = businessCycleDefinitionBean.getServiceName();
+		List<BusinessCycleDefinition> cycleDefinitions = new ArrayList<>();
+
+		for (String service : serviceNames) {
+			if (logger.isDebugEnabled())
+				logger.debug("Saving Business Cycle Definition for service name--> " + service);
+
+			BusinessCycleDefinition businessCycleDefinition;
+			businessCycleDefinition = businessCycleDefinitionBean.beanToEntity(businessCycleDefinitionBean);
+			businessCycleDefinition.setServiceName(service);
+
+			validate(businessCycleDefinition);
+			if (logger.isDebugEnabled())
+				logger.debug("BusinessCycleDefinition data is valid");
+
+			// set all fields
+			addData(businessCycleDefinition);
+			businessCycleDefinition.setCreatedBy("Anagha");
+			businessCycleDefinition.setActive(true);
+
+			// set isUsed field from business year definition=1
+			setBusinessYear(businessCycleDefinition);
+			cycleDefinitions.add(businessCycleDefinition);
+
+			if (logger.isDebugEnabled())
+				logger.debug("For service name --> " + service + " Business Cycle Definition added into list");
+		}
+
+		businessCycleDefinitionRepository.saveAll(cycleDefinitions);
 		if (logger.isDebugEnabled())
-			logger.debug("BusinessCycleDefinition data is valid");
+			logger.debug("Business Cycle Definitions saved successfully for given services--> " + serviceNames);
+	}
 
-		// replacing service type from enum to table entity
-		// ServiceTypeEnum serviceType =
-		// ServiceTypeEnum.valueOf(businessCycleDefinition.getServiceName().toUpperCase());
+	private BusinessCycleDefinition addData(BusinessCycleDefinition businessCycleDefinition) {
 
-		ServiceCode serviceType = serviceCodeRepository.findByServiceName(businessCycleDefinition.getServiceName());
 		String shortCode = "";
 		String frequncyName = "";
 		if (businessCycleDefinition.getFrequencyMaster() != null) {
@@ -69,6 +96,7 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 			frequncyName = businessCycleDefinition.getFrequencyMaster().getName().getValue();
 		}
 
+		ServiceCode serviceType = serviceCodeRepository.findByServiceName(businessCycleDefinition.getServiceName());
 		String description = businessCycleDefinition.getName() + " " + frequncyName + " " + serviceType.getServiceName()
 				+ " " + "Cycle";
 		businessCycleDefinition.setDescription(description);
@@ -77,21 +105,6 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		businessCycleDefinition.setName(cycleName);
 
 		businessCycleDefinition.setServiceName(serviceType.getServiceName());
-		businessCycleDefinition.setCreatedBy("Anagha");
-		businessCycleDefinition.setActive(true);
-
-		// set isUsed field from business year definition=1
-		setBusinessYear(businessCycleDefinition);
-
-		try {
-			businessCycleDefinitionRepository.save(businessCycleDefinition);
-		} catch (DataIntegrityViolationException e) {
-			logger.error("Business year Definition, Frequency master and service name combination should be unique");
-			logger.error("Business Cycle Definition already exist");
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition already exist");
-		}
-		if (logger.isDebugEnabled())
-			logger.debug("BusinessCycleDefinition saved into DB");
 
 		return businessCycleDefinition;
 	}
@@ -157,7 +170,8 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 						businessCycleDefinition.getFrequencyMaster().getId(), businessCycleDefinition.getServiceName());
 
 		if (businessCycleDef != null) {
-			logger.error("BusinessYearDefinition, FrequencyMaster and ServiceName combination already exist");
+			logger.error("Business year Definition, Frequency master and service name combination should be unique");
+			logger.error("Business Cycle Definition already exist");
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, " Business cycle Definition record alreay exist");
 		}
 	}
@@ -174,7 +188,7 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 			logger.debug("BusinessCycleDefinition data is valid, " + "updating into DB");
 
 		overrideForUpdate(existingBusinessCycleDefinition, updatedBusinessCycleDefinition);
-		updatedBusinessCycleDefinition.setLastModifiedBy("Anagha");
+
 		businessCycleDefinitionRepository.save(updatedBusinessCycleDefinition);
 
 		if (logger.isDebugEnabled())
@@ -204,12 +218,20 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 
 	private BusinessCycleDefinition overrideForUpdate(BusinessCycleDefinition dbCycleDefinitionObject,
 			BusinessCycleDefinition requestCycleDefinitionObject) {
+		if (logger.isDebugEnabled())
+			logger.debug("In overrideForUpdate BusinessCycleDefinition");
+//		requestCycleDefinitionObject.setServiceName(dbCycleDefinitionObject.getServiceName());
+//		requestCycleDefinitionObject.setName(dbCycleDefinitionObject.getName());
+//		requestCycleDefinitionObject.setCreateDateTime(dbCycleDefinitionObject.getCreateDateTime());
+//		requestCycleDefinitionObject.setCreatedBy(dbCycleDefinitionObject.getCreatedBy());
 
-		requestCycleDefinitionObject.setServiceName(dbCycleDefinitionObject.getServiceName());
-		requestCycleDefinitionObject.setName(dbCycleDefinitionObject.getName());
-		requestCycleDefinitionObject.setCreateDateTime(dbCycleDefinitionObject.getCreateDateTime());
-		requestCycleDefinitionObject.setCreatedBy(dbCycleDefinitionObject.getCreatedBy());
-
+		requestCycleDefinitionObject.setFrequencyMaster(dbCycleDefinitionObject.getFrequencyMaster());
+		requestCycleDefinitionObject.setBusinessYearDefinition(dbCycleDefinitionObject.getBusinessYearDefinition());
+		requestCycleDefinitionObject.setLastModifiedBy("Anagha");
+		// set all fields
+		addData(requestCycleDefinitionObject);
+		if (logger.isDebugEnabled())
+			logger.debug("In overrideForUpdate BusinessCycleDefinition, all data set to existing object");
 		return requestCycleDefinitionObject;
 	}
 
@@ -273,12 +295,6 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 					"Business Cycle Definition is used can not delete!");
 		}
 
-		// List<BusinessCycle> businessCycleList =
-		// businessCycleService.getAllByCycleDefinition(id);
-		// if (businessCycleList.isEmpty())
-		// throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business
-		// Cycle Definition not found!");
-		// businessCycleService.deleteAllByCycleDefinitionId(id);
 		businessCycleDefinitionRepository.softDeleteById(id);
 		if (logger.isDebugEnabled())
 			logger.debug("Soft deleted business cycle definition record with business year id-> " + id);

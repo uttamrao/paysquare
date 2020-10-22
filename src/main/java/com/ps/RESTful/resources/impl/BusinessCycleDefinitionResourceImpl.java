@@ -20,6 +20,7 @@ import com.ps.RESTful.error.handler.InvalidRequestException;
 import com.ps.RESTful.resources.BusinessCycleDefinitionResource;
 import com.ps.RESTful.resources.response.handler.Response;
 import com.ps.RESTful.resources.response.handler.ResponseBuilder;
+import com.ps.beans.BusinessCycleDefinitionBean;
 import com.ps.entities.tenant.BusinessCycleDefinition;
 import com.ps.entities.tenant.BusinessYearDefinition;
 import com.ps.entities.tenant.FrequencyMaster;
@@ -51,7 +52,10 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 
 		if (logger.isDebugEnabled())
 			logger.debug("In BusinessCycleDefinition add EP");
-		BusinessCycleDefinition businessCycleDefinition = businessCycleDefinitionDTOMapper.dtoToEntity(requestDTO);
+		BusinessCycleDefinitionBean businessCycleDefinitionBean = new BusinessCycleDefinitionBean();
+		// BusinessCycleDefinition businessCycleDefinition =
+		// businessCycleDefinitionDTOMapper.dtoToEntity(requestDTO);
+		businessCycleDefinitionBean = businessCycleDefinitionBean.dtoToBean(requestDTO);
 
 		if (logger.isDebugEnabled())
 			logger.debug("In BusinessCycleDefinition add EP, finding businessYearDifinition object in db with id-> "
@@ -62,7 +66,8 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 		if (businessYearDefinition == null)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year Definition not found!");
 
-		businessCycleDefinition.setBusinessYearDefinition(businessYearDefinition);
+		// businessCycleDefinition.setBusinessYearDefinition(businessYearDefinition);
+		businessCycleDefinitionBean.setBusinessYearDefinition(businessYearDefinition);
 
 		if (requestDTO.getFrequencyMasterId() != 0) {
 			if (logger.isDebugEnabled())
@@ -73,12 +78,14 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 			if (frequencyMaster == null)
 				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency master not found!");
 
-			businessCycleDefinition.setFrequencyMaster(frequencyMaster);
+			// businessCycleDefinition.setFrequencyMaster(frequencyMaster);
+			businessCycleDefinitionBean.setFrequencyMaster(frequencyMaster);
 		}
 
 		if (logger.isDebugEnabled())
 			logger.debug("Sending request to businessCycleDefinition service add method to add data into DB");
-		businessCycleDefinitionService.add(businessCycleDefinition);
+		// businessCycleDefinitionService.add(businessCycleDefinition);
+		businessCycleDefinitionService.add(businessCycleDefinitionBean);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),

@@ -6,14 +6,6 @@ public class BusinessCycleDefinitionDTO extends AbstractTimeDTO {
 
 	private String name;
 
-	private String serviceName;
-
-//	private String weekStartDefinition;
-//
-//	private int reOccuranceDays;
-//
-//	private boolean forceToBusinessYearEnd;
-
 	private boolean isUsed;
 
 	private String description;
@@ -38,36 +30,12 @@ public class BusinessCycleDefinitionDTO extends AbstractTimeDTO {
 		this.name = name;
 	}
 
-	public String getServiceName() {
-		return serviceName;
-	}
-
-	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
-	}
-
-//	public String getWeekStartDefinition() {
-//		return weekStartDefinition;
+//	public List<String> getServiceName() {
+//		return serviceName;
 //	}
 //
-//	public void setWeekStartDefinition(String weekStartDefinition) {
-//		this.weekStartDefinition = weekStartDefinition;
-//	}
-//
-//	public int getReOccuranceDays() {
-//		return reOccuranceDays;
-//	}
-//
-//	public void setReOccuranceDays(int reOccuranceDays) {
-//		this.reOccuranceDays = reOccuranceDays;
-//	}
-//
-//	public boolean isForceToBusinessYearEnd() {
-//		return forceToBusinessYearEnd;
-//	}
-//
-//	public void setForceToBusinessYearEnd(boolean forceToBusinessYearEnd) {
-//		this.forceToBusinessYearEnd = forceToBusinessYearEnd;
+//	public void setServiceName(List<String> serviceName) {
+//		this.serviceName = serviceName;
 //	}
 
 	public boolean getIsUsed() {
@@ -85,11 +53,4 @@ public class BusinessCycleDefinitionDTO extends AbstractTimeDTO {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	@Override
-	public String toString() {
-		return "BusinessCycleDefinitionDTO [isActive=" + isActive + ", name=" + name + ", serviceName=" + serviceName
-				+ ", isUsed=" + isUsed + ", description=" + description + "]";
-	}
-
 }

@@ -34,7 +34,7 @@ public class BusinessCycleDefinitionDTOMapper implements
 			businessCycleDefinition.setActive(dto.isActive());
 			businessCycleDefinition.setCreatedBy(dto.getCreatedBy());
 			businessCycleDefinition.setName(dto.getName());
-			businessCycleDefinition.setServiceName(dto.getServiceName());
+			// businessCycleDefinition.setServiceName(dto.getServiceName());
 
 //			if(!StringUtils.isBlank(dto.getWeekStartDefinition()) && WeeksEnum.isValid(dto.getWeekStartDefinition()))
 //				businessCycleDefinition.setWeekStartDefinition(WeeksEnum.valueOf(dto.getWeekStartDefinition()));
@@ -59,10 +59,6 @@ public class BusinessCycleDefinitionDTOMapper implements
 //		responseDTO.setReOccuranceDays(businessCycleDefinition.getReoccuranceDays());
 //		responseDTO.setForceToBusinessYearEnd(businessCycleDefinition.isForceToBusinessYearEnd());
 		responseDTO.setCreatedBy(businessCycleDefinition.getCreatedBy());
-//		String name = businessCycleDefinition.getName();
-//		name = name.substring(0, name.indexOf('_'));
-//		responseDTO.setName(name);
-		// businessCycleDefinitionOptional.get().setName(name);
 		responseDTO.setName(businessCycleDefinition.getName());
 		responseDTO.setServiceName(businessCycleDefinition.getServiceName());
 		responseDTO.setBusinessYearDefinition(
