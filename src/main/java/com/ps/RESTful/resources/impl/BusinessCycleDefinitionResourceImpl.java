@@ -99,8 +99,9 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 			logger.debug(
 					"In BusinessCycleDefinition update EP, calling service method to find cycleDefinition with id-> "
 							+ resourceId);
-		// BusinessCycleDefinition dbBusinessCycleDefinition =
-		// businessCycleDefinitionService.getById(resourceId);
+
+		if (requestDTO.getServiceName().size() > 1)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Service name should be single value for update!");
 
 		if (logger.isDebugEnabled())
 			logger.debug("Mapping request dto to entity");

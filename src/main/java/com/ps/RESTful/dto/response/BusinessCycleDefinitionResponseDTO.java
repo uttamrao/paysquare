@@ -12,6 +12,8 @@ public class BusinessCycleDefinitionResponseDTO extends BusinessCycleDefinitionD
 
 	private String serviceName;
 
+	private int serviceCodeId;
+
 	public int getId() {
 		return id;
 	}
