@@ -19,7 +19,7 @@ public interface BusinessCycleDefinitionService {
 
 	public void softDeleteById(int id);
 
-	public BusinessCycleDefinition update(BusinessCycleDefinition existingBusinessCycleDefinition,
+	public BusinessCycleDefinition update(int businessCycleDefinitionId,
 			BusinessCycleDefinition updatedBusinessCycleDefinition);
 
 }

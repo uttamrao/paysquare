@@ -34,7 +34,7 @@ public class BusinessCycleDefinitionDTOMapper implements
 			businessCycleDefinition.setActive(dto.isActive());
 			businessCycleDefinition.setCreatedBy(dto.getCreatedBy());
 			businessCycleDefinition.setName(dto.getName());
-			// businessCycleDefinition.setServiceName(dto.getServiceName());
+			businessCycleDefinition.setServiceName(dto.getServiceName().get(0));
 
 //			if(!StringUtils.isBlank(dto.getWeekStartDefinition()) && WeeksEnum.isValid(dto.getWeekStartDefinition()))
 //				businessCycleDefinition.setWeekStartDefinition(WeeksEnum.valueOf(dto.getWeekStartDefinition()));

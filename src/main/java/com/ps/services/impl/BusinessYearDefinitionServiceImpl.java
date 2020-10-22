@@ -41,7 +41,7 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 		if (logger.isDebugEnabled())
 			logger.debug("In add BusinessYearDefinition");
 
-		validate(businessYearDefinition);
+		validate(0, businessYearDefinition);
 
 		businessYearDefinition.setCreatedBy("Anagha");
 		businessYearDefinition.setActive(true);
@@ -55,7 +55,7 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 		return businessYearDefinition;
 	}
 
-	private void validate(BusinessYearDefinition businessYearDefinition) {
+	private void validate(int businessYearDefinitionId, BusinessYearDefinition businessYearDefinition) {
 
 		if (logger.isDebugEnabled())
 			logger.debug("In validate method, Validating businessYearDefinition");
@@ -85,8 +85,11 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 				.findByfromDateAndToDate(businessYearDefinition.getFromDate(), businessYearDefinition.getToDate());
 
 		if (businessYear != null) {
-			logger.error("From date and To date combination already exist");
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, " Business Year Definition record alreay exist");
+			if (businessYearDefinitionId != businessYear.getId()) {
+				logger.error("From date and To date combination already exist");
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST,
+						" Business Year Definition record already exist");
+			}
 		}
 	}
 
@@ -176,7 +179,7 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 					"Business Year Definition is used can not update!");
 		}
 
-		validate(businessYearDefinition);
+		validate(businessYearDefinitionId, businessYearDefinition);
 
 		if (logger.isDebugEnabled())
 			logger.debug("BusinessYearDefinition data is valid, " + "updating into DB");

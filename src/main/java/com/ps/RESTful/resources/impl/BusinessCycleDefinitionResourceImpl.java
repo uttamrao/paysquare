@@ -99,7 +99,8 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 			logger.debug(
 					"In BusinessCycleDefinition update EP, calling service method to find cycleDefinition with id-> "
 							+ resourceId);
-		BusinessCycleDefinition dbBusinessCycleDefinition = businessCycleDefinitionService.getById(resourceId);
+		// BusinessCycleDefinition dbBusinessCycleDefinition =
+		// businessCycleDefinitionService.getById(resourceId);
 
 		if (logger.isDebugEnabled())
 			logger.debug("Mapping request dto to entity");
@@ -110,6 +111,10 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 					+ requestDTO.getBusinessYearDefinitionId());
 		BusinessYearDefinition businessYearDefinition = businessYearDefinitionService
 				.getById(requestDTO.getBusinessYearDefinitionId());
+
+		if (businessYearDefinition == null)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year Definition not found!");
+
 		businessCycleDefinition.setBusinessYearDefinition(businessYearDefinition);
 
 		if (requestDTO.getFrequencyMasterId() != 0) {
@@ -117,16 +122,19 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 				logger.debug("In BusinessCycleDefinition add EP, finding frequencyMaster object in db with id-> "
 						+ requestDTO.getFrequencyMasterId());
 			FrequencyMaster frequencyMaster = frequencyMasterService.getById(requestDTO.getFrequencyMasterId());
+
+			if (frequencyMaster == null)
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency master not found!");
+
 			businessCycleDefinition.setFrequencyMaster(frequencyMaster);
 		}
 
 		if (logger.isDebugEnabled())
 			logger.debug("Sending request to businessCycleDefinition service add method to add data into DB");
-		businessCycleDefinitionService.update(dbBusinessCycleDefinition, businessCycleDefinition);
+		businessCycleDefinitionService.update(resourceId, businessCycleDefinition);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
-						"Business Cycle Definition updated successfully.").build());
+		return ResponseEntity.status(HttpStatus.OK).body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(),
+				SuccessCode.OK.getCode(), "Business Cycle Definition updated successfully.").build());
 	}
 
 	@Override

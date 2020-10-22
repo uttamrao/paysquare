@@ -65,7 +65,7 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 			businessCycleDefinition = businessCycleDefinitionBean.beanToEntity(businessCycleDefinitionBean);
 			businessCycleDefinition.setServiceName(service);
 
-			validate(businessCycleDefinition);
+			validate(0, businessCycleDefinition);
 			if (logger.isDebugEnabled())
 				logger.debug("BusinessCycleDefinition data is valid");
 
@@ -75,7 +75,7 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 			businessCycleDefinition.setActive(true);
 
 			// set isUsed field from business year definition=1
-			setBusinessYear(businessCycleDefinition);
+			setBusinessYearToTrue(businessCycleDefinition);
 			cycleDefinitions.add(businessCycleDefinition);
 
 			if (logger.isDebugEnabled())
@@ -109,7 +109,7 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		return businessCycleDefinition;
 	}
 
-	private void setBusinessYear(BusinessCycleDefinition businessCycleDefinition) {
+	private void setBusinessYearToTrue(BusinessCycleDefinition businessCycleDefinition) {
 		Optional<BusinessYearDefinition> businessYearOptional = businessYearDefinitionRepository
 				.findByIdAndIsActive(businessCycleDefinition.getBusinessYearDefinition().getId(), true);
 
@@ -123,7 +123,7 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 			logger.debug("Business year Definition IsUsed field updated in table to: true");
 	}
 
-	private void validate(BusinessCycleDefinition businessCycleDefinition) {
+	private void validate(int businessCycleDefinitionId, BusinessCycleDefinition businessCycleDefinition) {
 
 		if (logger.isDebugEnabled())
 			logger.debug("In validate method, Validating businessCycleDefinitions");
@@ -170,69 +170,110 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 						businessCycleDefinition.getFrequencyMaster().getId(), businessCycleDefinition.getServiceName());
 
 		if (businessCycleDef != null) {
-			logger.error("Business year Definition, Frequency master and service name combination should be unique");
-			logger.error("Business Cycle Definition already exist");
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, " Business cycle Definition record alreay exist");
+			if (businessCycleDefinitionId != businessCycleDef.getId()) {
+				logger.error(
+						"Business year Definition, Frequency master and service name combination should be unique");
+				logger.error("Business Cycle Definition already exist");
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST,
+						" Business cycle Definition record alreay exist");
+			}
 		}
 	}
 
 	@Override
 	@Transactional("tenantTransactionManager")
-	public BusinessCycleDefinition update(BusinessCycleDefinition existingBusinessCycleDefinition,
+	public BusinessCycleDefinition update(int businessCycleDefinitionId,
 			BusinessCycleDefinition updatedBusinessCycleDefinition) {
 		if (logger.isDebugEnabled())
 			logger.debug("In update BusinessCycleDefinition service method");
 
-		validateUpdateRequest(existingBusinessCycleDefinition, updatedBusinessCycleDefinition);
+		BusinessCycleDefinition existingCycleDefinition = validateUpdateRequest(businessCycleDefinitionId,
+				updatedBusinessCycleDefinition);
+
 		if (logger.isDebugEnabled())
 			logger.debug("BusinessCycleDefinition data is valid, " + "updating into DB");
 
-		overrideForUpdate(existingBusinessCycleDefinition, updatedBusinessCycleDefinition);
+		overrideForUpdate(existingCycleDefinition, updatedBusinessCycleDefinition);
 
-		businessCycleDefinitionRepository.save(updatedBusinessCycleDefinition);
+		businessCycleDefinitionRepository.save(existingCycleDefinition);
 
+		// set isUsed field from business year definition=1
+		setBusinessYearToTrue(existingCycleDefinition);
 		if (logger.isDebugEnabled())
-			logger.debug("BusinessCycleDefinition updated into DB");
+			logger.debug("BusinessCycleDefinition updated into DB: " + existingCycleDefinition);
 
 		return updatedBusinessCycleDefinition;
 	}
 
-	private void validateUpdateRequest(BusinessCycleDefinition existingBusinessCycleDefinition,
+	private BusinessCycleDefinition validateUpdateRequest(int businessCycleDefinitionId,
 			BusinessCycleDefinition updatedBusinessCycleDefinition) {
 
 		if (logger.isDebugEnabled())
 			logger.debug("In validateUpdateRequest BusinessCycleDefinition");
 
-		if (existingBusinessCycleDefinition != null) {
-			List<BusinessCycle> businessCycles = businessCycleService
-					.getAllByCycleDefinition(existingBusinessCycleDefinition.getId());
-			if (!CollectionUtils.isEmpty(businessCycles)) {
-				if (logger.isDebugEnabled())
-					logger.debug("Business cycles are already created for cycleDefinitionId "
-							+ existingBusinessCycleDefinition.getId());
-				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business cycles are already created!");
-			}
+		if (businessCycleDefinitionId == 0) {
+			logger.error("Business Year Definition id is Invalid!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year Definition is Invalid!");
 		}
-		validate(updatedBusinessCycleDefinition);
+
+		Optional<BusinessCycleDefinition> businessCycleOptional = businessCycleDefinitionRepository
+				.findByIdAndIsActive(businessCycleDefinitionId, true);
+		if (businessCycleOptional.isEmpty()) {
+			logger.error("Business Year Definition not found!");
+			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
+		}
+
+		if (businessCycleOptional.get().getIsUsed()) {
+			logger.error("Business Year Definition is used can not update!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST,
+					"Business Year Definition is used can not update!");
+		}
+
+		validate(businessCycleDefinitionId, updatedBusinessCycleDefinition);
+
+		return businessCycleOptional.get();
 	}
 
-	private BusinessCycleDefinition overrideForUpdate(BusinessCycleDefinition dbCycleDefinitionObject,
+	private BusinessCycleDefinition overrideForUpdate(BusinessCycleDefinition existingCycleDefinition,
 			BusinessCycleDefinition requestCycleDefinitionObject) {
 		if (logger.isDebugEnabled())
 			logger.debug("In overrideForUpdate BusinessCycleDefinition");
-//		requestCycleDefinitionObject.setServiceName(dbCycleDefinitionObject.getServiceName());
-//		requestCycleDefinitionObject.setName(dbCycleDefinitionObject.getName());
-//		requestCycleDefinitionObject.setCreateDateTime(dbCycleDefinitionObject.getCreateDateTime());
-//		requestCycleDefinitionObject.setCreatedBy(dbCycleDefinitionObject.getCreatedBy());
 
-		requestCycleDefinitionObject.setFrequencyMaster(dbCycleDefinitionObject.getFrequencyMaster());
-		requestCycleDefinitionObject.setBusinessYearDefinition(dbCycleDefinitionObject.getBusinessYearDefinition());
-		requestCycleDefinitionObject.setLastModifiedBy("Anagha");
+		existingCycleDefinition.setServiceName(requestCycleDefinitionObject.getServiceName());
+		existingCycleDefinition.setName(requestCycleDefinitionObject.getName());
+		existingCycleDefinition.setDescription(requestCycleDefinitionObject.getDescription());
+		existingCycleDefinition.setFrequencyMaster(requestCycleDefinitionObject.getFrequencyMaster());
+
+		// before updating business cycle definition isUsed from business year set=0 if
+		// year is not used any other cycle
+		setBusinessYearToFalse(existingCycleDefinition);
+
+		existingCycleDefinition.setBusinessYearDefinition(requestCycleDefinitionObject.getBusinessYearDefinition());
+		existingCycleDefinition.setLastModifiedBy("Anagha");
 		// set all fields
-		addData(requestCycleDefinitionObject);
+		addData(existingCycleDefinition);
 		if (logger.isDebugEnabled())
 			logger.debug("In overrideForUpdate BusinessCycleDefinition, all data set to existing object");
-		return requestCycleDefinitionObject;
+		return existingCycleDefinition;
+	}
+
+	private void setBusinessYearToFalse(BusinessCycleDefinition existingCycleDefinition) {
+		List<BusinessCycleDefinition> cycles = businessCycleDefinitionRepository.findBusinessYearDefinitionUsed(
+				existingCycleDefinition.getBusinessYearDefinition().getId(), existingCycleDefinition.getId());
+
+		if (cycles.isEmpty()) {
+			Optional<BusinessYearDefinition> businessYearOptional = businessYearDefinitionRepository
+					.findByIdAndIsActive(existingCycleDefinition.getBusinessYearDefinition().getId(), true);
+
+			if (businessYearOptional.isEmpty())
+				throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Year Definition not found!");
+
+			businessYearOptional.get().setIsUsed(false);
+			businessYearDefinitionRepository.save(businessYearOptional.get());
+
+			if (logger.isDebugEnabled())
+				logger.debug("Business year Definition IsUsed field updated in table to: false");
+		}
 	}
 
 	@Override

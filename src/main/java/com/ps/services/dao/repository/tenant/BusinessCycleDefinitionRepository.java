@@ -36,4 +36,9 @@ public interface BusinessCycleDefinitionRepository extends AbstractRepository<Bu
 	BusinessCycleDefinition findByBusinessYearDefinitionAndFrequencyMasterAndServiceNameAndIsActive(
 			@Param("businessYearDefinitionId") int businessYearDefinitionId,
 			@Param("frequencyMasterId") int frequencyMasterId, String serviceName);
+
+	@Query("SELECT cd FROM BusinessCycleDefinition cd WHERE cd.isActive = true and cd.businessYearDefinition.id = (:businessYearDefinitionId) and cd.id!=(:businessCycleDefinitionId)")
+	List<BusinessCycleDefinition> findBusinessYearDefinitionUsed(
+			@Param("businessYearDefinitionId") int businessYearDefinitionId,
+			@Param("businessCycleDefinitionId") int businessCycleDefinitionId);
 }
