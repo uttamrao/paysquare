@@ -2,7 +2,7 @@ package com.ps.RESTful.dto.request;
 
 import com.ps.dto.BusinessCycleDTO;
 
-public class BusinessCycleRequestDTO extends BusinessCycleDTO{
+public class BusinessCycleRequestDTO extends BusinessCycleDTO {
 
 	private int businessCycleDefinitionId;
 

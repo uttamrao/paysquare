@@ -12,33 +12,43 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import com.ps.entities.master.AbstractTimeEntity;
-
 @Entity
 public class BusinessCycle {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="businessCycleId")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "businessCycleId")
 	private int id;
-	
+
 	@ManyToOne
-	@JoinColumn(name="businessCycleDefinitionId",referencedColumnName = "businessCycleDefinitionId")
+	@JoinColumn(name = "businessCycleDefinitionId", referencedColumnName = "businessCycleDefinitionId")
 	private BusinessCycleDefinition businessCycleDefinition;
-	
+
+	private int periodId;
+
+	private String periodName;
+
+	private boolean isLocked;
+
 	@Temporal(TemporalType.DATE)
 	private Date fromDate;
-	
+
 	@Temporal(TemporalType.DATE)
 	private Date toDate;
-	
-	private int periodId;
-	
-	private String periodName;
-	
-	private boolean isLocked;
-	
-	private boolean isActive = true;
+
+	private String businessYear;
+	private int noOfDays;
+	private int noOfCycles;
+	private boolean isForceToYearEnd;
+	private String remark;
+	private boolean isUsed;
+
+	private boolean isActive;
+
+	// constructor
+	public BusinessCycle() {
+		super();
+	}
 
 	public int getId() {
 		return id;
@@ -103,4 +113,62 @@ public class BusinessCycle {
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
 	}
+
+	public String getBusinessYear() {
+		return businessYear;
+	}
+
+	public void setBusinessYear(String businessYear) {
+		this.businessYear = businessYear;
+	}
+
+	public int getNoOfDays() {
+		return noOfDays;
+	}
+
+	public void setNoOfDays(int noOfDays) {
+		this.noOfDays = noOfDays;
+	}
+
+	public int getNoOfCycles() {
+		return noOfCycles;
+	}
+
+	public void setNoOfCycles(int noOfCycles) {
+		this.noOfCycles = noOfCycles;
+	}
+
+	public boolean isForceToYearEnd() {
+		return isForceToYearEnd;
+	}
+
+	public void setForceToYearEnd(boolean isForceToYearEnd) {
+		this.isForceToYearEnd = isForceToYearEnd;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public boolean isUsed() {
+		return isUsed;
+	}
+
+	public void setUsed(boolean isUsed) {
+		this.isUsed = isUsed;
+	}
+
+	@Override
+	public String toString() {
+		return "BusinessCycle [id=" + id + ", businessCycleDefinition=" + businessCycleDefinition + ", periodId="
+				+ periodId + ", periodName=" + periodName + ", isLocked=" + isLocked + ", fromDate=" + fromDate
+				+ ", toDate=" + toDate + ", businessYear=" + businessYear + ", noOfDays=" + noOfDays + ", noOfCycles="
+				+ noOfCycles + ", isForceToYearEnd=" + isForceToYearEnd + ", remark=" + remark + ", isUsed=" + isUsed
+				+ ", isActive=" + isActive + "]";
+	}
+
 }

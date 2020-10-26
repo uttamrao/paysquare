@@ -6,17 +6,19 @@ import com.ps.beans.BusinessCycleBean;
 import com.ps.entities.tenant.BusinessCycle;
 
 public interface BusinessCycleService {
-	
+
 	public void add(BusinessCycleBean businessCycleBean);
-	
+
 	public List<BusinessCycle> getAll();
-	
+
+	public List<BusinessCycle> getAllByBusinessCycleIdAndBusinessYear(int cycleDefinitionId, int businessYear);
+
 	public List<BusinessCycle> getAllByCycleDefinition(int id);
-	
+
 	public List<BusinessCycle> getAllByBusinessYearDefinitionId(int id);
-	
+
 	public void deleteAllByCycleDefinitionIds(List<Integer> ids);
-	
+
 	public void deleteAllByCycleDefinitionId(int ids);
-			
+
 }

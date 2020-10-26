@@ -168,6 +168,9 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 
 		List<BusinessCycle> businessCycleList = businessCycleRepository.findAllByCycleDefinitionId(id);
 
+		if (businessCycleList.isEmpty())
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition not found!");
+
 		return businessCycleList;
 	}
 
@@ -208,6 +211,12 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		List<Integer> cycleDefinitionId = new ArrayList<Integer>();
 		cycleDefinitionId.add(id);
 		businessCycleRepository.deleteAllByBusinessCycleDefinitionIds(cycleDefinitionId);
+	}
+
+	@Override
+	public List<BusinessCycle> getAllByBusinessCycleIdAndBusinessYear(int cycleDefinitionId, int businessYear) {
+
+		return null;
 	}
 
 }
