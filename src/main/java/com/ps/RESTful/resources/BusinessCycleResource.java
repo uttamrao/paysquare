@@ -2,6 +2,7 @@ package com.ps.RESTful.resources;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +15,7 @@ import com.ps.RESTful.resources.response.handler.Response;
 public interface BusinessCycleResource {
 
 	public final static String RESOURCE_PATH = "/business-cycle";
-	public final static String GET_CYCLE_DEFINITION_PATH = "/cycle-definition/{resourceId}";
+	public final static String GET_CYCLE_DEFINITION_PATH = "/cycle-definition/{cycleDefinitionId}/{businessYear}";
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Response> add(@RequestBody BusinessCycleRequestDTO requestDTO);
@@ -26,6 +27,11 @@ public interface BusinessCycleResource {
 	@GetMapping(path = GET_CYCLE_DEFINITION_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Response> getAllByBusinessCycleIdAndBusinessYear(
 			@PathVariable(name = "cycleDefinitionId") int cycleDefinitionId,
-			@PathVariable(name = "businessYear") int businessYear);
+			@PathVariable(name = "businessYear") String businessYear);
+
+	@DeleteMapping(path = GET_CYCLE_DEFINITION_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Response> softDeleteByBusinessCycleIdAndBusinessYear(
+			@PathVariable(name = "cycleDefinitionId") int cycleDefinitionId,
+			@PathVariable(name = "businessYear") String businessYear);
 
 }

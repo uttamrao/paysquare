@@ -69,7 +69,7 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 		if (logger.isDebugEnabled())
 			logger.debug("In businessCycle getAll EP");
 
-		List<BusinessCycle> businessCycleList = new ArrayList<BusinessCycle>();
+		List<BusinessCycle> businessCycleList = new ArrayList<>();
 
 		if (cycleDefinitionId != null) {
 			if (logger.isDebugEnabled())
@@ -94,17 +94,20 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 								.results(responseDTOList).build());
 	}
 
+	/** GET by ID **/
 	@Override
-	public ResponseEntity<Response> getAllByBusinessCycleIdAndBusinessYear(int cycleDefinitionId, int businessYear) {
+	public ResponseEntity<Response> getAllByBusinessCycleIdAndBusinessYear(int cycleDefinitionId, String businessYear) {
 		if (logger.isDebugEnabled())
 			logger.debug("In businessCycle getAllByBusinessCycleId EP");
 
-		List<BusinessCycle> businessCycleList = new ArrayList<BusinessCycle>();
+		List<BusinessCycle> businessCycleList = new ArrayList<>();
 
 		if (logger.isDebugEnabled())
-			logger.debug("Sending request to businessCycle service getByCycleID method for cycleDefiniitonID-> "
-					+ cycleDefinitionId);
-		businessCycleList = businessCycleService.getAllByCycleDefinition(cycleDefinitionId);
+			logger.debug(
+					"Sending request to businessCycle service getAllByBusinessCycleIdAndBusinessYear method for cycleDefiniitonID-> "
+							+ cycleDefinitionId);
+		businessCycleList = businessCycleService.getAllByBusinessCycleIdAndBusinessYear(cycleDefinitionId,
+				businessYear);
 
 		if (logger.isDebugEnabled())
 			logger.debug("Sending request to businessCycle dto mapper to map entity list to responseDTO list");
@@ -116,6 +119,25 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 								.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
 										"Business Cycle records retrieved successfully")
 								.results(responseDTOList).build());
+	}
+
+	/** Soft delete by Id **/
+
+	@Override
+	public ResponseEntity<Response> softDeleteByBusinessCycleIdAndBusinessYear(int cycleDefinitionId,
+			String businessYear) {
+		if (logger.isDebugEnabled())
+			logger.debug("In businessCycle softDeleteByBusinessCycleIdAndBusinessYear EP");
+
+		if (logger.isDebugEnabled())
+			logger.debug(
+					"Sending request to businessCycle service softDeleteByBusinessCycleIdAndBusinessYear method for cycleDefiniitonID-> "
+							+ cycleDefinitionId);
+		businessCycleService.softDeleteByBusinessCycleIdAndBusinessYear(cycleDefinitionId, businessYear);
+
+		return ResponseEntity.status(HttpStatus.OK).body(ResponseBuilder.builder()
+				.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(), "Business Cycle deleted successfully.")
+				.build());
 	}
 
 }

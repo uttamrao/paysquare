@@ -11,7 +11,7 @@ public interface BusinessCycleService {
 
 	public List<BusinessCycle> getAll();
 
-	public List<BusinessCycle> getAllByBusinessCycleIdAndBusinessYear(int cycleDefinitionId, int businessYear);
+	public List<BusinessCycle> getAllByBusinessCycleIdAndBusinessYear(int cycleDefinitionId, String businessYear);
 
 	public List<BusinessCycle> getAllByCycleDefinition(int id);
 
@@ -20,5 +20,7 @@ public interface BusinessCycleService {
 	public void deleteAllByCycleDefinitionIds(List<Integer> ids);
 
 	public void deleteAllByCycleDefinitionId(int ids);
+
+	public void softDeleteByBusinessCycleIdAndBusinessYear(int cycleDefinitionId, String businessYear);
 
 }

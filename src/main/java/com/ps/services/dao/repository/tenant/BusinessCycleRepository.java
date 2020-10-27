@@ -15,9 +15,9 @@ public interface BusinessCycleRepository extends AbstractRepository<BusinessCycl
 	Optional<BusinessCycle> findTopByBusinessCycleDefinitionOrderByFromDateDesc(
 			BusinessCycleDefinition businessCycleDefinition);
 
-	@Query("Select c from BusinessCycle c where c.businessCycleDefinition.id = :id and c.businessYear=:businessYear")
+	@Query("Select c from BusinessCycle c where c.businessCycleDefinition.id = :id and c.businessYear=:businessYear and c.isActive=true")
 	List<BusinessCycle> findAllByCycleDefinitionIdAndBusinessYear(@Param("id") int id,
-			@Param("businessYear") int businessYear);
+			@Param("businessYear") String businessYear);
 
 	@Query("Select c from BusinessCycle c where c.businessCycleDefinition.id = :id")
 	List<BusinessCycle> findAllByCycleDefinitionId(@Param("id") int id);
@@ -25,8 +25,18 @@ public interface BusinessCycleRepository extends AbstractRepository<BusinessCycl
 	@Query("Select c from BusinessCycle c where c.isLocked = false and c.businessCycleDefinition.businessYearDefinition.id = :yearDefinitionId")
 	List<BusinessCycle> findAllByBusinessYearDefinitionId(@Param("yearDefinitionId") int yearDefinitionId);
 
+	// hard delete
 	@Modifying
 	@Query("DELETE FROM BusinessCycle c where c.businessCycleDefinition.id in ?1")
 	void deleteAllByBusinessCycleDefinitionIds(List<Integer> cycleDefinitionIds);
+
+	// soft delete
+	@Modifying
+	@Query("UPDATE BusinessCycle c set c.isActive=false where c.businessCycleDefinition.id = :id and c.businessYear=:businessYear")
+	void softdeleteByCycleDefinitionIdAndBusinessYear(@Param("id") int id, @Param("businessYear") String businessYear);
+
+	// Get all by period id and isActive
+	@Query("Select c from BusinessCycle c where c.isActive = true and c.periodId=1")
+	List<BusinessCycle> findAllByPeriodIdByIsActive();
 
 }
