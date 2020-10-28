@@ -56,11 +56,15 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 
 		if (logger.isDebugEnabled())
 			logger.debug("Sending request to businessCycleDefinition service add method to add data into DB");
-		businessCycleService.add(businessCycleBean);
+		List<BusinessCycle> businessCycleList = businessCycleService.add(businessCycleBean);
+
+		if (logger.isDebugEnabled())
+			logger.debug("Sending request to businessYearDefinition dto mapper to map entity to responseDTO");
+		List<BusinessCycleResponseDTO> responseDTO = businessCycleDTOMapper.entityListToDtoList(businessCycleList);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(ResponseBuilder.builder()
 				.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(), "Business Cycle added successfully.")
-				.build());
+				.results(responseDTO).build());
 	}
 
 	@Override
@@ -138,6 +142,22 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 		return ResponseEntity.status(HttpStatus.OK).body(ResponseBuilder.builder()
 				.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(), "Business Cycle deleted successfully.")
 				.build());
+	}
+
+	@Override
+	public ResponseEntity<Response> hardDeleteByBusinessCycleIdAndBusinessYear(int cycleDefinitionId,
+			String businessYear) {
+		if (logger.isDebugEnabled())
+			logger.debug("In businessCycle hardDeleteByBusinessCycleIdAndBusinessYear EP");
+
+		if (logger.isDebugEnabled())
+			logger.debug(
+					"Sending request to businessCycle service hardDeleteByBusinessCycleIdAndBusinessYear method for cycleDefiniitonID-> "
+							+ cycleDefinitionId);
+		businessCycleService.hardDeleteByBusinessCycleIdAndBusinessYear(cycleDefinitionId, businessYear);
+
+		return ResponseEntity.status(HttpStatus.OK).body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(),
+				SuccessCode.OK.getCode(), "Business Cycle discarded successfully.").build());
 	}
 
 }

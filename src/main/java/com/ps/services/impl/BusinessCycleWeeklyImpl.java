@@ -23,100 +23,106 @@ public class BusinessCycleWeeklyImpl implements BusinessCycleCommand {
 
 	Logger logger = Logger.getLogger(BusinessCycleWeeklyImpl.class);
 	List<BusinessCycle> businessCycleList = null;
-	
+
 	@Override
-	public List<BusinessCycle> create(BusinessCycleBean businessCycleBean) {			
-		
-		if(logger.isDebugEnabled())
+	public List<BusinessCycle> create(BusinessCycleBean businessCycleBean) {
+
+		if (logger.isDebugEnabled())
 			logger.debug("In cycle creation method");
-		
+
 		BusinessCycleUtils.validate(businessCycleBean);
-		
-		BusinessCycleDefinition businessCycleDefinition = businessCycleBean.getBusinessCycleDefinition();  		
-		BusinessYearDefinition businessYearDefinition = businessCycleDefinition.getBusinessYearDefinition(); 		
-		
-		if(logger.isDebugEnabled())
-			logger.debug("Converting business year from and to dates to java8 LocalDate object, as all the operations will be performed using its methods");  
-		LocalDate businessYearFrom = LocalDateUtils.convert(businessYearDefinition.getFromDate(), ZoneId.systemDefault());	
-		LocalDate businessYearTo = LocalDateUtils.convert(businessYearDefinition.getToDate(), ZoneId.systemDefault());	
+
+		BusinessCycleDefinition businessCycleDefinition = businessCycleBean.getBusinessCycleDefinition();
+		BusinessYearDefinition businessYearDefinition = businessCycleDefinition.getBusinessYearDefinition();
+
+		if (logger.isDebugEnabled())
+			logger.debug(
+					"Converting business year from and to dates to java8 LocalDate object, as all the operations will be performed using its methods");
+		LocalDate businessYearFrom = LocalDateUtils.convert(businessYearDefinition.getFromDate(),
+				ZoneId.systemDefault());
+		LocalDate businessYearTo = LocalDateUtils.convert(businessYearDefinition.getToDate(), ZoneId.systemDefault());
 
 		int currentYear = 0;
-		if(businessCycleBean.getLastCreatedYear() != 0)
+		if (businessCycleBean.getLastCreatedYear() != 0)
 			currentYear = businessCycleBean.getLastCreatedYear();
 		else
 			currentYear = LocalDate.now().getYear();
-		
+
 		businessYearFrom = businessYearFrom.withYear(currentYear);
 		businessYearTo = businessYearTo.withYear(currentYear);
-		
-		if(businessYearTo.compareTo(businessYearFrom) <= 0)
+
+		if (businessYearTo.compareTo(businessYearFrom) <= 0)
 			businessYearTo = businessYearTo.plusYears(1);
-		
+
 		int duration = BusinessCycleUtils.getWeeksBetween(businessYearFrom, businessYearTo);
-		int noOfCycles = BusinessCycleUtils.computeCycleCount(duration, 1,1);
-		businessCycleList =  new ArrayList<BusinessCycle>();
-		
-		for (int i = 0; i < businessCycleBean.getNoOfYears(); i++) {
-			
-			LocalDate lastCreateCycleDate = generateCycles(businessYearFrom, businessYearTo, noOfCycles, businessCycleDefinition);		
-			if (logger.isDebugEnabled())
-				logger.debug("lastCreateCycleDate-> " + lastCreateCycleDate);
-		
-			if(duration < 52)
-				lastCreateCycleDate = lastCreateCycleDate.plusYears(1);
-			else 
-				lastCreateCycleDate = lastCreateCycleDate.plusDays(1);			
-			
-			businessYearFrom = businessYearFrom.withYear(lastCreateCycleDate.getYear());
-			businessYearTo = businessYearTo.plusYears(1);		
-		}	
-	
+		int noOfCycles = BusinessCycleUtils.computeCycleCount(duration, 1, 1);
+		businessCycleList = new ArrayList<BusinessCycle>();
+
+		// for (int i = 0; i < businessCycleBean.getNoOfYears(); i++) {
+
+		LocalDate lastCreateCycleDate = generateCycles(businessYearFrom, businessYearTo, noOfCycles,
+				businessCycleDefinition, businessCycleBean);
 		if (logger.isDebugEnabled())
-			logger.debug("Total cycles created ->" +businessCycleList.size());
+			logger.debug("lastCreateCycleDate-> " + lastCreateCycleDate);
+
+		if (duration < 52)
+			lastCreateCycleDate = lastCreateCycleDate.plusYears(1);
+		else
+			lastCreateCycleDate = lastCreateCycleDate.plusDays(1);
+
+		businessYearFrom = businessYearFrom.withYear(lastCreateCycleDate.getYear());
+		businessYearTo = businessYearTo.plusYears(1);
+		// }
+
+		if (logger.isDebugEnabled())
+			logger.debug("Total cycles created ->" + businessCycleList.size());
 		return businessCycleList;
 	}
-	
-	LocalDate generateCycles(LocalDate cycleStartDate, LocalDate endCycleDate, int noOfCycles, BusinessCycleDefinition businessCycleDefinition) {
+
+	LocalDate generateCycles(LocalDate cycleStartDate, LocalDate endCycleDate, int noOfCycles,
+			BusinessCycleDefinition businessCycleDefinition, BusinessCycleBean businessCycleBean) {
 
 		int period = 1;
 		LocalDate nextCycleStartDate = cycleStartDate;
 		DayOfWeek startOfWeek = cycleStartDate.getDayOfWeek();
-		DayOfWeek endOfWeek = LocalDateUtils.enOftheWeek(startOfWeek);		 
-		
-		do {	
-			//could get nextCycleStartDate from last added cycle's endDate from the cycleList but instead of
-			// traversing through the entire list just to get a date its better to store it locally
+		DayOfWeek endOfWeek = LocalDateUtils.enOftheWeek(startOfWeek);
+
+		do {
+			// could get nextCycleStartDate from last added cycle's endDate from the
+			// cycleList but instead of
+			// traversing through the entire list just to get a date its better to store it
+			// locally
 			LocalDate startDate = null;
-			LocalDate endDate  = null;
-					
-			if(period == 1)
-				 startDate = nextCycleStartDate;
+			LocalDate endDate = null;
+
+			if (period == 1)
+				startDate = nextCycleStartDate;
 			else
 				startDate = nextCycleStartDate.with(TemporalAdjusters.previousOrSame(startOfWeek));
-			 	
-			if(period == noOfCycles && businessCycleDefinition.isForceToBusinessYearEnd())
+
+			if (period == noOfCycles && businessCycleDefinition.isForceToBusinessYearEnd())
 				endDate = startDate.withDayOfMonth(endCycleDate.getDayOfMonth());
 			else
 				endDate = startDate.with(TemporalAdjusters.nextOrSame(endOfWeek));
-			
-				BusinessCycle cycle = BusinessCycleUtils.setCycle(startDate, endDate, businessCycleDefinition, period);
-				businessCycleList.add(cycle);
-				if(logger.isDebugEnabled())
-					logger.debug("No of cycle for businessYearDefinitionId-> "+cycle.getBusinessCycleDefinition().getId()
-							+" period-> "+cycle.getPeriodId()
-							+" periodName-> "+cycle.getPeriodName()					
-							+" start -> "+cycle.getFromDate()+", end-> "+cycle.getToDate());
-			
-				nextCycleStartDate = endDate.plusDays(1);
-				period++;
-			
-			if(logger.isDebugEnabled())
-				logger.debug("nextCycleStartDate-> "+nextCycleStartDate
-						+" period-> "+period);
+
+			BusinessCycle cycle = BusinessCycleUtils.setCycle(startDate, endDate, businessCycleDefinition, period,
+					noOfCycles, businessCycleBean);
+//			cycle.setActive(true);
+//			cycle.setBusinessYear(businessCycleBean.getBusinessYear());
+			businessCycleList.add(cycle);
+			if (logger.isDebugEnabled())
+				logger.debug("No of cycle for businessYearDefinitionId-> " + cycle.getBusinessCycleDefinition().getId()
+						+ " period-> " + cycle.getPeriodId() + " periodName-> " + cycle.getPeriodName() + " start -> "
+						+ cycle.getFromDate() + ", end-> " + cycle.getToDate());
+
+			nextCycleStartDate = endDate.plusDays(1);
+			period++;
+
+			if (logger.isDebugEnabled())
+				logger.debug("nextCycleStartDate-> " + nextCycleStartDate + " period-> " + period);
 		} while (endCycleDate.compareTo(nextCycleStartDate) >= 0);
-		
 
 		return nextCycleStartDate;
 	}
-	
+
 }

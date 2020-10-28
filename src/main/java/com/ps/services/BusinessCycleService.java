@@ -7,7 +7,7 @@ import com.ps.entities.tenant.BusinessCycle;
 
 public interface BusinessCycleService {
 
-	public void add(BusinessCycleBean businessCycleBean);
+	public List<BusinessCycle> add(BusinessCycleBean businessCycleBean);
 
 	public List<BusinessCycle> getAll();
 
@@ -22,5 +22,7 @@ public interface BusinessCycleService {
 	public void deleteAllByCycleDefinitionId(int ids);
 
 	public void softDeleteByBusinessCycleIdAndBusinessYear(int cycleDefinitionId, String businessYear);
+
+	public void hardDeleteByBusinessCycleIdAndBusinessYear(int cycleDefinitionId, String businessYear);
 
 }

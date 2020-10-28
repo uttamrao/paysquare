@@ -4,9 +4,14 @@ import com.ps.entities.tenant.BusinessCycleDefinition;
 
 public class BusinessCycleBean {
 
-	BusinessCycleDefinition businessCycleDefinition;	
+	BusinessCycleDefinition businessCycleDefinition;
+	String businessYear;
 	int lastCreatedYear;
 	int noOfYears = 1;
+
+	public BusinessCycleBean() {
+		super();
+	}
 
 	public BusinessCycleDefinition getBusinessCycleDefinition() {
 		return businessCycleDefinition;
@@ -32,4 +37,17 @@ public class BusinessCycleBean {
 		this.lastCreatedYear = lastCreatedYear;
 	}
 
+	public String getBusinessYear() {
+		return businessYear;
+	}
+
+	public void setBusinessYear(String businessYear) {
+		this.businessYear = businessYear;
+	}
+
+	@Override
+	public String toString() {
+		return "BusinessCycleBean [businessCycleDefinition=" + businessCycleDefinition + ", businessYear="
+				+ businessYear + ", lastCreatedYear=" + lastCreatedYear + ", noOfYears=" + noOfYears + "]";
+	}
 }

@@ -16,6 +16,7 @@ public interface BusinessCycleResource {
 
 	public final static String RESOURCE_PATH = "/business-cycle";
 	public final static String GET_CYCLE_DEFINITION_PATH = "/cycle-definition/{cycleDefinitionId}/{businessYear}";
+	public final static String DELETE_CYCLE_DEFINITION_PATH = "/cycles/{cycleDefinitionId}/{businessYear}";
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Response> add(@RequestBody BusinessCycleRequestDTO requestDTO);
@@ -31,6 +32,11 @@ public interface BusinessCycleResource {
 
 	@DeleteMapping(path = GET_CYCLE_DEFINITION_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Response> softDeleteByBusinessCycleIdAndBusinessYear(
+			@PathVariable(name = "cycleDefinitionId") int cycleDefinitionId,
+			@PathVariable(name = "businessYear") String businessYear);
+
+	@DeleteMapping(path = DELETE_CYCLE_DEFINITION_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Response> hardDeleteByBusinessCycleIdAndBusinessYear(
 			@PathVariable(name = "cycleDefinitionId") int cycleDefinitionId,
 			@PathVariable(name = "businessYear") String businessYear);
 

@@ -84,6 +84,7 @@ public class BusinessCycleDTOMapper
 
 			businessCycleBean = new BusinessCycleBean();
 			businessCycleBean.setNoOfYears(dto.getNoOfYears());
+			businessCycleBean.setBusinessYear(dto.getBusinessYear());
 		}
 
 		return businessCycleBean;

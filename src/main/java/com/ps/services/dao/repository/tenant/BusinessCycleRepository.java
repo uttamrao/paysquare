@@ -30,10 +30,15 @@ public interface BusinessCycleRepository extends AbstractRepository<BusinessCycl
 	@Query("DELETE FROM BusinessCycle c where c.businessCycleDefinition.id in ?1")
 	void deleteAllByBusinessCycleDefinitionIds(List<Integer> cycleDefinitionIds);
 
-	// soft delete
+	// soft delete by business year and business cycle definition id
 	@Modifying
 	@Query("UPDATE BusinessCycle c set c.isActive=false where c.businessCycleDefinition.id = :id and c.businessYear=:businessYear")
 	void softdeleteByCycleDefinitionIdAndBusinessYear(@Param("id") int id, @Param("businessYear") String businessYear);
+
+	// soft delete by business year and business cycle definition id
+	@Modifying
+	@Query("DELETE FROM BusinessCycle c where c.businessCycleDefinition.id = :id and c.businessYear=:businessYear")
+	void hardDeleteByCycleDefinitionIdAndBusinessYear(@Param("id") int id, @Param("businessYear") String businessYear);
 
 	// Get all by period id and isActive
 	@Query("Select c from BusinessCycle c where c.isActive = true and c.periodId=1")

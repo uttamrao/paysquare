@@ -1,7 +1,5 @@
 package com.ps.services.impl;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +23,6 @@ import com.ps.services.BusinessCycleInvoker;
 import com.ps.services.BusinessCycleService;
 import com.ps.services.dao.repository.tenant.BusinessCycleDefinitionRepository;
 import com.ps.services.dao.repository.tenant.BusinessCycleRepository;
-import com.ps.util.LocalDateUtils;
 import com.ps.util.RequestUtils;
 
 @Service
@@ -60,7 +57,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 
 	@Override
 	@Transactional("tenantTransactionManager")
-	public void add(BusinessCycleBean businessCycleBean) {
+	public List<BusinessCycle> add(BusinessCycleBean businessCycleBean) {
 
 		if (logger.isDebugEnabled())
 			logger.debug("In add BusinessCycleDefinition");
@@ -81,12 +78,16 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		// i.e set start year to the year last cycle was created
 		// based on the the duration it should be decided if cycle should be created for
 		// this year or next
-		Optional<BusinessCycle> businessCycle = businessCycleRepository
-				.findTopByBusinessCycleDefinitionOrderByFromDateDesc(businessCycleBean.getBusinessCycleDefinition());
-		if (businessCycle.isPresent()) {
-			LocalDate fromDate = LocalDateUtils.convert(businessCycle.get().getToDate(), ZoneId.systemDefault());
-			businessCycleBean.setLastCreatedYear(fromDate.plusDays(1).getYear());
-		}
+//		Optional<BusinessCycle> businessCycle = businessCycleRepository
+//				.findTopByBusinessCycleDefinitionOrderByFromDateDesc(businessCycleBean.getBusinessCycleDefinition());
+//		if (businessCycle.isPresent()) {
+//			LocalDate fromDate = LocalDateUtils.convert(businessCycle.get().getToDate(), ZoneId.systemDefault());
+//			businessCycleBean.setLastCreatedYear(fromDate.plusDays(1).getYear());
+
+		// LocalDate fromDate = LocalDateUtils.convert(businessCycle.get().getToDate(),
+		// ZoneId.systemDefault());
+		businessCycleBean.setLastCreatedYear(Integer.parseInt(businessCycleBean.getBusinessYear()));
+		// }
 
 		BusinessCycleCommand businessCycleCommand = businessCycleCommandObject.get(frequency);
 		List<BusinessCycle> cycleList = businessCycleInvoker.createCycle(businessCycleCommand, businessCycleBean);
@@ -103,6 +104,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 			if (logger.isDebugEnabled())
 				logger.debug("Business Cycle Definition saved into DB successfully");
 		}
+		return cycleList;
 	}
 
 	private void setBusinessCycleDefinition(BusinessCycleDefinition businessCycleDefinition) {
@@ -149,6 +151,19 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 			if (businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster() == null)
 				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle frequency not found!");
 		}
+
+		if (logger.isDebugEnabled())
+			logger.debug("Validating cycle alreday exist for , business cycle def id-> "
+					+ businessCycleBean.getBusinessCycleDefinition().getId() + " and business year-->"
+					+ businessCycleBean.getBusinessYear());
+		List<BusinessCycle> businessCycleList = businessCycleRepository.findAllByCycleDefinitionIdAndBusinessYear(
+				businessCycleBean.getBusinessCycleDefinition().getId(), businessCycleBean.getBusinessYear());
+
+		if (!businessCycleList.isEmpty())
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle already exist");
+
+		if (logger.isDebugEnabled())
+			logger.debug("Business cycle creation object validated successfully");
 	}
 
 	@Override
@@ -245,8 +260,10 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		List<BusinessCycle> businessCycleList = businessCycleRepository
 				.findAllByCycleDefinitionIdAndBusinessYear(cycleDefinitionId, businessYear);
 
-		if (businessCycleList.isEmpty())
+		if (businessCycleList.isEmpty()) {
+			logger.error("Business Cycle creation not found!");
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle creation not found!");
+		}
 
 		if (logger.isDebugEnabled())
 			logger.debug("In BusinessCycle creation found");
@@ -257,8 +274,9 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 	@Transactional("tenantTransactionManager")
 	public void softDeleteByBusinessCycleIdAndBusinessYear(int cycleDefinitionId, String businessYear) {
 		if (logger.isDebugEnabled())
-			logger.debug("In BusinessCycle Definition getByCycleDefinition method, businessCycleDefinitionId-> "
-					+ cycleDefinitionId);
+			logger.debug(
+					"In BusinessCycle Definition softDeleteByBusinessCycleIdAndBusinessYear method, businessCycleDefinitionId-> "
+							+ cycleDefinitionId);
 		if (cycleDefinitionId == 0)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
 
@@ -269,20 +287,73 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
 		}
 
-		if (businessYear == null)
-			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business businessYear is Invalid!");
+		if (businessYear == null) {
+			logger.error("Business Year is Invalid!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year is Invalid!");
+		}
 
 		List<BusinessCycle> businessCycleList = businessCycleRepository
 				.findAllByCycleDefinitionIdAndBusinessYear(cycleDefinitionId, businessYear);
 
-		if (businessCycleList.isEmpty())
+		if (businessCycleList.isEmpty()) {
+			logger.error("Business Cycle Creation not found!");
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Creation not found!");
+		}
+
+		for (BusinessCycle businessCycle : businessCycleList) {
+			if (businessCycle.isLocked()) {
+				logger.error("Business Cycle Creation not delete!");
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Creation not delete!");
+			}
+		}
 
 		businessCycleRepository.softdeleteByCycleDefinitionIdAndBusinessYear(cycleDefinitionId, businessYear);
 		if (logger.isDebugEnabled())
 			logger.debug("Soft deleted business cycle creation record with business cycle creation id-> "
 					+ cycleDefinitionId);
+	}
 
+	@Override
+	@Transactional("tenantTransactionManager")
+	public void hardDeleteByBusinessCycleIdAndBusinessYear(int cycleDefinitionId, String businessYear) {
+		if (logger.isDebugEnabled())
+			logger.debug(
+					"In BusinessCycle Definition hardDeleteByBusinessCycleIdAndBusinessYear method, businessCycleDefinitionId-> "
+							+ cycleDefinitionId);
+		if (cycleDefinitionId == 0)
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
+
+		Optional<BusinessCycleDefinition> businessCycleDefinitionOptional = businessCycleDefinitionRepository
+				.findByIdAndIsActive(cycleDefinitionId, true);
+		if (businessCycleDefinitionOptional.isEmpty()) {
+			logger.error("Business Cycle Definition not found!");
+			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
+		}
+
+		if (businessYear == null) {
+			logger.error("Business Year is Invalid!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year is Invalid!");
+		}
+
+		List<BusinessCycle> businessCycleList = businessCycleRepository
+				.findAllByCycleDefinitionIdAndBusinessYear(cycleDefinitionId, businessYear);
+
+		if (businessCycleList.isEmpty()) {
+			logger.error("Business Cycle Creation not found!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Creation not found!");
+		}
+
+		for (BusinessCycle businessCycle : businessCycleList) {
+			if (businessCycle.isLocked()) {
+				logger.error("Business Cycle Creation not delete!");
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Creation not delete!");
+			}
+		}
+
+		businessCycleRepository.hardDeleteByCycleDefinitionIdAndBusinessYear(cycleDefinitionId, businessYear);
+		if (logger.isDebugEnabled())
+			logger.debug("Hard deleted business cycle creation record with business cycle creation id-> "
+					+ cycleDefinitionId);
 	}
 
 }
