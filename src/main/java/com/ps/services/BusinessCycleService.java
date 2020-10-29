@@ -25,4 +25,5 @@ public interface BusinessCycleService {
 
 	public void hardDeleteByBusinessCycleIdAndBusinessYear(int cycleDefinitionId, String businessYear);
 
+	public List<BusinessCycle> update(List<BusinessCycle> requestList, int cycleDefinitionId, String businessYear);
 }

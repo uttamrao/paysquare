@@ -31,6 +31,20 @@ public class BusinessCycleUtils {
 		return months;
 	}
 
+	public static int getDaysBetween(LocalDate from, LocalDate to) {
+
+		if (to.compareTo(from) <= 0)
+			to = to.plusYears(1);
+
+		long days = (int) ChronoUnit.DAYS.between(from, to);
+
+		if (logger.isDebugEnabled())
+			logger.debug("Duration of business year  between fromDate-> " + from + " and toDate-> " + to
+					+ " is noOfDays-> " + days);
+
+		return (int) days;
+	}
+
 	public static int getWeeksBetween(LocalDate from, LocalDate to) {
 
 		if (to.compareTo(from) <= 0)
@@ -87,12 +101,12 @@ public class BusinessCycleUtils {
 
 		StringBuilder periodNameBuilder = new StringBuilder();
 		periodNameBuilder.append(cycleDefinitionName);
-		periodNameBuilder.append("_" + String.valueOf(startDate.getDayOfMonth()));
-		periodNameBuilder.append(startDate.getMonth().name().substring(0, 3));
-		periodNameBuilder.append(String.valueOf(startDate.getYear()).substring(2));
-		periodNameBuilder.append("_" + String.valueOf(endDate.getDayOfMonth()));
-		periodNameBuilder.append(endDate.getMonth().name().substring(0, 3));
-		periodNameBuilder.append(String.valueOf(endDate.getYear()).substring(2));
+		// periodNameBuilder.append("_" + String.valueOf(startDate.getDayOfMonth()));
+		// periodNameBuilder.append(startDate.getMonth().name().substring(0, 3));
+		// periodNameBuilder.append(String.valueOf(startDate.getYear()).substring(2));
+//		periodNameBuilder.append("_" + String.valueOf(endDate.getDayOfMonth()));
+//		periodNameBuilder.append(endDate.getMonth().name().substring(0, 3));
+//		periodNameBuilder.append(String.valueOf(endDate.getYear()).substring(2));
 		periodNameBuilder.append("_" + String.valueOf(periodId));
 
 		return periodNameBuilder.toString();

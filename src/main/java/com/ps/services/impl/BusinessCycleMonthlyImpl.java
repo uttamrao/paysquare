@@ -56,8 +56,6 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 		int noOfCycles = BusinessCycleUtils.computeCycleCount(duration, 1, 1);
 		businessCycleList = new ArrayList<BusinessCycle>();
 
-		// for (int i = 0; i < businessCycleBean.getNoOfYears(); i++) {
-
 		LocalDate lastCreateCycleDate = generateCycles(businessYearFrom, businessYearTo, noOfCycles,
 				businessCycleDefinition, businessCycleBean);
 		if (logger.isDebugEnabled())
@@ -70,7 +68,6 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 
 		businessYearFrom = businessYearFrom.withYear(lastCreateCycleDate.getYear());
 		businessYearTo = businessYearTo.plusYears(1);
-		// }
 
 		if (logger.isDebugEnabled())
 			logger.debug("Total cycles created ->" + businessCycleList.size());
@@ -102,6 +99,9 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 			LocalDate startDate = nextCycleStartDate;
 			LocalDate endDate = null;
 
+			if (logger.isDebugEnabled())
+				logger.debug("generation cycle for peiod--> " + period);
+
 			if (!createByDate) {
 				endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
 				nextCycleStartDate = endDate.plusMonths(1).withDayOfMonth(1);
@@ -127,5 +127,11 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 		} while (endCycleDate.compareTo(nextCycleStartDate) >= 0);
 
 		return nextCycleStartDate;
+	}
+
+	@Override
+	public List<BusinessCycle> update(List<BusinessCycle> requestList) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

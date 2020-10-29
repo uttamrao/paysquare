@@ -58,8 +58,6 @@ public class BusinessCycleWeeklyImpl implements BusinessCycleCommand {
 		int noOfCycles = BusinessCycleUtils.computeCycleCount(duration, 1, 1);
 		businessCycleList = new ArrayList<BusinessCycle>();
 
-		// for (int i = 0; i < businessCycleBean.getNoOfYears(); i++) {
-
 		LocalDate lastCreateCycleDate = generateCycles(businessYearFrom, businessYearTo, noOfCycles,
 				businessCycleDefinition, businessCycleBean);
 		if (logger.isDebugEnabled())
@@ -72,10 +70,12 @@ public class BusinessCycleWeeklyImpl implements BusinessCycleCommand {
 
 		businessYearFrom = businessYearFrom.withYear(lastCreateCycleDate.getYear());
 		businessYearTo = businessYearTo.plusYears(1);
-		// }
 
 		if (logger.isDebugEnabled())
 			logger.debug("Total cycles created ->" + businessCycleList.size());
+		for (BusinessCycle businessCycle : businessCycleList) {
+			businessCycle.setNoOfCycles(businessCycleList.size());
+		}
 		return businessCycleList;
 	}
 
@@ -95,6 +95,9 @@ public class BusinessCycleWeeklyImpl implements BusinessCycleCommand {
 			LocalDate startDate = null;
 			LocalDate endDate = null;
 
+			if (logger.isDebugEnabled())
+				logger.debug("generation cycle for peiod--> " + period);
+
 			if (period == 1)
 				startDate = nextCycleStartDate;
 			else
@@ -107,8 +110,7 @@ public class BusinessCycleWeeklyImpl implements BusinessCycleCommand {
 
 			BusinessCycle cycle = BusinessCycleUtils.setCycle(startDate, endDate, businessCycleDefinition, period,
 					noOfCycles, businessCycleBean);
-//			cycle.setActive(true);
-//			cycle.setBusinessYear(businessCycleBean.getBusinessYear());
+
 			businessCycleList.add(cycle);
 			if (logger.isDebugEnabled())
 				logger.debug("No of cycle for businessYearDefinitionId-> " + cycle.getBusinessCycleDefinition().getId()
@@ -123,6 +125,12 @@ public class BusinessCycleWeeklyImpl implements BusinessCycleCommand {
 		} while (endCycleDate.compareTo(nextCycleStartDate) >= 0);
 
 		return nextCycleStartDate;
+	}
+
+	@Override
+	public List<BusinessCycle> update(List<BusinessCycle> requestList) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

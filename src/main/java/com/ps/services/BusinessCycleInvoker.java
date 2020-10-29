@@ -7,5 +7,8 @@ import com.ps.entities.tenant.BusinessCycle;
 
 public interface BusinessCycleInvoker {
 
-	public List<BusinessCycle> createCycle(BusinessCycleCommand businessCycleCommand, BusinessCycleBean businessCycleBean);	
+	public List<BusinessCycle> createCycle(BusinessCycleCommand businessCycleCommand,
+			BusinessCycleBean businessCycleBean);
+
+	public List<BusinessCycle> updateCycle(BusinessCycleCommand businessCycleCommand, List<BusinessCycle> requestList);
 }

@@ -22,4 +22,6 @@ public interface BusinessCycleDefinitionService {
 	public BusinessCycleDefinition update(int businessCycleDefinitionId,
 			BusinessCycleDefinition updatedBusinessCycleDefinition);
 
+	public BusinessCycleDefinition get(int businessCycleDefinitionId);
+
 }

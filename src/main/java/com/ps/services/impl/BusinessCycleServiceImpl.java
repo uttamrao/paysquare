@@ -356,4 +356,36 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 					+ cycleDefinitionId);
 	}
 
+	@Override
+	@Transactional("tenantTransactionManager")
+	public List<BusinessCycle> update(List<BusinessCycle> requestList, int cycleDefinitionId, String businessYear) {
+		if (logger.isDebugEnabled())
+			logger.debug("In add BusinessCycleDefinition");
+		// validate(businessCycleBean);
+
+		FrequencyEnum frequency = null;
+
+		if (requestList.get(0).getBusinessCycleDefinition().getFrequencyMaster() != null)
+			frequency = requestList.get(0).getBusinessCycleDefinition().getFrequencyMaster().getName();
+		else
+			frequency = FrequencyEnum.ADHOC;
+
+		if (logger.isDebugEnabled())
+			logger.debug("Initializing businessCycle creation for frequency-> " + frequency);
+
+		BusinessCycleCommand businessCycleCommand = businessCycleCommandObject.get(frequency);
+		List<BusinessCycle> cycleList = businessCycleInvoker.updateCycle(businessCycleCommand, requestList);
+
+		if (logger.isDebugEnabled())
+			logger.debug("Updating  cycles->" + cycleList.size() + " into db");
+
+		if (!CollectionUtils.isEmpty(cycleList)) {
+			businessCycleRepository.saveAll(cycleList);
+
+			if (logger.isDebugEnabled())
+				logger.debug("Business Cycle Definition updated into DB successfully");
+		}
+		return cycleList;
+	}
+
 }

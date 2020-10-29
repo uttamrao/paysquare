@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ps.RESTful.dto.mapper.BusinessCycleDTOMapper;
 import com.ps.RESTful.dto.request.BusinessCycleRequestDTO;
+import com.ps.RESTful.dto.request.BusinessCycleUpdateRequestDTO;
 import com.ps.RESTful.dto.response.BusinessCycleResponseDTO;
 import com.ps.RESTful.enums.StatusEnum;
 import com.ps.RESTful.enums.SuccessCode;
@@ -49,7 +50,7 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 			logger.debug("In BusinessCycle add EP, finding businessCycleDifinition object in db with id-> "
 					+ requestDTO.getBusinessCycleDefinitionId());
 		BusinessCycleDefinition businessCycleDefinition = businessCycleDefinitionService
-				.getById(requestDTO.getBusinessCycleDefinitionId());
+				.get(requestDTO.getBusinessCycleDefinitionId());
 
 		BusinessCycleBean businessCycleBean = businessCycleDTOMapper.dtoToBean(requestDTO);
 		businessCycleBean.setBusinessCycleDefinition(businessCycleDefinition);
@@ -158,6 +159,27 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 
 		return ResponseEntity.status(HttpStatus.OK).body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(),
 				SuccessCode.OK.getCode(), "Business Cycle discarded successfully.").build());
+	}
+
+	@Override
+	public ResponseEntity<Response> update(BusinessCycleUpdateRequestDTO requestDTO, int cycleDefinitionId,
+			String businessYear) {
+		if (logger.isDebugEnabled())
+			logger.debug("In businessCycle hardDeleteByBusinessCycleIdAndBusinessYear EP");
+
+		if (logger.isDebugEnabled())
+			logger.debug("In BusinessCycle add EP, finding businessCycleDifinition object in db with id-> "
+					+ cycleDefinitionId);
+		BusinessCycleDefinition businessCycleDefinition = businessCycleDefinitionService.getById(cycleDefinitionId);
+		// mapper call
+		BusinessCycle businessCycle = new BusinessCycle();
+		businessCycle.setBusinessCycleDefinition(businessCycleDefinition);
+
+		if (logger.isDebugEnabled())
+			logger.debug("Sending request to businessCycleDefinition service add method to add data into DB");
+		// List<BusinessCycle> businessCycleList =
+		// businessCycleService.add(businessCycleBean);
+		return null;
 	}
 
 }

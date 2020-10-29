@@ -52,30 +52,46 @@ public class BusinessCycleAdhocImpl implements BusinessCycleCommand {
 		if (businessYearTo.compareTo(businessYearFrom) <= 0)
 			businessYearTo = businessYearTo.plusYears(1);
 
+		int duration = BusinessCycleUtils.getDaysBetween(businessYearFrom, businessYearTo);
+		int noOfCycles = BusinessCycleUtils.computeCycleCount(duration, 1,
+				businessCycleDefinition.getReoccuranceDays());
+
 		businessCycleList = new ArrayList<BusinessCycle>();
 
 		LocalDate lastCreateCycleDate = generateCycles(businessYearFrom, businessYearTo, businessCycleDefinition,
-				businessCycleBean);
+				businessCycleBean, noOfCycles);
 		if (logger.isDebugEnabled())
 			logger.debug("lastCreateCycleDate-> " + lastCreateCycleDate);
 
 		if (logger.isDebugEnabled())
 			logger.debug("Total cycles created ->" + businessCycleList.size());
+		for (BusinessCycle businessCycle : businessCycleList) {
+			businessCycle.setNoOfCycles(businessCycleList.size());
+		}
 		return businessCycleList;
 	}
 
 	LocalDate generateCycles(LocalDate cycleStartDate, LocalDate endCycleDate,
-			BusinessCycleDefinition businessCycleDefinition, BusinessCycleBean businessCycleBean) {
+			BusinessCycleDefinition businessCycleDefinition, BusinessCycleBean businessCycleBean, int noOfCycles) {
 
 		int period = 1;
 		LocalDate nextCycleStartDate = cycleStartDate;
-
 		do {
 			LocalDate startDate = null;
 			LocalDate endDate = null;
 
+			if (logger.isDebugEnabled())
+				logger.debug("generation cycle for peiod--> " + period);
+
 			startDate = nextCycleStartDate;
-			endDate = startDate.plusDays(businessCycleDefinition.getReoccuranceDays());
+
+			if (period == noOfCycles && businessCycleDefinition.isForceToBusinessYearEnd())
+				endDate = (endCycleDate);
+			else
+				endDate = startDate.plusDays(businessCycleDefinition.getReoccuranceDays());
+
+//			startDate = nextCycleStartDate;
+//			endDate = startDate.plusDays(businessCycleDefinition.getReoccuranceDays());
 
 			BusinessCycle cycle = BusinessCycleUtils.setCycle(startDate, endDate, businessCycleDefinition, period, 1,
 					businessCycleBean);
@@ -94,6 +110,15 @@ public class BusinessCycleAdhocImpl implements BusinessCycleCommand {
 		} while (endCycleDate.compareTo(nextCycleStartDate) >= 0);
 
 		return nextCycleStartDate;
+	}
+
+	@Override
+	public List<BusinessCycle> update(List<BusinessCycle> requestList) {
+		if (logger.isDebugEnabled())
+			logger.debug("In cycle updation method");
+
+		businessCycleList = new ArrayList<BusinessCycle>();
+		return null;
 	}
 
 }

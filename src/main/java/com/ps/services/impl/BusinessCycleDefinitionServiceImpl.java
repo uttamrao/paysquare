@@ -313,6 +313,28 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 
 	@Override
 	@Transactional("tenantTransactionManager")
+	public BusinessCycleDefinition get(int id) {
+
+		if (logger.isDebugEnabled())
+			logger.debug("In BusinessCycleDefinition get method getting business year with id-> " + id);
+		if (id == 0) {
+			logger.error("Business Year Definition id is Invalid!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Definition is Invalid!");
+		}
+
+		Optional<BusinessCycleDefinition> businessCycleDefinitionOptional = businessCycleDefinitionRepository
+				.findByIdAndIsActive(id, true);
+		if (businessCycleDefinitionOptional.isEmpty())
+			throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
+
+		if (logger.isDebugEnabled())
+			logger.debug("In BusinessCycleDefinition getById method getting business -> "
+					+ businessCycleDefinitionOptional.get());
+		return businessCycleDefinitionOptional.get();
+	}
+
+	@Override
+	@Transactional("tenantTransactionManager")
 	public void softDeleteById(int id) {
 
 		if (logger.isDebugEnabled())
