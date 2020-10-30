@@ -159,7 +159,7 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 
 		if (logger.isDebugEnabled())
 			logger.debug("In BusinessYearDefinition getById method getting business year with id-> "
-					+ businessYearDefinitionId);
+					+ businessYearDefinitionId + " and update request--> " + businessYearDefinition);
 
 		if (businessYearDefinitionId == 0) {
 			logger.error("Business Year Definition id is Invalid!");

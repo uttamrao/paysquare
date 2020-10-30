@@ -48,4 +48,9 @@ public interface BusinessCycleRepository extends AbstractRepository<BusinessCycl
 	@Query("Select c from BusinessCycle c where c.isActive = true and c.periodId=1")
 	List<BusinessCycle> findAllByPeriodIdByIsActive();
 
+	// for setting isUsed field to 0 if not used in cycle creation
+	@Query("SELECT cd FROM BusinessCycle cd WHERE cd.isActive = true and cd.businessCycleDefinition.id = :businessCycleDefinitionId")
+	List<BusinessCycle> findByBusinessCycleDefinitionIdUsed(
+			@Param("businessCycleDefinitionId") int businessCycleDefinitionId);
+
 }

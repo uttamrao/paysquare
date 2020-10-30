@@ -358,6 +358,10 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 					"Business Cycle Definition is used can not delete!");
 		}
 
+		// before updating business cycle definition isUsed from business year set=0 if
+		// year is not used any other cycle
+		setBusinessYearToFalse(businessCycleDefinitionOptional.get());
+
 		businessCycleDefinitionRepository.softDeleteById(id);
 		if (logger.isDebugEnabled())
 			logger.debug("Soft deleted business cycle definition record with business year id-> " + id);

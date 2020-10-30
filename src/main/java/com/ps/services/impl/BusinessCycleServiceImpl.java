@@ -78,11 +78,12 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		// i.e set start year to the year last cycle was created
 		// based on the the duration it should be decided if cycle should be created for
 		// this year or next
-//		Optional<BusinessCycle> businessCycle = businessCycleRepository
-//				.findTopByBusinessCycleDefinitionOrderByFromDateDesc(businessCycleBean.getBusinessCycleDefinition());
-//		if (businessCycle.isPresent()) {
-//			LocalDate fromDate = LocalDateUtils.convert(businessCycle.get().getToDate(), ZoneId.systemDefault());
-//			businessCycleBean.setLastCreatedYear(fromDate.plusDays(1).getYear());
+		// Optional<BusinessCycle> businessCycle = businessCycleRepository
+		// .findTopByBusinessCycleDefinitionOrderByFromDateDesc(businessCycleBean.getBusinessCycleDefinition());
+		// if (businessCycle.isPresent()) {
+		// LocalDate fromDate = LocalDateUtils.convert(businessCycle.get().getToDate(),
+		// ZoneId.systemDefault());
+		// businessCycleBean.setLastCreatedYear(fromDate.plusDays(1).getYear());
 
 		// LocalDate fromDate = LocalDateUtils.convert(businessCycle.get().getToDate(),
 		// ZoneId.systemDefault());
@@ -99,7 +100,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 			businessCycleRepository.saveAll(cycleList);
 
 			// set isUsed field from business cycle definition=1
-			setBusinessCycleDefinition(businessCycleBean.getBusinessCycleDefinition());
+			setBusinessCycleDefinitionToTrue(businessCycleBean.getBusinessCycleDefinition());
 
 			if (logger.isDebugEnabled())
 				logger.debug("Business Cycle Definition saved into DB successfully");
@@ -107,7 +108,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		return cycleList;
 	}
 
-	private void setBusinessCycleDefinition(BusinessCycleDefinition businessCycleDefinition) {
+	private void setBusinessCycleDefinitionToTrue(BusinessCycleDefinition businessCycleDefinition) {
 
 		Optional<BusinessCycleDefinition> businessCycleDefinitionOptional = businessCycleDefinitionRepository
 				.findByIdAndIsActive(businessCycleDefinition.getId(), true);
@@ -312,13 +313,17 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 			}
 		}
 
-		businessCycleList = businessCycleRepository.findAllByBusinessYearDefinitionIdAndIsUsed(cycleDefinitionId);
-		if (!businessCycleList.isEmpty()) {
+		List<BusinessCycle> businessCycles = businessCycleRepository
+				.findAllByBusinessYearDefinitionIdAndIsUsed(cycleDefinitionId);
+		if (!businessCycles.isEmpty()) {
 			logger.error("Business year is used and Cycle Creation not delete!");
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Creation can not delete!");
 		}
 
 		businessCycleRepository.softdeleteByCycleDefinitionIdAndBusinessYear(cycleDefinitionId, businessYear);
+		// before updating business cycle definition isUsed from business year set=0 if
+		// year is not used any other cycle
+		setBusinessCycleDefinitionToFalse(businessCycleDefinitionOptional.get());
 		if (logger.isDebugEnabled())
 			logger.debug("Soft deleted business cycle creation record with business cycle creation id-> "
 					+ cycleDefinitionId);
@@ -362,9 +367,40 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		}
 
 		businessCycleRepository.hardDeleteByCycleDefinitionIdAndBusinessYear(cycleDefinitionId, businessYear);
+
+		// before updating business cycle definition isUsed from business year set=0 if
+		// year is not used any other cycle
+		setBusinessCycleDefinitionToFalse(businessCycleDefinitionOptional.get());
+
 		if (logger.isDebugEnabled())
 			logger.debug("Hard deleted business cycle creation record with business cycle creation id-> "
 					+ cycleDefinitionId);
+	}
+
+	private void setBusinessCycleDefinitionToFalse(BusinessCycleDefinition businessCycleDefinition) {
+
+		if (logger.isDebugEnabled())
+			logger.debug("In setBusinessCycleDefinitionToFalse method");
+
+		List<BusinessCycle> cycles = businessCycleRepository
+				.findByBusinessCycleDefinitionIdUsed(businessCycleDefinition.getId());
+
+		if (cycles.isEmpty()) {
+			if (logger.isDebugEnabled())
+				logger.debug("Inside loop");
+			Optional<BusinessCycleDefinition> businessCycleDefinitionOptional = businessCycleDefinitionRepository
+					.findByIdAndIsActive(businessCycleDefinition.getId(), true);
+
+			if (businessCycleDefinitionOptional.isEmpty())
+				throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND, "Business Cycle Definition not found!");
+
+			businessCycleDefinitionOptional.get().setIsUsed(false);
+			businessCycleDefinitionRepository.save(businessCycleDefinitionOptional.get());
+
+			if (logger.isDebugEnabled())
+				logger.debug("Business cycle Definition IsUsed field updated in table to: false");
+		}
+
 	}
 
 	@Override

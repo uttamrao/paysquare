@@ -24,7 +24,7 @@ import com.ps.services.BusinessYearDefinitionService;
 
 @RestController
 @RequestMapping(path = { BusinessYearDefinitionResource.RESOURCE_PATH })
-public class BusinessYearDefinitionResourceImpl extends AbstractResourceImpl implements BusinessYearDefinitionResource  {
+public class BusinessYearDefinitionResourceImpl extends AbstractResourceImpl implements BusinessYearDefinitionResource {
 
 	Logger logger = Logger.getLogger(BusinessYearDefinitionResourceImpl.class);
 
@@ -32,114 +32,108 @@ public class BusinessYearDefinitionResourceImpl extends AbstractResourceImpl imp
 	BusinessYearDefinitionDTOMapper businessYearDefinitionDTOMapper;
 
 	@Autowired
-	BusinessYearDefinitionService businessYearDefinitionService; 
+	BusinessYearDefinitionService businessYearDefinitionService;
 
 	@Override
 	public ResponseEntity<Response> add(BusinessYearDefinitionRequestDTO requestDTO) {
 
-		if(logger.isDebugEnabled())
+		if (logger.isDebugEnabled())
 			logger.debug("In BusinessYearDefinition add EP");
 		BusinessYearDefinition businessYearDefinition = businessYearDefinitionDTOMapper.dtoToEntity(requestDTO);
 
-		if(logger.isDebugEnabled())
-			logger.debug("Sending request to businessYearDefinition service add method to add data into DB"); 
+		if (logger.isDebugEnabled())
+			logger.debug("Sending request to businessYearDefinition service add method to add data into DB");
 		businessYearDefinitionService.add(businessYearDefinition);
 
-		if(logger.isDebugEnabled())
+		if (logger.isDebugEnabled())
 			logger.debug("Sending request to businessYearDefinition dto mapper to map entity to responseDTO");
-		BusinessYearDefinitionResponseDTO responseDTO = businessYearDefinitionDTOMapper.entityToDto(businessYearDefinition);
+		BusinessYearDefinitionResponseDTO responseDTO = businessYearDefinitionDTOMapper
+				.entityToDto(businessYearDefinition);
 		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(ResponseBuilder.builder()
-						.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
-								"Business Year Definition added successfully.")
-						.result(responseDTO)
-						.build());
+				.body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
+						"Business Year Definition added successfully.").result(responseDTO).build());
 	}
 
 	@Override
 	public ResponseEntity<Response> getAll() {
 
-		if(logger.isDebugEnabled())
+		if (logger.isDebugEnabled())
 			logger.debug("In businessYearDefinition getAll EP");
 
-		if(logger.isDebugEnabled())
-			logger.debug("Sending request to businessYearDefinition service getAll method"); 
-		List<BusinessYearDefinition> businessYearDefinitionList= businessYearDefinitionService.getAll();
+		if (logger.isDebugEnabled())
+			logger.debug("Sending request to businessYearDefinition service getAll method");
+		List<BusinessYearDefinition> businessYearDefinitionList = businessYearDefinitionService.getAll();
 
-		if(logger.isDebugEnabled())
+		if (logger.isDebugEnabled())
 			logger.debug("Sending request to businessYearDefinition dto mapper to map entity list to responseDTO list");
-		List<BusinessYearDefinitionResponseDTO> responseDTOList = businessYearDefinitionDTOMapper.entityListToDtoList(businessYearDefinitionList);
+		List<BusinessYearDefinitionResponseDTO> responseDTOList = businessYearDefinitionDTOMapper
+				.entityListToDtoList(businessYearDefinitionList);
 
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(ResponseBuilder.builder()
 						.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
 								"Business Year Definition records retrieved successfully")
-						.results(responseDTOList)
-						.build());
+						.results(responseDTOList).build());
 	}
 
 	@Override
 	public ResponseEntity<Response> get(@PathVariable("resourceId") int resourceId) {
 
-		if(logger.isDebugEnabled())
+		if (logger.isDebugEnabled())
 			logger.debug("In businessYearDefinition get EP");
 
-		if(logger.isDebugEnabled())
-			logger.debug("Sending request to businessYearDefinition service get method"); 
-		BusinessYearDefinition businessYearDefinition= businessYearDefinitionService.getById(resourceId);
+		if (logger.isDebugEnabled())
+			logger.debug("Sending request to businessYearDefinition service get method");
+		BusinessYearDefinition businessYearDefinition = businessYearDefinitionService.getById(resourceId);
 
-		if(logger.isDebugEnabled())
+		if (logger.isDebugEnabled())
 			logger.debug("Sending request to businessYearDefinition dto mapper to map entity to responseDTO");
-		BusinessYearDefinitionResponseDTO responseDTO = businessYearDefinitionDTOMapper.entityToDto(businessYearDefinition);
+		BusinessYearDefinitionResponseDTO responseDTO = businessYearDefinitionDTOMapper
+				.entityToDto(businessYearDefinition);
 
-
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(ResponseBuilder.builder()
-						.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
-								"Business Year Definition record retrieved successfully")
-						.result(responseDTO)
-						.build());
+		return ResponseEntity
+				.status(HttpStatus.OK).body(
+						ResponseBuilder.builder()
+								.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
+										"Business Year Definition record retrieved successfully")
+								.result(responseDTO).build());
 	}
-	@Override
-	public ResponseEntity<Response> delete(@PathVariable("resourceId") int resourceId){
 
-		if(logger.isDebugEnabled())
-			logger.debug("In businessYearDefinition delete EP for id-> "+resourceId);
+	@Override
+	public ResponseEntity<Response> delete(@PathVariable("resourceId") int resourceId) {
+
+		if (logger.isDebugEnabled())
+			logger.debug("In businessYearDefinition delete EP for id-> " + resourceId);
 		businessYearDefinitionService.softDeleteById(resourceId);
 
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(ResponseBuilder.builder()
-						.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
-								"Business Year Definition record deleted successfully")
-						.build());
+		return ResponseEntity.status(HttpStatus.OK).body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(),
+				SuccessCode.OK.getCode(), "Business Year Definition record deleted successfully").build());
 	}
 
 	@Override
 	public ResponseEntity<Response> update(BusinessYearDefinitionRequestDTO requestDTO, int resourceId) {
-		if(logger.isDebugEnabled())
+		if (logger.isDebugEnabled())
 			logger.debug("In businessYearDefinition update EP");
 		if (logger.isDebugEnabled())
-			logger.debug("updating Business Year Definition for BusinessYearDefinitionId--> " + resourceId);
+			logger.debug("updating Business Year Definition for BusinessYearDefinitionId--> " + resourceId
+					+ " and requestDTO-->" + requestDTO);
 
 		BusinessYearDefinition businessYearDefinition = businessYearDefinitionDTOMapper.dtoToEntity(requestDTO);
 
-		if(logger.isDebugEnabled())
+		if (logger.isDebugEnabled())
 			logger.debug("Sending request to businessYearDefinition service updateByBusinessYearId method");
-		businessYearDefinition = businessYearDefinitionService.updateByBusinessYearId(resourceId, businessYearDefinition);
+		businessYearDefinition = businessYearDefinitionService.updateByBusinessYearId(resourceId,
+				businessYearDefinition);
 
-		BusinessYearDefinitionResponseDTO responseDTO = businessYearDefinitionDTOMapper.entityToDto(businessYearDefinition);
+		BusinessYearDefinitionResponseDTO responseDTO = businessYearDefinitionDTOMapper
+				.entityToDto(businessYearDefinition);
 
 		if (responseDTO == null) {
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
 					.body(ResponseBuilder.builder().status(StatusEnum.FAILURE.getValue(),
-							ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Year Definition not updated")
-							.build());
+							ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Year Definition not updated").build());
 		}
-		return ResponseEntity
-				.status(HttpStatus.OK).body(
-						ResponseBuilder.builder()
-						.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
-								"Business Year Definition updated Successfully")
-						.result(responseDTO).build());
+		return ResponseEntity.status(HttpStatus.OK).body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(),
+				SuccessCode.OK.getCode(), "Business Year Definition updated Successfully").result(responseDTO).build());
 	}
 }
