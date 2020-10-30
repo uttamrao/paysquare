@@ -25,6 +25,10 @@ public interface BusinessCycleRepository extends AbstractRepository<BusinessCycl
 	@Query("Select c from BusinessCycle c where c.isLocked = false and c.businessCycleDefinition.businessYearDefinition.id = :yearDefinitionId")
 	List<BusinessCycle> findAllByBusinessYearDefinitionId(@Param("yearDefinitionId") int yearDefinitionId);
 
+	// for soft delete- to check year definition used or not
+	@Query("Select c from BusinessCycle c where c.isUsed = true and c.businessCycleDefinition.businessYearDefinition.id = :yearDefinitionId")
+	List<BusinessCycle> findAllByBusinessYearDefinitionIdAndIsUsed(@Param("yearDefinitionId") int yearDefinitionId);
+
 	// hard delete
 	@Modifying
 	@Query("DELETE FROM BusinessCycle c where c.businessCycleDefinition.id in ?1")

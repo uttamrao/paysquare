@@ -88,7 +88,7 @@ public class BusinessCycleUtils {
 		cycle.setPeriodName(setPeriodName(startDate, endDate, businessCycleDefinition.getName(), periodId));
 
 		int datediff = (int) ChronoUnit.DAYS.between(startDate, endDate);
-		cycle.setNoOfDays(datediff);
+		cycle.setNoOfDays(datediff + 1);
 
 		cycle.setNoOfCycles(noOfCycles);
 		cycle.setActive(true);

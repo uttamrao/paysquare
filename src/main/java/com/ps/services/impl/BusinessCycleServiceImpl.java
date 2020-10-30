@@ -303,8 +303,19 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		for (BusinessCycle businessCycle : businessCycleList) {
 			if (businessCycle.isLocked()) {
 				logger.error("Business Cycle Creation not delete!");
-				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Creation not delete!");
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Creation can not delete!");
 			}
+
+			if (businessCycle.isUsed()) {
+				logger.error("Business Cycle Creation not delete!");
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Creation can not delete!");
+			}
+		}
+
+		businessCycleList = businessCycleRepository.findAllByBusinessYearDefinitionIdAndIsUsed(cycleDefinitionId);
+		if (!businessCycleList.isEmpty()) {
+			logger.error("Business year is used and Cycle Creation not delete!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Creation can not delete!");
 		}
 
 		businessCycleRepository.softdeleteByCycleDefinitionIdAndBusinessYear(cycleDefinitionId, businessYear);
