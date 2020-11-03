@@ -23,9 +23,17 @@ public class BusinessCycleInvokerImpl implements BusinessCycleInvoker {
 	}
 
 	@Override
-	public List<BusinessCycle> updateCycle(BusinessCycleCommand businessCycleCommand, List<BusinessCycle> requestList) {
+	public List<BusinessCycle> updateCycle(BusinessCycleCommand businessCycleCommand, List<BusinessCycle> oldCycleList,
+			List<BusinessCycle> requestList) {
 		logger.debug("In BusinessCycleInvokerImpl updateCycle method");
-		return null;
+		return businessCycleCommand.update(oldCycleList, requestList);
+	}
+
+	@Override
+	public List<BusinessCycle> forceToYearEnd(BusinessCycleCommand businessCycleCommand,
+			List<BusinessCycle> oldCycleList, List<BusinessCycle> requestList) {
+		logger.debug("In BusinessCycleInvokerImpl updateCycle method");
+		return businessCycleCommand.forceToYearEnd(oldCycleList, requestList);
 	}
 
 }

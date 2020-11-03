@@ -1,49 +1,26 @@
 package com.ps.RESTful.dto.request;
 
+import java.util.List;
+
+import com.ps.RESTful.dto.response.BusinessCycleResponseDTO;
 import com.ps.dto.BusinessCycleDTO;
 
 public class BusinessCycleUpdateRequestDTO extends BusinessCycleDTO {
 
-	private String fromDate;
-	private String toDate;
-	private String remark;
-	private boolean status;
+	private List<BusinessCycleResponseDTO> businessCycleList;
 	private boolean isForceToBusinessYearEnd;
+	private boolean isAdjustedToNextCycle;
 
 	public BusinessCycleUpdateRequestDTO() {
 		super();
 	}
 
-	public String getFromDate() {
-		return fromDate;
+	public List<BusinessCycleResponseDTO> getBusinessCycleList() {
+		return businessCycleList;
 	}
 
-	public void setFromDate(String fromDate) {
-		this.fromDate = fromDate;
-	}
-
-	public String getToDate() {
-		return toDate;
-	}
-
-	public void setToDate(String toDate) {
-		this.toDate = toDate;
-	}
-
-	public String getRemark() {
-		return remark;
-	}
-
-	public void setRemark(String remark) {
-		this.remark = remark;
-	}
-
-	public boolean isStatus() {
-		return status;
-	}
-
-	public void setStatus(boolean status) {
-		this.status = status;
+	public void setBusinessCycleList(List<BusinessCycleResponseDTO> businessCycleList) {
+		this.businessCycleList = businessCycleList;
 	}
 
 	public boolean isForceToBusinessYearEnd() {
@@ -54,10 +31,17 @@ public class BusinessCycleUpdateRequestDTO extends BusinessCycleDTO {
 		this.isForceToBusinessYearEnd = isForceToBusinessYearEnd;
 	}
 
-	@Override
-	public String toString() {
-		return "BusinessCycleUpdateRequestDTO [fromDate=" + fromDate + ", toDate=" + toDate + ", remark=" + remark
-				+ ", status=" + status + "]";
+	public boolean isAdjustedToNextCycle() {
+		return isAdjustedToNextCycle;
 	}
 
+	public void setAdjustedToNextCycle(boolean isAdjustedToNextCycle) {
+		this.isAdjustedToNextCycle = isAdjustedToNextCycle;
+	}
+
+	@Override
+	public String toString() {
+		return "BusinessCycleUpdateRequestDTO [businessCycleList=" + businessCycleList + ", isForceToBusinessYearEnd="
+				+ isForceToBusinessYearEnd + ", isAdjustedToNextCycle=" + isAdjustedToNextCycle + "]";
+	}
 }

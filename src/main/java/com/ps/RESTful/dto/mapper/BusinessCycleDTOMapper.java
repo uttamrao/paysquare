@@ -9,9 +9,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.ps.RESTful.dto.request.BusinessCycleRequestDTO;
+import com.ps.RESTful.dto.request.BusinessCycleUpdateRequestDTO;
 import com.ps.RESTful.dto.response.BusinessCycleResponseDTO;
 import com.ps.beans.BusinessCycleBean;
 import com.ps.entities.tenant.BusinessCycle;
+import com.ps.entities.tenant.BusinessCycleDefinition;
 import com.ps.util.DateUtils;
 
 @Component
@@ -94,4 +96,50 @@ public class BusinessCycleDTOMapper
 		return null;
 	}
 
+	// for update method
+	public BusinessCycle updateResponseDtoToEntity(BusinessCycleResponseDTO dto) {
+		BusinessCycle businessCycle = new BusinessCycle();
+
+		if (dto != null) {
+			businessCycle.setId(dto.getId());
+			businessCycle.setPeriodId(dto.getPeriodId());
+			businessCycle.setPeriodName(dto.getPeriodName());
+			businessCycle.setLocked(dto.isLocked());
+			businessCycle.setFromDate(DateUtils.stringToDate(dto.getFromDate()));
+			businessCycle.setToDate(DateUtils.stringToDate(dto.getToDate()));
+			businessCycle.setBusinessYear(dto.getBusinessYear());
+			businessCycle.setNoOfDays(dto.getNoOfDays());
+			businessCycle.setNoOfCycles(dto.getNoOfCycles());
+			businessCycle.setRemark(dto.getRemark());
+			businessCycle.setUsed(dto.isUsed());
+			businessCycle.setActive(dto.isActive());
+
+		}
+		return businessCycle;
+	}
+
+	public List<BusinessCycle> updateDtoToEntityList(BusinessCycleUpdateRequestDTO dto,
+			BusinessCycleDefinition businessCycleDefinition) {
+
+		if (logger.isDebugEnabled())
+			logger.debug("dto: -->" + dto);
+
+		if (logger.isDebugEnabled())
+			logger.debug("In BusinessYear dto mapper mapping dto to entity list");
+		List<BusinessCycle> businessCycleList = new ArrayList<>();
+
+		if (dto != null) {
+
+			// businessCycleList = dto.getBusinessCycleList();
+			for (int i = 0; i < dto.getBusinessCycleList().size(); i++) {
+				BusinessCycle businessCycle = updateResponseDtoToEntity(dto.getBusinessCycleList().get(i));
+				businessCycle.setBusinessCycleDefinition(businessCycleDefinition);
+				businessCycle.setForceToYearEnd(dto.isForceToBusinessYearEnd());
+				businessCycle.setAdjustedToNextCycle(dto.isAdjustedToNextCycle());
+				businessCycleList.add(businessCycle);
+			}
+		}
+
+		return businessCycleList;
+	}
 }

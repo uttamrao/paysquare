@@ -10,12 +10,15 @@ import java.util.List;
 import org.jboss.logging.Logger;
 import org.springframework.stereotype.Service;
 
+import com.ps.RESTful.enums.ErrorCode;
+import com.ps.RESTful.error.handler.InvalidRequestException;
 import com.ps.beans.BusinessCycleBean;
 import com.ps.entities.tenant.BusinessCycle;
 import com.ps.entities.tenant.BusinessCycleDefinition;
 import com.ps.entities.tenant.BusinessYearDefinition;
 import com.ps.services.BusinessCycleCommand;
 import com.ps.util.BusinessCycleUtils;
+import com.ps.util.DateUtils;
 import com.ps.util.LocalDateUtils;
 
 @Service("BusinessCycleWeeklyImpl")
@@ -56,7 +59,7 @@ public class BusinessCycleWeeklyImpl implements BusinessCycleCommand {
 
 		int duration = BusinessCycleUtils.getWeeksBetween(businessYearFrom, businessYearTo);
 		int noOfCycles = BusinessCycleUtils.computeCycleCount(duration, 1, 1);
-		businessCycleList = new ArrayList<BusinessCycle>();
+		businessCycleList = new ArrayList<>();
 
 		LocalDate lastCreateCycleDate = generateCycles(businessYearFrom, businessYearTo, noOfCycles,
 				businessCycleDefinition, businessCycleBean);
@@ -109,7 +112,7 @@ public class BusinessCycleWeeklyImpl implements BusinessCycleCommand {
 				endDate = startDate.with(TemporalAdjusters.nextOrSame(endOfWeek));
 
 			BusinessCycle cycle = BusinessCycleUtils.setCycle(startDate, endDate, businessCycleDefinition, period,
-					noOfCycles, businessCycleBean);
+					noOfCycles, businessCycleBean.getBusinessYear());
 
 			businessCycleList.add(cycle);
 			if (logger.isDebugEnabled())
@@ -127,10 +130,193 @@ public class BusinessCycleWeeklyImpl implements BusinessCycleCommand {
 		return nextCycleStartDate;
 	}
 
-	@Override
-	public List<BusinessCycle> update(List<BusinessCycle> requestList) {
-		// TODO Auto-generated method stub
-		return null;
+	public BusinessCycle updatingCurrentCycle(int i, List<BusinessCycle> oldCycleList,
+			List<BusinessCycle> requestList) {
+		BusinessCycle cycle = oldCycleList.get(i);
+		cycle.setToDate(requestList.get(i).getToDate());
+		cycle.setAdjustedToNextCycle(requestList.get(i).isAdjustedToNextCycle());
+
+		int datediff = BusinessCycleUtils.calculateNoOfDays(requestList.get(i).getFromDate(),
+				requestList.get(i).getToDate());
+		cycle.setNoOfDays(datediff + 1);
+		return cycle;
 	}
 
+	@Override
+	public List<BusinessCycle> update(List<BusinessCycle> oldCycleList, List<BusinessCycle> requestList) {
+		if (logger.isDebugEnabled())
+			logger.debug("In cycle update method");
+
+		for (int i = 0; i < requestList.size(); i++) {
+
+			// If to date is modified then update the values
+			if (!requestList.get(i).getToDate().equals(oldCycleList.get(i).getToDate())) {
+
+				// If business cycle is locked then can not update the cycle
+				if (!oldCycleList.get(i).isLocked()) {
+					if (logger.isDebugEnabled())
+						logger.debug("To date is updated for cycle--> " + requestList.get(i));
+
+					if (!requestList.get(0).isAdjustedToNextCycle()) {
+
+						if (logger.isDebugEnabled())
+							logger.debug("Days are not adjusted to next cycle, so only updating to date--> "
+									+ requestList.get(i).getToDate());
+
+						BusinessCycle cycle = updatingCurrentCycle(i, oldCycleList, requestList);
+
+						if (logger.isDebugEnabled())
+							logger.debug("Number of days updated to --> " + cycle.getNoOfDays());
+						break;
+					}
+					if (requestList.get(0).isAdjustedToNextCycle()) {
+						if (logger.isDebugEnabled())
+							logger.debug("Days are adjusted to next cycle, so updating to date of current cycle--> "
+									+ requestList.get(i).getToDate());
+
+						BusinessCycle cycle = updatingCurrentCycle(i, oldCycleList, requestList);
+
+						if (logger.isDebugEnabled())
+							logger.debug("Number of days updated to --> " + cycle.getNoOfDays());
+
+						// updating successive from date=to date+1
+						if (logger.isDebugEnabled())
+							logger.debug(
+									"Previous from date of next cycle --> " + requestList.get(i + 1).getFromDate());
+
+						BusinessCycle nextCycle = updatingNextCycle(i, oldCycleList, requestList);
+
+						if (logger.isDebugEnabled())
+							logger.debug("Number of days updated to --> " + nextCycle.getNoOfDays());
+						if (logger.isDebugEnabled())
+							logger.debug("updated next cycle from date--> " + nextCycle.getFromDate());
+						break;
+					}
+				} else {
+					logger.error("Business Cycle Definition is locked and not able to update the cycle!");
+					throw new InvalidRequestException(ErrorCode.RESOURCE_NOT_FOUND,
+							"Business Cycle Definition is locked and can not update!");
+				}
+			}
+		}
+		return oldCycleList;
+	}
+
+	public BusinessCycle updatingNextCycle(int i, List<BusinessCycle> oldCycleList, List<BusinessCycle> requestList) {
+		LocalDate fromLocalDate = DateUtils.convertDateToLocalDate(requestList.get(i).getToDate());
+		fromLocalDate = fromLocalDate.plusDays(1);
+
+		BusinessCycle nextCycle = oldCycleList.get(i + 1);
+		nextCycle.setFromDate(DateUtils.convertLocalDateToDate(fromLocalDate));
+
+		int datediff = BusinessCycleUtils.calculateNoOfDays(nextCycle.getFromDate(), nextCycle.getToDate());
+		nextCycle.setNoOfDays(datediff + 1);
+
+		return nextCycle;
+	}
+
+	@Override
+	public List<BusinessCycle> forceToYearEnd(List<BusinessCycle> oldCycleList, List<BusinessCycle> requestList) {
+		if (logger.isDebugEnabled())
+			logger.debug("In cycle forceToYearEnd method");
+
+		BusinessYearDefinition businessYearDefinition = oldCycleList.get(0).getBusinessCycleDefinition()
+				.getBusinessYearDefinition();
+
+		LocalDate businessYearTo = LocalDateUtils.convert(businessYearDefinition.getToDate(), ZoneId.systemDefault());
+
+		for (int i = 0; i < requestList.size(); i++) {
+			// If to date is modified then update the values
+			if (!requestList.get(i).getToDate().equals(oldCycleList.get(i).getToDate())) {
+				if (logger.isDebugEnabled())
+					logger.debug("To date is updated for cycle--> " + requestList.get(i));
+
+				// if last cycles to date is modified then update to date as it is
+				if (i == requestList.size() - 1) {
+					if (logger.isDebugEnabled())
+						logger.debug("Last cycle to date is modified to--> " + requestList.get(i).getToDate());
+
+					BusinessCycle cycle = updatingCurrentCycle(i, oldCycleList, requestList);
+
+					if (logger.isDebugEnabled())
+						logger.debug("Number of days updated to --> " + cycle.getNoOfDays());
+					break;
+				} else {
+
+					if (!requestList.get(0).isAdjustedToNextCycle()) {
+						if (logger.isDebugEnabled())
+							logger.debug("Days are not adjusted to next cycle, so only updating to date--> "
+									+ requestList.get(i).getToDate());
+
+						BusinessCycle cycle = updatingCurrentCycle(i, oldCycleList, requestList);
+
+						if (logger.isDebugEnabled())
+							logger.debug("Number of days updated to --> " + cycle.getNoOfDays());
+
+					}
+					if (requestList.get(0).isAdjustedToNextCycle()) {
+						if (logger.isDebugEnabled())
+							logger.debug("Days are adjusted to next cycle, so updating to date of current cycle--> "
+									+ requestList.get(i).getToDate());
+
+						BusinessCycle cycle = updatingCurrentCycle(i, oldCycleList, requestList);
+
+						if (logger.isDebugEnabled())
+							logger.debug("Number of days updated to --> " + cycle.getNoOfDays());
+
+						// updating successive from date=to date+1
+						if (logger.isDebugEnabled())
+							logger.debug(
+									"Previous from date of next cycle --> " + requestList.get(i + 1).getFromDate());
+
+						BusinessCycle nextCycle = updatingNextCycle(i, oldCycleList, requestList);
+
+						if (logger.isDebugEnabled())
+							logger.debug("Number of days updated to --> " + nextCycle.getNoOfDays());
+						if (logger.isDebugEnabled())
+							logger.debug("updated next cycle from date--> " + nextCycle.getFromDate());
+
+					}
+					// updating last cycle to date= end date of year
+					BusinessCycle lastCycle = updateLastCycle(requestList.size() - 1, oldCycleList, requestList,
+							businessYearTo);
+
+					if (logger.isDebugEnabled())
+						logger.debug("updated last cycle to date--> " + lastCycle.getToDate());
+					if (logger.isDebugEnabled())
+						logger.debug("Number of days updated to --> " + lastCycle.getNoOfDays());
+
+					break;
+				}
+			}
+
+			// if to date is not modified then modified last cycle to date= end date of year
+			if (i == requestList.size() - 1) {
+				if (logger.isDebugEnabled())
+					logger.debug("To date is not modified hence modified last cycle date");
+
+				BusinessCycle cycle = updateLastCycle(i, oldCycleList, requestList, businessYearTo);
+
+				if (logger.isDebugEnabled())
+					logger.debug("To date is not modified hence modified last cycle date--> " + cycle.getToDate());
+				if (logger.isDebugEnabled())
+					logger.debug("Number of days updated to --> " + cycle.getNoOfDays());
+			}
+		}
+		return oldCycleList;
+	}
+
+	public BusinessCycle updateLastCycle(int i, List<BusinessCycle> oldCycleList, List<BusinessCycle> requestList,
+			LocalDate businessYearTo) {
+		BusinessCycle cycle = oldCycleList.get(i);
+		LocalDate startDate = LocalDateUtils.convert(requestList.get(i).getFromDate(), ZoneId.systemDefault());
+
+		LocalDate endDate = startDate.withDayOfMonth(businessYearTo.getDayOfMonth());
+		cycle.setToDate(DateUtils.convert(endDate, ZoneId.systemDefault()));
+
+		int datediff = BusinessCycleUtils.calculateNoOfDays(cycle.getFromDate(), cycle.getToDate());
+		cycle.setNoOfDays(datediff + 1);
+
+		return cycle;
+	}
 }

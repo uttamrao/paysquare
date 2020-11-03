@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ps.RESTful.dto.mapper.ServiceCodeDTOMapper;
 import com.ps.RESTful.dto.response.ServiceCodeResponseDTO;
+import com.ps.RESTful.enums.ErrorCode;
 import com.ps.RESTful.enums.StatusEnum;
 import com.ps.RESTful.enums.SuccessCode;
 import com.ps.RESTful.resources.ServiceCodeResource;
@@ -44,6 +45,14 @@ public class ServiceCodeResourceImpl extends AbstractResourceImpl implements Ser
 			logger.debug("Sending request to Mapp entity list to responseDTO list");
 		List<ServiceCodeResponseDTO> responseDTOList = serviceCodeDTOMapper.entityListToDtoList(serviceCodeList);
 
+		if (responseDTOList.isEmpty()) {
+			return ResponseEntity
+					.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+							ResponseBuilder
+									.builder().status(StatusEnum.FAILURE.getValue(),
+											ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Service code records not found")
+									.build());
+		}
 		return ResponseEntity
 				.status(HttpStatus.OK).body(
 						ResponseBuilder.builder()

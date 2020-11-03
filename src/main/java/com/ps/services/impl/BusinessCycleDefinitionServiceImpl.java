@@ -50,12 +50,15 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 
 	@Override
 	@Transactional("tenantTransactionManager")
-	public void add(BusinessCycleDefinitionBean businessCycleDefinitionBean) {
+	public List<BusinessCycleDefinition> add(BusinessCycleDefinitionBean businessCycleDefinitionBean) {
 		if (logger.isDebugEnabled())
 			logger.debug("In add BusinessCycleDefinition");
 
 		List<String> serviceNames = businessCycleDefinitionBean.getServiceName();
 		List<BusinessCycleDefinition> cycleDefinitions = new ArrayList<>();
+
+		if (serviceNames.isEmpty())
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Service name is not selected");
 
 		for (String service : serviceNames) {
 			if (logger.isDebugEnabled())
@@ -85,6 +88,8 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		businessCycleDefinitionRepository.saveAll(cycleDefinitions);
 		if (logger.isDebugEnabled())
 			logger.debug("Business Cycle Definitions saved successfully for given services--> " + serviceNames);
+
+		return cycleDefinitions;
 	}
 
 	private BusinessCycleDefinition addData(BusinessCycleDefinition businessCycleDefinition) {
@@ -141,6 +146,14 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency not found!");
 		}
 
+		if (businessCycleDefinition.getFrequencyMaster().getName().getValue().equalsIgnoreCase("Adhoc")) {
+			if (logger.isDebugEnabled())
+				logger.debug("Validating Reoccurance days set to businessCycleDefinition if frequency=Adhoc");
+			if (businessCycleDefinition.getReoccuranceDays() == 0) {
+				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Please select Re Occurrance days!");
+			}
+		}
+
 		if (logger.isDebugEnabled())
 			logger.debug("Validating if businessYear is set in businessCycleDefinition, object-> "
 					+ businessCycleDefinition.getBusinessYearDefinition());
@@ -155,7 +168,7 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 		if (logger.isDebugEnabled())
 			logger.debug(
 					"Validating businessCycleDefinition, serviceName-> " + businessCycleDefinition.getServiceName());
-		// !ServiceTypeEnum.isValid(businessCycleDefinition.getServiceName())
+
 		if (businessCycleDefinition.getServiceName() == null || businessCycleDefinition.getServiceName().isEmpty())
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Cycle Definition service name not found!");
 
@@ -175,7 +188,8 @@ public class BusinessCycleDefinitionServiceImpl implements BusinessCycleDefiniti
 						"Business year Definition, Frequency master and service name combination should be unique");
 				logger.error("Business Cycle Definition already exist");
 				throw new InvalidRequestException(ErrorCode.BAD_REQUEST,
-						" Business cycle Definition record alreay exist");
+						" Business cycle Definition record alreay exist for " + businessCycleDefinition.getServiceName()
+								+ " service");
 			}
 		}
 	}

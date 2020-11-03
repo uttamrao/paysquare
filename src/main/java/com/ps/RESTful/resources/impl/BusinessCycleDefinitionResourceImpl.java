@@ -53,8 +53,7 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 		if (logger.isDebugEnabled())
 			logger.debug("In BusinessCycleDefinition add EP");
 		BusinessCycleDefinitionBean businessCycleDefinitionBean = new BusinessCycleDefinitionBean();
-		// BusinessCycleDefinition businessCycleDefinition =
-		// businessCycleDefinitionDTOMapper.dtoToEntity(requestDTO);
+
 		businessCycleDefinitionBean = businessCycleDefinitionBean.dtoToBean(requestDTO);
 
 		if (logger.isDebugEnabled())
@@ -66,7 +65,6 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 		if (businessYearDefinition == null)
 			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Year Definition not found!");
 
-		// businessCycleDefinition.setBusinessYearDefinition(businessYearDefinition);
 		businessCycleDefinitionBean.setBusinessYearDefinition(businessYearDefinition);
 
 		if (requestDTO.getFrequencyMasterId() != 0) {
@@ -78,15 +76,19 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 			if (frequencyMaster == null)
 				throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Frequency master not found!");
 
-			// businessCycleDefinition.setFrequencyMaster(frequencyMaster);
 			businessCycleDefinitionBean.setFrequencyMaster(frequencyMaster);
 		}
 
 		if (logger.isDebugEnabled())
 			logger.debug("Sending request to businessCycleDefinition service add method to add data into DB");
-		// businessCycleDefinitionService.add(businessCycleDefinition);
-		businessCycleDefinitionService.add(businessCycleDefinitionBean);
 
+		List<BusinessCycleDefinition> cycles = businessCycleDefinitionService.add(businessCycleDefinitionBean);
+
+		if (cycles.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+					.body(ResponseBuilder.builder().status(StatusEnum.FAILURE.getValue(),
+							ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Cycle Definition not added").build());
+		}
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
 						"Business Cycle Definition added successfully.").build());
@@ -132,8 +134,15 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 
 		if (logger.isDebugEnabled())
 			logger.debug("Sending request to businessCycleDefinition service add method to add data into DB");
-		businessCycleDefinitionService.update(resourceId, businessCycleDefinition);
+		businessCycleDefinition = businessCycleDefinitionService.update(resourceId, businessCycleDefinition);
 
+		if (businessCycleDefinition == null) {
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+					.body(ResponseBuilder.builder()
+							.status(StatusEnum.FAILURE.getValue(), ErrorCode.SERVICE_UNAVAILABLE.getCode(),
+									"Business Cycle Definition updated not successfully")
+							.build());
+		}
 		return ResponseEntity.status(HttpStatus.OK).body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(),
 				SuccessCode.OK.getCode(), "Business Cycle Definition updated successfully.").build());
 	}
@@ -154,6 +163,12 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 		List<BusinessCycleDefinitionResponseDTO> responseDTOList = businessCycleDefinitionDTOMapper
 				.entityListToDtoList(businessCycleDefinitionList);
 
+		if (responseDTOList.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+					.body(ResponseBuilder.builder().status(StatusEnum.FAILURE.getValue(),
+							ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Year Definition records not found")
+							.build());
+		}
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(ResponseBuilder.builder()
 						.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
@@ -177,6 +192,11 @@ public class BusinessCycleDefinitionResourceImpl extends AbstractResourceImpl
 		BusinessCycleDefinitionResponseDTO responseDTO = businessCycleDefinitionDTOMapper
 				.entityToDto(businessCycleDefinition);
 
+		if (responseDTO == null) {
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+					.body(ResponseBuilder.builder().status(StatusEnum.FAILURE.getValue(),
+							ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Year Definition not found").build());
+		}
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(ResponseBuilder.builder()
 						.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),

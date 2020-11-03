@@ -20,6 +20,8 @@ public class BusinessCycleDefinitionBean extends AbstractTimeDTO {
 
 	private BusinessYearDefinition businessYearDefinition;
 
+	private int reoccuranceDays;
+
 	private boolean isUsed;
 
 	private String description;
@@ -94,6 +96,14 @@ public class BusinessCycleDefinitionBean extends AbstractTimeDTO {
 		this.businessYearDefinition = businessYearDefinition;
 	}
 
+	public int getReoccuranceDays() {
+		return reoccuranceDays;
+	}
+
+	public void setReoccuranceDays(int reoccuranceDays) {
+		this.reoccuranceDays = reoccuranceDays;
+	}
+
 	public BusinessCycleDefinitionBean dtoToBean(BusinessCycleDefinitionRequestDTO dto) {
 		BusinessCycleDefinitionBean businessCycleDefinitionBean = null;
 
@@ -109,7 +119,7 @@ public class BusinessCycleDefinitionBean extends AbstractTimeDTO {
 //			if(!StringUtils.isBlank(dto.getWeekStartDefinition()) && WeeksEnum.isValid(dto.getWeekStartDefinition()))
 //				businessCycleDefinition.setWeekStartDefinition(WeeksEnum.valueOf(dto.getWeekStartDefinition()));
 
-//			businessCycleDefinition.setReoccuranceDays(dto.getReOccuranceDays());
+			businessCycleDefinitionBean.setReoccuranceDays(dto.getReoccuranceDays());
 //			businessCycleDefinition.setForceToBusinessYearEnd(dto.isForceToBusinessYearEnd());
 			businessCycleDefinitionBean.setDescription(dto.getDescription());
 			businessCycleDefinitionBean.setIsUsed(dto.getIsUsed());
@@ -130,6 +140,7 @@ public class BusinessCycleDefinitionBean extends AbstractTimeDTO {
 			businessCycleDefinition.setName(businessCycleDefinitionBean.getName());
 			businessCycleDefinition.setDescription(businessCycleDefinitionBean.getDescription());
 			businessCycleDefinition.setIsUsed(businessCycleDefinitionBean.getIsUsed());
+			businessCycleDefinition.setReoccuranceDays(businessCycleDefinitionBean.getReoccuranceDays());
 			businessCycleDefinition.setBusinessYearDefinition(businessCycleDefinitionBean.getBusinessYearDefinition());
 			businessCycleDefinition.setFrequencyMaster(businessCycleDefinitionBean.getFrequencyMaster());
 		}

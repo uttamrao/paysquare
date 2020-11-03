@@ -20,6 +20,7 @@ public interface BusinessCycleResource {
 	public final static String UPDATE_PATH = "/update/{cycleDefinitionId}/{businessYear}";
 	public final static String GET_CYCLE_DEFINITION_PATH = "/cycle-definition/{cycleDefinitionId}/{businessYear}";
 	public final static String DELETE_CYCLE_DEFINITION_PATH = "/cycles/{cycleDefinitionId}/{businessYear}";
+	public final static String FORCE_END_PATH = "/force-end/{cycleDefinitionId}/{businessYear}";
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Response> add(@RequestBody BusinessCycleRequestDTO requestDTO);
@@ -45,6 +46,11 @@ public interface BusinessCycleResource {
 
 	@PutMapping(path = UPDATE_PATH, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Response> update(@RequestBody BusinessCycleUpdateRequestDTO requestDTO,
+			@PathVariable(name = "cycleDefinitionId") int cycleDefinitionId,
+			@PathVariable(name = "businessYear") String businessYear);
+
+	@PutMapping(path = FORCE_END_PATH, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Response> forceEnd(@RequestBody BusinessCycleUpdateRequestDTO requestDTO,
 			@PathVariable(name = "cycleDefinitionId") int cycleDefinitionId,
 			@PathVariable(name = "businessYear") String businessYear);
 }

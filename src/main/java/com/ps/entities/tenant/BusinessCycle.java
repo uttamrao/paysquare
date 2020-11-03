@@ -45,6 +45,8 @@ public class BusinessCycle {
 
 	private boolean isActive;
 
+	private boolean isAdjustedToNextCycle;
+
 	// constructor
 	public BusinessCycle() {
 		super();
@@ -162,13 +164,20 @@ public class BusinessCycle {
 		this.isUsed = isUsed;
 	}
 
+	public boolean isAdjustedToNextCycle() {
+		return isAdjustedToNextCycle;
+	}
+
+	public void setAdjustedToNextCycle(boolean isAdjustedToNextCycle) {
+		this.isAdjustedToNextCycle = isAdjustedToNextCycle;
+	}
+
 	@Override
 	public String toString() {
 		return "BusinessCycle [id=" + id + ", businessCycleDefinition=" + businessCycleDefinition + ", periodId="
 				+ periodId + ", periodName=" + periodName + ", isLocked=" + isLocked + ", fromDate=" + fromDate
 				+ ", toDate=" + toDate + ", businessYear=" + businessYear + ", noOfDays=" + noOfDays + ", noOfCycles="
 				+ noOfCycles + ", isForceToYearEnd=" + isForceToYearEnd + ", remark=" + remark + ", isUsed=" + isUsed
-				+ ", isActive=" + isActive + "]";
+				+ ", isActive=" + isActive + ", isAdjustedToNextCycle=" + isAdjustedToNextCycle + "]";
 	}
-
 }

@@ -9,7 +9,7 @@ public interface BusinessCycleDefinitionService {
 
 	// public BusinessCycleDefinition add(BusinessCycleDefinition
 	// businessCycleDefinitionService);
-	public void add(BusinessCycleDefinitionBean businessCycleDefinitionBean);
+	public List<BusinessCycleDefinition> add(BusinessCycleDefinitionBean businessCycleDefinitionBean);
 
 	public List<BusinessCycleDefinition> getAll();
 

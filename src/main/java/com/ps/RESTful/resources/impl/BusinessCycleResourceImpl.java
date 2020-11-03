@@ -14,6 +14,7 @@ import com.ps.RESTful.dto.mapper.BusinessCycleDTOMapper;
 import com.ps.RESTful.dto.request.BusinessCycleRequestDTO;
 import com.ps.RESTful.dto.request.BusinessCycleUpdateRequestDTO;
 import com.ps.RESTful.dto.response.BusinessCycleResponseDTO;
+import com.ps.RESTful.enums.ErrorCode;
 import com.ps.RESTful.enums.StatusEnum;
 import com.ps.RESTful.enums.SuccessCode;
 import com.ps.RESTful.resources.BusinessCycleResource;
@@ -63,6 +64,14 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 			logger.debug("Sending request to businessYearDefinition dto mapper to map entity to responseDTO");
 		List<BusinessCycleResponseDTO> responseDTO = businessCycleDTOMapper.entityListToDtoList(businessCycleList);
 
+		if (responseDTO.isEmpty()) {
+			return ResponseEntity
+					.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+							ResponseBuilder
+									.builder().status(StatusEnum.FAILURE.getValue(),
+											ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Cycle not added")
+									.build());
+		}
 		return ResponseEntity.status(HttpStatus.CREATED).body(ResponseBuilder.builder()
 				.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(), "Business Cycle added successfully.")
 				.results(responseDTO).build());
@@ -91,6 +100,14 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 			logger.debug("Sending request to businessCycle dto mapper to map entity list to responseDTO list");
 		List<BusinessCycleResponseDTO> responseDTOList = businessCycleDTOMapper.entityListToDtoList(businessCycleList);
 
+		if (responseDTOList.isEmpty()) {
+			return ResponseEntity
+					.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+							ResponseBuilder
+									.builder().status(StatusEnum.FAILURE.getValue(),
+											ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Ccyle records not found")
+									.build());
+		}
 		return ResponseEntity
 				.status(HttpStatus.OK).body(
 						ResponseBuilder.builder()
@@ -118,6 +135,14 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 			logger.debug("Sending request to businessCycle dto mapper to map entity list to responseDTO list");
 		List<BusinessCycleResponseDTO> responseDTOList = businessCycleDTOMapper.entityListToDtoList(businessCycleList);
 
+		if (responseDTOList.isEmpty()) {
+			return ResponseEntity
+					.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+							ResponseBuilder
+									.builder().status(StatusEnum.FAILURE.getValue(),
+											ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Ccyle records not found")
+									.build());
+		}
 		return ResponseEntity
 				.status(HttpStatus.OK).body(
 						ResponseBuilder.builder()
@@ -145,6 +170,8 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 				.build());
 	}
 
+	/** hard deleted for discard button **/
+
 	@Override
 	public ResponseEntity<Response> hardDeleteByBusinessCycleIdAndBusinessYear(int cycleDefinitionId,
 			String businessYear) {
@@ -161,25 +188,81 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 				SuccessCode.OK.getCode(), "Business Cycle discarded successfully.").build());
 	}
 
+	/** update by Id **/
+
 	@Override
 	public ResponseEntity<Response> update(BusinessCycleUpdateRequestDTO requestDTO, int cycleDefinitionId,
 			String businessYear) {
 		if (logger.isDebugEnabled())
-			logger.debug("In businessCycle hardDeleteByBusinessCycleIdAndBusinessYear EP");
+			logger.debug("In businessCycle update EP");
 
 		if (logger.isDebugEnabled())
-			logger.debug("In BusinessCycle add EP, finding businessCycleDifinition object in db with id-> "
+			logger.debug("In BusinessCycle update EP, finding businessCycleDifinition object in db with id-> "
 					+ cycleDefinitionId);
-		BusinessCycleDefinition businessCycleDefinition = businessCycleDefinitionService.getById(cycleDefinitionId);
-		// mapper call
-		BusinessCycle businessCycle = new BusinessCycle();
-		businessCycle.setBusinessCycleDefinition(businessCycleDefinition);
+		BusinessCycleDefinition businessCycleDefinition = businessCycleDefinitionService.get(cycleDefinitionId);
+
+		List<BusinessCycle> businessCycleList = businessCycleDTOMapper.updateDtoToEntityList(requestDTO,
+				businessCycleDefinition);
 
 		if (logger.isDebugEnabled())
-			logger.debug("Sending request to businessCycleDefinition service add method to add data into DB");
-		// List<BusinessCycle> businessCycleList =
-		// businessCycleService.add(businessCycleBean);
-		return null;
+			logger.debug("Sending request to businessCycleDefinition service update method to updating data into DB");
+
+		businessCycleList = businessCycleService.update(businessCycleList, cycleDefinitionId, businessYear);
+
+		if (logger.isDebugEnabled())
+			logger.debug("Sending request to businessYearDefinition dto mapper to map entity to responseDTO");
+		List<BusinessCycleResponseDTO> responseDTO = businessCycleDTOMapper.entityListToDtoList(businessCycleList);
+
+		if (businessCycleList.isEmpty()) {
+			return ResponseEntity
+					.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+							ResponseBuilder
+									.builder().status(StatusEnum.FAILURE.getValue(),
+											ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Cycle not updated")
+									.build());
+		}
+		return ResponseEntity.status(HttpStatus.CREATED).body(ResponseBuilder.builder()
+				.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(), "Business Cycle updated successfully.")
+				.results(responseDTO).build());
+	}
+
+	/** force to year end by Id **/
+	@Override
+	public ResponseEntity<Response> forceEnd(BusinessCycleUpdateRequestDTO requestDTO, int cycleDefinitionId,
+			String businessYear) {
+		if (logger.isDebugEnabled())
+			logger.debug("In businessCycle forceEnd EP");
+
+		if (logger.isDebugEnabled())
+			logger.debug("In BusinessCycle forceEnd EP, finding businessCycleDifinition object in db with id-> "
+					+ cycleDefinitionId);
+		BusinessCycleDefinition businessCycleDefinition = businessCycleDefinitionService.get(cycleDefinitionId);
+
+		List<BusinessCycle> businessCycleList = businessCycleDTOMapper.updateDtoToEntityList(requestDTO,
+				businessCycleDefinition);
+
+		if (logger.isDebugEnabled())
+			logger.debug(
+					"Sending request to businessCycleDefinition service force to year end method to updating data into DB");
+
+		businessCycleList = businessCycleService.updateForceToYearEnd(businessCycleList, cycleDefinitionId,
+				businessYear);
+
+		if (logger.isDebugEnabled())
+			logger.debug("Sending request to businessYearDefinition dto mapper to map entity to responseDTO");
+		List<BusinessCycleResponseDTO> responseDTO = businessCycleDTOMapper.entityListToDtoList(businessCycleList);
+
+		if (businessCycleList.isEmpty()) {
+			return ResponseEntity
+					.status(HttpStatus.SERVICE_UNAVAILABLE).body(
+							ResponseBuilder
+									.builder().status(StatusEnum.FAILURE.getValue(),
+											ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Cycle not updated")
+									.build());
+		}
+		return ResponseEntity.status(HttpStatus.CREATED).body(ResponseBuilder.builder()
+				.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(), "Business Cycle updated successfully.")
+				.results(responseDTO).build());
 	}
 
 }

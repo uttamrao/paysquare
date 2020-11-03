@@ -9,5 +9,7 @@ public interface BusinessCycleCommand {
 
 	public List<BusinessCycle> create(BusinessCycleBean businessCycleBean);
 
-	public List<BusinessCycle> update(List<BusinessCycle> requestList);
+	public List<BusinessCycle> update(List<BusinessCycle> oldCycleList, List<BusinessCycle> requestList);
+
+	public List<BusinessCycle> forceToYearEnd(List<BusinessCycle> oldCycleList, List<BusinessCycle> requestList);
 }

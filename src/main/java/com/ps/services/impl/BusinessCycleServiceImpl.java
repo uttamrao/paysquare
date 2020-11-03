@@ -173,8 +173,25 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		if (logger.isDebugEnabled())
 			logger.debug("In BusinessCycle getAll");
 
-		// List<BusinessCycle> businessCycleList = businessCycleRepository.findAll();
 		List<BusinessCycle> businessCycleList = businessCycleRepository.findAllByPeriodIdByIsActive();
+
+		// this is for UI - isUsed flag set=1 for soft delete logic
+		// If business definition id is assigned to payroll area then cycles created for
+		// that id's should not delete
+		for (BusinessCycle businessCycle : businessCycleList) {
+			if (businessCycle.isUsed()) {
+
+				if (logger.isDebugEnabled())
+					logger.debug("cycle used");
+				List<BusinessCycle> cycles = businessCycleRepository
+						.findByBusinessCycleDefinitionIdUsed(businessCycle.getBusinessCycleDefinition().getId());
+
+				for (int i = 0; i < cycles.size(); i++) {
+					BusinessCycle cycle = cycles.get(i);
+					cycle.setUsed(true);
+				}
+			}
+		}
 		return businessCycleList;
 	}
 
@@ -407,7 +424,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 	@Transactional("tenantTransactionManager")
 	public List<BusinessCycle> update(List<BusinessCycle> requestList, int cycleDefinitionId, String businessYear) {
 		if (logger.isDebugEnabled())
-			logger.debug("In add BusinessCycleDefinition");
+			logger.debug("In update BusinessCycleDefinition method");
 		// validate(businessCycleBean);
 
 		FrequencyEnum frequency = null;
@@ -417,16 +434,77 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		else
 			frequency = FrequencyEnum.ADHOC;
 
+		List<BusinessCycle> oldCycleList = businessCycleRepository
+				.findAllByCycleDefinitionIdAndBusinessYear(cycleDefinitionId, businessYear);
+
+		if (oldCycleList.isEmpty()) {
+			logger.error("Business Cycle Creation not found!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Creation not found!");
+		}
+
 		if (logger.isDebugEnabled())
 			logger.debug("Initializing businessCycle creation for frequency-> " + frequency);
 
 		BusinessCycleCommand businessCycleCommand = businessCycleCommandObject.get(frequency);
-		List<BusinessCycle> cycleList = businessCycleInvoker.updateCycle(businessCycleCommand, requestList);
+		List<BusinessCycle> cycleList = businessCycleInvoker.updateCycle(businessCycleCommand, oldCycleList,
+				requestList);
 
 		if (logger.isDebugEnabled())
 			logger.debug("Updating  cycles->" + cycleList.size() + " into db");
 
 		if (!CollectionUtils.isEmpty(cycleList)) {
+
+//			for (int i = 0; i < requestList.size(); i++) {
+//				BusinessCycle cycle = oldCycleList.get(i);
+//				cycle.setAdjustedToNextCycle(requestList.get(i).isAdjustedToNextCycle());
+//			}
+			businessCycleRepository.saveAll(cycleList);
+
+			if (logger.isDebugEnabled())
+				logger.debug("Business Cycle Definition updated into DB successfully");
+		}
+		return cycleList;
+	}
+
+	@Override
+	@Transactional("tenantTransactionManager")
+	public List<BusinessCycle> updateForceToYearEnd(List<BusinessCycle> requestList, int cycleDefinitionId,
+			String businessYear) {
+		if (logger.isDebugEnabled())
+			logger.debug("In updateForceToYearEnd BusinessCycleDefinition method");
+		// validate(businessCycleBean);
+
+		FrequencyEnum frequency = null;
+
+		if (requestList.get(0).getBusinessCycleDefinition().getFrequencyMaster() != null)
+			frequency = requestList.get(0).getBusinessCycleDefinition().getFrequencyMaster().getName();
+		else
+			frequency = FrequencyEnum.ADHOC;
+
+		List<BusinessCycle> oldCycleList = businessCycleRepository
+				.findAllByCycleDefinitionIdAndBusinessYear(cycleDefinitionId, businessYear);
+
+		if (oldCycleList.isEmpty()) {
+			logger.error("Business Cycle Creation not found!");
+			throw new InvalidRequestException(ErrorCode.BAD_REQUEST, "Business Cycle Creation not found!");
+		}
+
+		if (logger.isDebugEnabled())
+			logger.debug("Initializing businessCycle creation for frequency-> " + frequency);
+
+		BusinessCycleCommand businessCycleCommand = businessCycleCommandObject.get(frequency);
+		List<BusinessCycle> cycleList = businessCycleInvoker.forceToYearEnd(businessCycleCommand, oldCycleList,
+				requestList);
+
+		if (logger.isDebugEnabled())
+			logger.debug("Updating  cycles->" + cycleList.size() + " into db");
+
+		if (!CollectionUtils.isEmpty(cycleList)) {
+
+			for (int i = 0; i < requestList.size(); i++) {
+				BusinessCycle cycle = oldCycleList.get(i);
+				cycle.setForceToYearEnd(true);
+			}
 			businessCycleRepository.saveAll(cycleList);
 
 			if (logger.isDebugEnabled())

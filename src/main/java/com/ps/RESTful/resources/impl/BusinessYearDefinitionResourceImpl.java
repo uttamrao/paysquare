@@ -49,6 +49,13 @@ public class BusinessYearDefinitionResourceImpl extends AbstractResourceImpl imp
 			logger.debug("Sending request to businessYearDefinition dto mapper to map entity to responseDTO");
 		BusinessYearDefinitionResponseDTO responseDTO = businessYearDefinitionDTOMapper
 				.entityToDto(businessYearDefinition);
+
+		if (responseDTO == null) {
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+					.body(ResponseBuilder.builder().status(StatusEnum.FAILURE.getValue(),
+							ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Year Definition not added").build());
+		}
+
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(ResponseBuilder.builder().status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
 						"Business Year Definition added successfully.").result(responseDTO).build());
@@ -69,6 +76,12 @@ public class BusinessYearDefinitionResourceImpl extends AbstractResourceImpl imp
 		List<BusinessYearDefinitionResponseDTO> responseDTOList = businessYearDefinitionDTOMapper
 				.entityListToDtoList(businessYearDefinitionList);
 
+		if (responseDTOList.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+					.body(ResponseBuilder.builder().status(StatusEnum.FAILURE.getValue(),
+							ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Year Definition records not found")
+							.build());
+		}
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(ResponseBuilder.builder()
 						.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(),
@@ -90,6 +103,12 @@ public class BusinessYearDefinitionResourceImpl extends AbstractResourceImpl imp
 			logger.debug("Sending request to businessYearDefinition dto mapper to map entity to responseDTO");
 		BusinessYearDefinitionResponseDTO responseDTO = businessYearDefinitionDTOMapper
 				.entityToDto(businessYearDefinition);
+
+		if (responseDTO == null) {
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+					.body(ResponseBuilder.builder().status(StatusEnum.FAILURE.getValue(),
+							ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Year Definition not found").build());
+		}
 
 		return ResponseEntity
 				.status(HttpStatus.OK).body(

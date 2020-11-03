@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 import org.jboss.logging.Logger;
 
@@ -77,8 +78,7 @@ public class BusinessCycleUtils {
 	}
 
 	public static BusinessCycle setCycle(LocalDate startDate, LocalDate endDate,
-			BusinessCycleDefinition businessCycleDefinition, int periodId, int noOfCycles,
-			BusinessCycleBean businessCycleBean) {
+			BusinessCycleDefinition businessCycleDefinition, int periodId, int noOfCycles, String businessYear) {
 
 		BusinessCycle cycle = new BusinessCycle();
 		cycle.setFromDate(DateUtils.convert(startDate, ZoneId.systemDefault()));
@@ -92,7 +92,7 @@ public class BusinessCycleUtils {
 
 		cycle.setNoOfCycles(noOfCycles);
 		cycle.setActive(true);
-		cycle.setBusinessYear(businessCycleBean.getBusinessYear());
+		cycle.setBusinessYear(businessYear);
 		return cycle;
 	}
 
@@ -143,4 +143,10 @@ public class BusinessCycleUtils {
 		}
 	}
 
+	public static int calculateNoOfDays(Date fromDate, Date toDate) {
+		LocalDate fromLocalDate = DateUtils.convertDateToLocalDate(fromDate);
+		LocalDate toLocalDate = DateUtils.convertDateToLocalDate(toDate);
+		return (int) ChronoUnit.DAYS.between(fromLocalDate, toLocalDate);
+
+	}
 }
