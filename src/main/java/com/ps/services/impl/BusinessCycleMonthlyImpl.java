@@ -161,7 +161,7 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 						cycle.setNoOfDays(datediff + 1);
 
 						if (logger.isDebugEnabled())
-							logger.debug("Number of days updated to --> " + datediff + 1);
+							logger.debug("Number of days updated to --> " + cycle.getNoOfDays());
 						break;
 					}
 					if (requestList.get(0).isAdjustedToNextCycle()) {
@@ -177,7 +177,7 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 						cycle.setNoOfDays(datediff + 1);
 
 						if (logger.isDebugEnabled())
-							logger.debug("Number of days updated to --> " + datediff + 1);
+							logger.debug("Number of days updated to --> " + cycle.getNoOfDays());
 
 						// updating successive from date=to date+1
 						if (logger.isDebugEnabled())
@@ -193,7 +193,7 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 						nextCycle.setNoOfDays(datediff + 1);
 
 						if (logger.isDebugEnabled())
-							logger.debug("Number of days updated to --> " + datediff + 1);
+							logger.debug("Number of days updated to --> " + nextCycle.getNoOfDays());
 						if (logger.isDebugEnabled())
 							logger.debug("updated next cycle from date--> " + nextCycle.getFromDate());
 						break;
@@ -210,7 +210,9 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 
 	@Override
 	public List<BusinessCycle> forceToYearEnd(List<BusinessCycle> oldCycleList, List<BusinessCycle> requestList) {
-		// TODO Auto-generated method stub
-		return null;
+		if (logger.isDebugEnabled())
+			logger.debug("In cycle forceToYearEnd method");
+
+		return update(oldCycleList, requestList);
 	}
 }
