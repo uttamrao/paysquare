@@ -146,7 +146,7 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 				// If business cycle is locked then can not update the cycle
 				if (!oldCycleList.get(i).isLocked()) {
 					if (logger.isDebugEnabled())
-						logger.debug("To date is upadetd for cycle--> " + requestList.get(i).getToDate());
+						logger.debug("To date is updated for cycle--> " + requestList.get(i).getToDate());
 
 					if (!requestList.get(0).isAdjustedToNextCycle()) {
 						if (logger.isDebugEnabled())

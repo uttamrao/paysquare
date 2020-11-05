@@ -27,8 +27,12 @@ public interface BusinessCycleDefinitionRepository extends AbstractRepository<Bu
 	@Query("UPDATE BusinessCycleDefinition cd SET cd.isActive = false WHERE cd.businessYearDefinition.id = :id")
 	void softDeleteAllByBusinessYearDefinitionId(int id);
 
+//	@Modifying
+//	@Query("UPDATE BusinessCycleDefinition cd SET cd.isActive = false WHERE cd.id = :id")
+//	void softDeleteById(int id);
+
 	@Modifying
-	@Query("UPDATE BusinessCycleDefinition cd SET cd.isActive = false WHERE cd.id = :id")
+	@Query("Delete from BusinessCycleDefinition cd WHERE cd.id = :id")
 	void softDeleteById(int id);
 
 	// to check unique constraint

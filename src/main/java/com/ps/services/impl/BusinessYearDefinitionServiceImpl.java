@@ -126,6 +126,7 @@ public class BusinessYearDefinitionServiceImpl implements BusinessYearDefinition
 					"Business Year Definition is used can not delete!");
 		}
 
+		// replacing soft delete by hard delete
 		businessYearDefinitionRepository.softDeleteById(id);
 		if (logger.isDebugEnabled())
 			logger.debug(" Deleted business year definition record with business year id-> " + id);

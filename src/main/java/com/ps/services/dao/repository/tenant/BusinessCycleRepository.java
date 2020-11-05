@@ -39,7 +39,7 @@ public interface BusinessCycleRepository extends AbstractRepository<BusinessCycl
 	@Query("UPDATE BusinessCycle c set c.isActive=false where c.businessCycleDefinition.id = :id and c.businessYear=:businessYear")
 	void softdeleteByCycleDefinitionIdAndBusinessYear(@Param("id") int id, @Param("businessYear") String businessYear);
 
-	// soft delete by business year and business cycle definition id
+	// hard delete by business year and business cycle definition id
 	@Modifying
 	@Query("DELETE FROM BusinessCycle c where c.businessCycleDefinition.id = :id and c.businessYear=:businessYear")
 	void hardDeleteByCycleDefinitionIdAndBusinessYear(@Param("id") int id, @Param("businessYear") String businessYear);
