@@ -10,7 +10,7 @@ public class BusinessCycleDefinitionDTO extends AbstractTimeDTO {
 
 	private String description;
 
-	private int reoccuranceDays;
+	private int addDays;
 
 	public BusinessCycleDefinitionDTO() {
 		super();
@@ -56,18 +56,18 @@ public class BusinessCycleDefinitionDTO extends AbstractTimeDTO {
 		this.description = description;
 	}
 
-	public int getReoccuranceDays() {
-		return reoccuranceDays;
+	public int getAddDays() {
+		return addDays;
 	}
 
-	public void setReoccuranceDays(int reoccuranceDays) {
-		this.reoccuranceDays = reoccuranceDays;
+	public void setAddDays(int addDays) {
+		this.addDays = addDays;
 	}
 
 	@Override
 	public String toString() {
 		return "BusinessCycleDefinitionDTO [isActive=" + isActive + ", name=" + name + ", isUsed=" + isUsed
-				+ ", description=" + description + ", reoccuranceDays=" + reoccuranceDays + "]";
+				+ ", description=" + description + ", addDays=" + addDays + "]";
 	}
 
 }

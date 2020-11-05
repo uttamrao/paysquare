@@ -135,6 +135,7 @@ public class BusinessCycleAdhocImpl implements BusinessCycleCommand {
 						BusinessCycle cycle = oldCycleList.get(i);
 						cycle.setToDate(requestList.get(i).getToDate());
 						cycle.setAdjustedToNextCycle(requestList.get(i).isAdjustedToNextCycle());
+						cycle.setRemark(requestList.get(i).getRemark());
 
 						int datediff = BusinessCycleUtils.calculateNoOfDays(requestList.get(i).getFromDate(),
 								requestList.get(i).getToDate());
@@ -155,6 +156,7 @@ public class BusinessCycleAdhocImpl implements BusinessCycleCommand {
 								requestList.get(i).getToDate());
 						cycle.setNoOfDays(datediff + 1);
 						cycle.setAdjustedToNextCycle(requestList.get(i).isAdjustedToNextCycle());
+						cycle.setRemark(requestList.get(i).getRemark());
 
 						if (logger.isDebugEnabled())
 							logger.debug("Number of days updated to --> " + datediff + 1);
@@ -284,6 +286,7 @@ public class BusinessCycleAdhocImpl implements BusinessCycleCommand {
 		BusinessCycle cycle = oldCycleList.get(i);
 		cycle.setToDate(requestList.get(i).getToDate());
 		cycle.setAdjustedToNextCycle(requestList.get(i).isAdjustedToNextCycle());
+		cycle.setRemark(requestList.get(i).getRemark());
 
 		int datediff = BusinessCycleUtils.calculateNoOfDays(requestList.get(i).getFromDate(),
 				requestList.get(i).getToDate());
@@ -311,6 +314,7 @@ public class BusinessCycleAdhocImpl implements BusinessCycleCommand {
 
 		LocalDate endDate = startDate.withDayOfMonth(businessYearTo.getDayOfMonth());
 		cycle.setToDate(DateUtils.convert(endDate, ZoneId.systemDefault()));
+		cycle.setRemark(requestList.get(i).getRemark());
 
 		int datediff = BusinessCycleUtils.calculateNoOfDays(cycle.getFromDate(), cycle.getToDate());
 		cycle.setNoOfDays(datediff + 1);

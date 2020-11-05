@@ -155,6 +155,7 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 						BusinessCycle cycle = oldCycleList.get(i);
 						cycle.setToDate(requestList.get(i).getToDate());
 						cycle.setAdjustedToNextCycle(requestList.get(i).isAdjustedToNextCycle());
+						cycle.setRemark(requestList.get(i).getRemark());
 
 						int datediff = BusinessCycleUtils.calculateNoOfDays(requestList.get(i).getFromDate(),
 								requestList.get(i).getToDate());
@@ -171,6 +172,7 @@ public class BusinessCycleMonthlyImpl implements BusinessCycleCommand {
 						BusinessCycle cycle = oldCycleList.get(i);
 						cycle.setToDate(requestList.get(i).getToDate());
 						cycle.setAdjustedToNextCycle(requestList.get(i).isAdjustedToNextCycle());
+						cycle.setRemark(requestList.get(i).getRemark());
 
 						int datediff = BusinessCycleUtils.calculateNoOfDays(requestList.get(i).getFromDate(),
 								requestList.get(i).getToDate());

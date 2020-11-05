@@ -20,7 +20,7 @@ public class BusinessCycleDefinitionBean extends AbstractTimeDTO {
 
 	private BusinessYearDefinition businessYearDefinition;
 
-	private int reoccuranceDays;
+	private int addDays;
 
 	private boolean isUsed;
 
@@ -96,12 +96,12 @@ public class BusinessCycleDefinitionBean extends AbstractTimeDTO {
 		this.businessYearDefinition = businessYearDefinition;
 	}
 
-	public int getReoccuranceDays() {
-		return reoccuranceDays;
+	public int getAddDays() {
+		return addDays;
 	}
 
-	public void setReoccuranceDays(int reoccuranceDays) {
-		this.reoccuranceDays = reoccuranceDays;
+	public void setAddDays(int addDays) {
+		this.addDays = addDays;
 	}
 
 	public BusinessCycleDefinitionBean dtoToBean(BusinessCycleDefinitionRequestDTO dto) {
@@ -119,7 +119,7 @@ public class BusinessCycleDefinitionBean extends AbstractTimeDTO {
 //			if(!StringUtils.isBlank(dto.getWeekStartDefinition()) && WeeksEnum.isValid(dto.getWeekStartDefinition()))
 //				businessCycleDefinition.setWeekStartDefinition(WeeksEnum.valueOf(dto.getWeekStartDefinition()));
 
-			businessCycleDefinitionBean.setReoccuranceDays(dto.getReoccuranceDays());
+			businessCycleDefinitionBean.setAddDays(dto.getAddDays());
 //			businessCycleDefinition.setForceToBusinessYearEnd(dto.isForceToBusinessYearEnd());
 			businessCycleDefinitionBean.setDescription(dto.getDescription());
 			businessCycleDefinitionBean.setIsUsed(dto.getIsUsed());
@@ -140,7 +140,7 @@ public class BusinessCycleDefinitionBean extends AbstractTimeDTO {
 			businessCycleDefinition.setName(businessCycleDefinitionBean.getName());
 			businessCycleDefinition.setDescription(businessCycleDefinitionBean.getDescription());
 			businessCycleDefinition.setIsUsed(businessCycleDefinitionBean.getIsUsed());
-			businessCycleDefinition.setReoccuranceDays(businessCycleDefinitionBean.getReoccuranceDays());
+			businessCycleDefinition.setReoccuranceDays(businessCycleDefinitionBean.getAddDays());
 			businessCycleDefinition.setBusinessYearDefinition(businessCycleDefinitionBean.getBusinessYearDefinition());
 			businessCycleDefinition.setFrequencyMaster(businessCycleDefinitionBean.getFrequencyMaster());
 		}

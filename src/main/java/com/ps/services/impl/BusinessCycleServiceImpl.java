@@ -284,7 +284,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		}
 
 		if (logger.isDebugEnabled())
-			logger.debug("In BusinessCycle creation found");
+			logger.debug("In BusinessCycle creation found-->");
 		return businessCycleList;
 	}
 
