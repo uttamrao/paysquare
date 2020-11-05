@@ -221,7 +221,7 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 											ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Cycle not updated")
 									.build());
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).body(ResponseBuilder.builder()
+		return ResponseEntity.status(HttpStatus.OK).body(ResponseBuilder.builder()
 				.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(), "Business Cycle updated successfully.")
 				.results(responseDTO).build());
 	}
@@ -260,7 +260,7 @@ public class BusinessCycleResourceImpl extends AbstractResourceImpl implements B
 											ErrorCode.SERVICE_UNAVAILABLE.getCode(), "Business Cycle not updated")
 									.build());
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).body(ResponseBuilder.builder()
+		return ResponseEntity.status(HttpStatus.OK).body(ResponseBuilder.builder()
 				.status(StatusEnum.SUCCESS.getValue(), SuccessCode.OK.getCode(), "Business Cycle updated successfully.")
 				.results(responseDTO).build());
 	}

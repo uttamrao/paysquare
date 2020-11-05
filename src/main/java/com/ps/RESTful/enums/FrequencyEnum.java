@@ -3,7 +3,7 @@ package com.ps.RESTful.enums;
 public enum FrequencyEnum {
 
 	MONTHLY("Monthly", "MM"), WEEKLY("Weekly", "WK"), BI_WEEKLY("Bi-Weekly", "BW"), SEMI_MONTHLY("Semi-Monthly", "SM"),
-	DAILY("Daily", "DD"), YEARLY("Yearly", "YY"), ADHOC("Adhoc", "AD");
+	DAILY("Daily", "DD"), YEARLY("Yearly", "YY"), CUSTOM("Custom Defined", "CD");
 
 	private String value;
 

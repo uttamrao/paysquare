@@ -51,7 +51,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 			businessCycleCommandObject.put(FrequencyEnum.SEMI_MONTHLY, new BusinessCycleSemiMonthlyImpl());
 			businessCycleCommandObject.put(FrequencyEnum.WEEKLY, new BusinessCycleWeeklyImpl());
 			businessCycleCommandObject.put(FrequencyEnum.BI_WEEKLY, new BusinessCycleBiWeeklyImpl());
-			businessCycleCommandObject.put(FrequencyEnum.ADHOC, new BusinessCycleAdhocImpl());
+			businessCycleCommandObject.put(FrequencyEnum.CUSTOM, new BusinessCycleAdhocImpl());
 		}
 	}
 
@@ -68,7 +68,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		if (businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster() != null)
 			frequency = businessCycleBean.getBusinessCycleDefinition().getFrequencyMaster().getName();
 		else
-			frequency = FrequencyEnum.ADHOC;
+			frequency = FrequencyEnum.CUSTOM;
 
 		if (logger.isDebugEnabled())
 			logger.debug("Initializing businessCycle creation for frequency-> " + frequency);
@@ -432,7 +432,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		if (requestList.get(0).getBusinessCycleDefinition().getFrequencyMaster() != null)
 			frequency = requestList.get(0).getBusinessCycleDefinition().getFrequencyMaster().getName();
 		else
-			frequency = FrequencyEnum.ADHOC;
+			frequency = FrequencyEnum.CUSTOM;
 
 		List<BusinessCycle> oldCycleList = businessCycleRepository
 				.findAllByCycleDefinitionIdAndBusinessYear(cycleDefinitionId, businessYear);
@@ -453,11 +453,6 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 			logger.debug("Updating  cycles->" + cycleList.size() + " into db");
 
 		if (!CollectionUtils.isEmpty(cycleList)) {
-
-//			for (int i = 0; i < requestList.size(); i++) {
-//				BusinessCycle cycle = oldCycleList.get(i);
-//				cycle.setAdjustedToNextCycle(requestList.get(i).isAdjustedToNextCycle());
-//			}
 			businessCycleRepository.saveAll(cycleList);
 
 			if (logger.isDebugEnabled())
@@ -479,7 +474,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 		if (requestList.get(0).getBusinessCycleDefinition().getFrequencyMaster() != null)
 			frequency = requestList.get(0).getBusinessCycleDefinition().getFrequencyMaster().getName();
 		else
-			frequency = FrequencyEnum.ADHOC;
+			frequency = FrequencyEnum.CUSTOM;
 
 		List<BusinessCycle> oldCycleList = businessCycleRepository
 				.findAllByCycleDefinitionIdAndBusinessYear(cycleDefinitionId, businessYear);
