@@ -52,6 +52,7 @@ public class BusinessCycleDTOMapper
 		responseDTO.setForceToYearEnd(businessCycle.isForceToYearEnd());
 		responseDTO.setUsed(businessCycle.isUsed());
 		responseDTO.setActive(businessCycle.isActive());
+		responseDTO.setRemark(businessCycle.getRemark());
 
 		responseDTO.setBusinessCycleDefinition(
 				businessCycleDefinitionDTOMapper.entityToDto(businessCycle.getBusinessCycleDefinition()));
