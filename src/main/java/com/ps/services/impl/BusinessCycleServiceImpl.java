@@ -464,6 +464,10 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 			logger.debug("Updating  cycles->" + cycleList.size() + " into db");
 
 		if (!CollectionUtils.isEmpty(cycleList)) {
+			for (int i = 0; i < requestList.size(); i++) {
+				BusinessCycle cycle = oldCycleList.get(i);
+				cycle.setRemark(requestList.get(i).getRemark());
+			}
 			businessCycleRepository.saveAll(cycleList);
 
 			if (logger.isDebugEnabled())
@@ -510,6 +514,7 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 			for (int i = 0; i < requestList.size(); i++) {
 				BusinessCycle cycle = oldCycleList.get(i);
 				cycle.setForceToYearEnd(true);
+				cycle.setRemark(requestList.get(i).getRemark());
 			}
 			businessCycleRepository.saveAll(cycleList);
 
