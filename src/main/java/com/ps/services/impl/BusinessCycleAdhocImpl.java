@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ps.RESTful.enums.ErrorCode;
 import com.ps.RESTful.error.handler.InvalidRequestException;
@@ -15,6 +17,7 @@ import com.ps.entities.tenant.BusinessCycle;
 import com.ps.entities.tenant.BusinessCycleDefinition;
 import com.ps.entities.tenant.BusinessYearDefinition;
 import com.ps.services.BusinessCycleCommand;
+import com.ps.services.dao.repository.tenant.BusinessCycleRepository;
 import com.ps.util.BusinessCycleUtils;
 import com.ps.util.DateUtils;
 import com.ps.util.LocalDateUtils;
@@ -24,6 +27,9 @@ public class BusinessCycleAdhocImpl implements BusinessCycleCommand {
 
 	Logger logger = Logger.getLogger(BusinessCycleAdhocImpl.class);
 	List<BusinessCycle> businessCycleList = null;
+
+	@Autowired
+	BusinessCycleRepository businessCycleRepository;
 
 	@Override
 	public List<BusinessCycle> create(BusinessCycleBean businessCycleBean) {
@@ -91,7 +97,7 @@ public class BusinessCycleAdhocImpl implements BusinessCycleCommand {
 			if (period == noOfCycles && businessCycleDefinition.isForceToBusinessYearEnd())
 				endDate = (endCycleDate);
 			else
-				endDate = startDate.plusDays(businessCycleDefinition.getReoccuranceDays());
+				endDate = startDate.plusDays(businessCycleDefinition.getReoccuranceDays() - 1);
 
 			BusinessCycle cycle = BusinessCycleUtils.setCycle(startDate, endDate, businessCycleDefinition, period, 1,
 					businessCycleBean.getBusinessYear());
@@ -191,10 +197,11 @@ public class BusinessCycleAdhocImpl implements BusinessCycleCommand {
 	}
 
 	@Override
+	@Transactional("tenantTransactionManager")
 	public List<BusinessCycle> forceToYearEnd(List<BusinessCycle> oldCycleList, List<BusinessCycle> requestList) {
 		if (logger.isDebugEnabled())
 			logger.debug("In cycle forceToYearEnd method");
-
+		List<BusinessCycle> removedList = new ArrayList<>();
 		BusinessYearDefinition businessYearDefinition = oldCycleList.get(0).getBusinessCycleDefinition()
 				.getBusinessYearDefinition();
 
@@ -218,48 +225,24 @@ public class BusinessCycleAdhocImpl implements BusinessCycleCommand {
 					break;
 				} else {
 
-					if (!requestList.get(0).isAdjustedToNextCycle()) {
-						if (logger.isDebugEnabled())
-							logger.debug("Days are not adjusted to next cycle, so only updating to date--> "
-									+ requestList.get(i).getToDate());
+					if (logger.isDebugEnabled())
+						logger.debug("Days are not adjusted to next cycle, so only updating to date--> "
+								+ requestList.get(i).getToDate());
 
-						BusinessCycle cycle = updatingCurrentCycle(i, oldCycleList, requestList);
-
-						if (logger.isDebugEnabled())
-							logger.debug("Number of days updated to --> " + cycle.getNoOfDays());
-
-					}
-					if (requestList.get(0).isAdjustedToNextCycle()) {
-						if (logger.isDebugEnabled())
-							logger.debug("Days are adjusted to next cycle, so updating to date of current cycle--> "
-									+ requestList.get(i).getToDate());
-
-						BusinessCycle cycle = updatingCurrentCycle(i, oldCycleList, requestList);
-
-						if (logger.isDebugEnabled())
-							logger.debug("Number of days updated to --> " + cycle.getNoOfDays());
-
-						// updating successive from date=to date+1
-						if (logger.isDebugEnabled())
-							logger.debug(
-									"Previous from date of next cycle --> " + requestList.get(i + 1).getFromDate());
-
-						BusinessCycle nextCycle = updatingNextCycle(i, oldCycleList, requestList);
-
-						if (logger.isDebugEnabled())
-							logger.debug("Number of days updated to --> " + nextCycle.getNoOfDays());
-						if (logger.isDebugEnabled())
-							logger.debug("updated next cycle from date--> " + nextCycle.getFromDate());
-
-					}
-					// updating last cycle to date= end date of year
-					BusinessCycle lastCycle = updateLastCycle(requestList.size() - 1, oldCycleList, requestList,
-							businessYearTo);
+					BusinessCycle cycle = updatingCurrentCycle(i, oldCycleList, requestList);
 
 					if (logger.isDebugEnabled())
-						logger.debug("updated last cycle to date--> " + lastCycle.getToDate());
-					if (logger.isDebugEnabled())
-						logger.debug("Number of days updated to --> " + lastCycle.getNoOfDays());
+						logger.debug("Number of days updated to --> " + cycle.getNoOfDays());
+
+					// deleting remaining cycles
+					for (int j = i + 1; j < oldCycleList.size(); j++) {
+						if (logger.isDebugEnabled())
+							logger.debug("deleting --> " + j + "oldCycleList.get(j): " + oldCycleList.get(j));
+
+						BusinessCycle deleteCycle = oldCycleList.get(j);
+
+						removedList.add(deleteCycle);
+					}
 
 					break;
 				}
@@ -278,7 +261,10 @@ public class BusinessCycleAdhocImpl implements BusinessCycleCommand {
 					logger.debug("Number of days updated to --> " + cycle.getNoOfDays());
 			}
 		}
-		return oldCycleList;
+		if (logger.isDebugEnabled())
+			logger.debug("oldCycleList --> " + oldCycleList);
+
+		return removedList;
 	}
 
 	public BusinessCycle updatingCurrentCycle(int i, List<BusinessCycle> oldCycleList,

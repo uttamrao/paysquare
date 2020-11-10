@@ -507,21 +507,27 @@ public class BusinessCycleServiceImpl implements BusinessCycleService {
 				requestList);
 
 		if (logger.isDebugEnabled())
-			logger.debug("Updating  cycles->" + cycleList.size() + " into db");
+			logger.debug("Updating  cycles->" + oldCycleList.size() + " into db");
 
-		if (!CollectionUtils.isEmpty(cycleList)) {
+		if (!CollectionUtils.isEmpty(oldCycleList)) {
 
-			for (int i = 0; i < requestList.size(); i++) {
+			for (int i = 0; i < oldCycleList.size(); i++) {
 				BusinessCycle cycle = oldCycleList.get(i);
 				cycle.setForceToYearEnd(true);
 				cycle.setRemark(requestList.get(i).getRemark());
 			}
-			businessCycleRepository.saveAll(cycleList);
 
+			businessCycleRepository.saveAll(oldCycleList);
+
+			for (int i = 0; i < cycleList.size(); i++) {
+				businessCycleRepository.deleteById(cycleList.get(i).getId());
+
+			}
 			if (logger.isDebugEnabled())
 				logger.debug("Business Cycle Definition updated into DB successfully");
 		}
-		return cycleList;
+		oldCycleList.removeAll(cycleList);
+		return oldCycleList;
 	}
 
 }

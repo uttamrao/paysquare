@@ -53,4 +53,10 @@ public interface BusinessCycleRepository extends AbstractRepository<BusinessCycl
 	List<BusinessCycle> findByBusinessCycleDefinitionIdUsed(
 			@Param("businessCycleDefinitionId") int businessCycleDefinitionId);
 
+	// hard delete by id
+	@Modifying
+	@Query("DELETE FROM BusinessCycle c where c.businessCycleDefinition.id =:id and c.periodId=:periodId and c.businessYear=:businessYear ")
+	void deleteByBusinessYear(@Param("id") int id, @Param("periodId") int periodId,
+			@Param("businessYear") String businessYear);
+
 }
