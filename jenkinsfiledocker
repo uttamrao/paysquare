@@ -3,7 +3,7 @@ stage ('scm checkout') {
 git 'https://github.com/uttamrao/paysquare.git'
 }
 stage ('package stage') {
-sh label: '', script: 'mvn clean package '
+sh 'mvn clean package'
 
 }
 stage ('docker image build') {
