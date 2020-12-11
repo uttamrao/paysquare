@@ -1,0 +1,24 @@
+node{
+stage ('scm checkout') {
+git 'https://github.com/uttamrao/maven-project.git'
+}
+stage ('package stage') {
+sh label: '', script: 'mvn clean package '
+
+}
+stage ('docker image build') {
+sh 'docker build -t abhoyar9/prakash-app1:1.0.0 .'
+}
+stage ('Push Docker image to DockerHub') {
+withCredentials([string(credentialsId: 'dockerhub1', variable: 'dockerhub1')]) {
+sh "docker login -u abhoyar9 -p ${dockerhub1}"
+}
+sh 'docker push abhoyar9/prakash-app1:1.0.0'
+}
+stage ('Deploy to Dev') {
+def dockerRun = 'docker run -d -p 9012:8080 --name my-tomcat-app16 abhoyar9/prakash-app1:1.0.0'
+sshagent(['amit']) {
+sh "ssh -o StrictHostKeyChecking=no ec2-user@172.31.39.151 ${dockerRun}"
+}
+}
+}
